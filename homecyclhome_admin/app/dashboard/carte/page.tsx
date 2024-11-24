@@ -1,9 +1,9 @@
 "use client";
-import { MapContainer, TileLayer, FeatureGroup, Marker, Popup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiService } from "@/services/api-service";
 
 const styles = {
@@ -17,61 +17,132 @@ const styles = {
 
 export default function Map() {
     const [polygons, setPolygons] = useState([]);
+    const [zoneSelected, setZoneSelected] = useState(null);
+
+    // Référence pour le FeatureGroup
+    const featureGroupRef = useRef(null);
 
     useEffect(() => {
-        const zones = async() => {
+        const fetchZones = async () => {
             try {
-                let data = await apiService("zones", "GET");
+                const data = await apiService("zones", "GET");
                 setPolygons(data);
             } catch (error) {
                 console.error("Error fetching zones", error);
             }
-        }
-        zones();
-    }, []) 
-    
+        };
+        fetchZones();
+    }, []);
+
     const savePolygon = async (polygon) => {
         try {
-            const response = await apiService('zones', 'POST', polygon);
+            const response = await apiService("zones", "POST", polygon);
             console.log("Zone sauvegardée :", response);
+            setPolygons(prevPolygons => [...prevPolygons, { ...polygon, id: response.id }]);
         } catch (error) {
             console.error("Erreur lors de la sauvegarde de la zone :", error);
         }
     };
 
+    const updatePolygon = async (polygon) => {
+        try {
+            await apiService(`zones/${polygon.id}`, "PUT", polygon);
+            console.log(`Zone ${polygon.id} mise à jour.`);
+        } catch (error) {
+            console.error(`Erreur lors de la mise à jour de la zone ${polygon.id} :`, error);
+        }
+    };
+
+    const deletePolygon = async (id) => {
+        try {
+            await apiService(`zones/${id}`, "DELETE");
+            console.log(`Zone ${id} supprimée.`);
+        } catch (error) {
+            console.error(`Erreur lors de la suppression de la zone ${id} :`, error);
+        }
+    };
+
     const _onCreate = (e) => {
-        console.log("Created");
         const newPolygon = e.layer.toGeoJSON();
         const coordinates = newPolygon.geometry.coordinates[0];
 
         const payload = {
-            name: "Nom par défaut", // Peut être ajusté
-            colour: "#FF5733", // À personnaliser
+            name: "Nom par défaut",
+            colour: "#FF5733",
             coordinates: coordinates.map(coord => ({ longitude: coord[0], latitude: coord[1] })),
-            technician: null, // À personnaliser si nécessaire
+            technician: null,
         };
 
         savePolygon(payload);
-
-        // Mettre à jour l'état local
-        setPolygons(prevPolygons => [...prevPolygons, payload]);
     };
 
-    const _onEdited = () => {
-        console.log("Edited");
+    const _onEdited = (e) => {
+        const layers = e.layers;
+        layers.eachLayer((layer) => {
+            const updatedPolygon = layer.toGeoJSON();
+            const id = layer.options.id; // Ajouter l'ID en option sur chaque layer
+            const coordinates = updatedPolygon.geometry.coordinates[0];
+
+            const payload = {
+                id,
+                name: "Nom modifié", // Vous pouvez récupérer et modifier cela si nécessaire
+                colour: "#FF5733", // Ajoutez des champs spécifiques au besoin
+                coordinates: coordinates.map(coord => ({ longitude: coord[0], latitude: coord[1] })),
+                technician: null,
+            };
+
+            updatePolygon(payload);
+        });
     };
 
-    const _onDeleted = () => {
-        console.log("Deleted");
+    const _onDeleted = (e) => {
+        const layers = e.layers;
+        const idsToDelete = [];
+
+        layers.eachLayer((layer) => {
+            if (layer.options.id) {
+                idsToDelete.push(layer.options.id);
+            }
+        });
+
+        idsToDelete.forEach((id) => deletePolygon(id));
+
+        setPolygons((prevPolygons) =>
+            prevPolygons.filter((polygon) => !idsToDelete.includes(polygon.id))
+        );
     };
-    
+
+    const addPolygonsToFeatureGroup = () => {
+        const featureGroup = featureGroupRef.current;
+        if (!featureGroup) return;
+
+        featureGroup.clearLayers(); // Efface les couches existantes avant d'ajouter
+
+        polygons.forEach((polygon) => {
+            const leafletPolygon = new L.Polygon(
+                polygon.coordinates.map((p) => [p.latitude, p.longitude]),
+                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id }
+            );
+
+            leafletPolygon.on("click", () => {
+                setZoneSelected(polygon.id);
+            });
+
+            featureGroup.addLayer(leafletPolygon);
+        });
+    };
+
+    useEffect(() => {
+        addPolygonsToFeatureGroup();
+    }, [polygons]);
+
     return (
         <MapContainer style={styles.map} center={[45.757704, 4.834099]} zoom={13} scrollWheelZoom={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <FeatureGroup>
+            <FeatureGroup ref={featureGroupRef}>
                 <EditControl
                     position="topright"
                     onCreated={_onCreate}
@@ -86,20 +157,6 @@ export default function Map() {
                     }}
                 />
             </FeatureGroup>
-            {polygons?.map((polygon) => (
-                <Polygon
-                key={polygon.id}
-                positions={polygon.coordinates.map((p: any) => [p.latitude, p.longitude])}
-                color={polygon.colour}
-                fillColor={polygon.colour}
-                eventHandlers={{
-                    click: () => {
-                        setZoneSelected(zone.id);
-                    },
-                }}
-            />
-            ))}
-
         </MapContainer>
     );
 }

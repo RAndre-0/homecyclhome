@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ZoneController extends AbstractController
 {
+    /* Renvoie toutes les zones */
     #[Route("/api/zones", name: "zones", methods: ["GET"])]
     public function get_zones(ZoneRepository $zoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
@@ -34,6 +35,7 @@ final class ZoneController extends AbstractController
         return new JsonResponse($liste_zones, Response::HTTP_OK, [], true);
     }
 
+    /* Créé une nouvelle zone */
     #[Route("/api/zones", name: "create_zone", methods: ["POST"])]
     public function new(
         ZoneRepository $zoneRepository,
@@ -68,6 +70,7 @@ final class ZoneController extends AbstractController
         return new JsonResponse($json_zone, JsonResponse::HTTP_CREATED, ["location" => $location], true);
     }
 
+    /* Retourne une zone */
     #[Route("/api/{id}", name: "get_zone", methods: ["GET"])]
     public function show(Zone $zone, ZoneRepository $zoneRepository, Request $request): JsonResponse
     {
@@ -93,15 +96,14 @@ final class ZoneController extends AbstractController
         ]);
     }
 
-    #[Route("/api/{id}", name: "delete_zone", methods: ["POST"])]
-    public function delete(Request $request, Zone $zone, EntityManagerInterface $entityManager): Response
+    /* Supprime une zone */
+    #[Route('/api/zones/{id}', name: 'delete_zone', methods: ["DELETE"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function delete_user(Zone $zone, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
     {
-        if ($this->isCsrfTokenValid("delete".$zone->getId(), $request->getPayload()->getString("_token"))) {
-            $entityManager->remove($zone);
-            $entityManager->flush();
-            $cache->invalidateTags(["zones_cache"]);
-        }
-
-        return $this->redirectToRoute("app_zone_index", [], Response::HTTP_SEE_OTHER);
+        $em->remove($zone);
+        $em->flush();
+        $cache->invalidateTags(["zones_cache"]);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
