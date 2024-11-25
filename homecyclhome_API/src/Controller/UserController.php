@@ -22,17 +22,42 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
     /* Renvoie tous les utilisateurs */
+    // #[Route('/api/users', name: 'users', methods: ["GET"])]
+    // public function get_users(UserRepository $userRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    // {
+    //     $id_cache = "get_users";
+
+    //     $liste_users = $cache->get($id_cache, function (ItemInterface $item) use ($userRepository, $serializer) {
+    //         $item->tag("users_cache");
+    //         $liste_users = $userRepository->findAll();
+    //         return $serializer->serialize($liste_users, "json", ["groups" => "get_users"]);
+    //     });
+
+    //     return new JsonResponse($liste_users, Response::HTTP_OK, [], true);
+    // }
     #[Route('/api/users', name: 'users', methods: ["GET"])]
-    public function get_users(UserRepository $userRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
-    {
-        $id_cache = "get_users";
-
-        $liste_users = $cache->get($id_cache, function (ItemInterface $item) use ($userRepository, $serializer) {
+    public function get_users(
+        UserRepository $userRepository,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache,
+        Request $request
+    ): JsonResponse {
+        $role = $request->query->get('role'); // Récupère le paramètre "role" si présent
+        $id_cache = "get_users" . ($role ? "_role_" . $role : "");
+    
+        $liste_users = $cache->get($id_cache, function (ItemInterface $item) use ($userRepository, $serializer, $role) {
             $item->tag("users_cache");
-            $liste_users = $userRepository->findAll();
-            return $serializer->serialize($liste_users, "json", ["groups" => "get_users"]);
+    
+            // Récupère les utilisateurs avec ou sans filtre de rôle
+            if ($role) {
+                $users = $userRepository->findUsersByRole($role);
+            } else {
+                $users = $userRepository->findAll();
+            }
+    
+            return $serializer->serialize($users, "json", ["groups" => "get_users"]);
         });
-
+    
         return new JsonResponse($liste_users, Response::HTTP_OK, [], true);
     }
 

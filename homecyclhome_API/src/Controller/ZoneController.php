@@ -58,7 +58,7 @@ final class ZoneController extends AbstractController
         $em->persist($zone);
         $em->flush();
 
-        // Invalidation du cache lié aux zones (si nécessaire)
+        // Suppression du cache lié aux zones
         $cache->invalidateTags(["zones_cache"]);
 
         // Génération de l'URL de la ressource créée
