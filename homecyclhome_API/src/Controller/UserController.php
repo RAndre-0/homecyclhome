@@ -35,30 +35,27 @@ class UserController extends AbstractController
 
     //     return new JsonResponse($liste_users, Response::HTTP_OK, [], true);
     // }
-    #[Route('/api/users', name: 'users', methods: ["GET"])]
-    public function get_users(
+    #[Route('/api/users/{role?}', name: 'users', methods: ["GET"])]
+    public function getUsers(
         UserRepository $userRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
-        Request $request
+        string $role = null // Injection du paramètre d'URL (optionnel)
     ): JsonResponse {
-        $role = $request->query->get('role'); // Récupère le paramètre "role" si présent
-        $id_cache = "get_users" . ($role ? "_role_" . $role : "");
-    
-        $liste_users = $cache->get($id_cache, function (ItemInterface $item) use ($userRepository, $serializer, $role) {
+        $cache->invalidateTags(["users_cache"]);
+        // Génération d'un ID de cache en fonction du rôle
+        $idCache = "users_cache" . ($role ? "_role_" . $role : "");
+        
+        $usersData = $cache->get($idCache, function (ItemInterface $item) use ($userRepository, $serializer, $role) {
             $item->tag("users_cache");
-    
-            // Récupère les utilisateurs avec ou sans filtre de rôle
-            if ($role) {
-                $users = $userRepository->findUsersByRole($role);
-            } else {
-                $users = $userRepository->findAll();
-            }
-    
+            
+            // Récupération des utilisateurs en fonction du rôle
+            $users = $role ? $userRepository->findUsersByRole($role) : $userRepository->findAll();
+            
             return $serializer->serialize($users, "json", ["groups" => "get_users"]);
         });
     
-        return new JsonResponse($liste_users, Response::HTTP_OK, [], true);
+        return new JsonResponse($usersData, Response::HTTP_OK, [], true);
     }
 
     /* Retourne un utilisateur */

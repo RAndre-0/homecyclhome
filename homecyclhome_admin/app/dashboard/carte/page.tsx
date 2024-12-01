@@ -5,6 +5,25 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { useState, useEffect, useRef } from 'react';
 import { apiService } from "@/services/api-service";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const styles = {
     map: {
@@ -137,26 +156,58 @@ export default function Map() {
     }, [polygons]);
 
     return (
-        <MapContainer style={styles.map} center={[45.757704, 4.834099]} zoom={13} scrollWheelZoom={false}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <FeatureGroup ref={featureGroupRef}>
-                <EditControl
-                    position="topright"
-                    onCreated={_onCreate}
-                    onEdited={_onEdited}
-                    onDeleted={_onDeleted}
-                    draw={{
-                        rectangle: false,
-                        polyline: false,
-                        circle: false,
-                        circlemarker: false,
-                        marker: false,
-                    }}
+        <>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Zone</CardTitle>
+                    <CardDescription>Card Description</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Label htmlFor="zoneName">Nom de la zone</Label>
+                    <Input type="text" id="zoneName" placeholder="Nom de la zone" />
+                    <Label htmlFor="userSelect">Technicien</Label>
+                    <Select id="userSelect">
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select a fruit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Fruits</SelectLabel>
+                                <SelectItem value="apple">Apple</SelectItem>
+                                <SelectItem value="banana">Banana</SelectItem>
+                                <SelectItem value="blueberry">Blueberry</SelectItem>
+                                <SelectItem value="grapes">Grapes</SelectItem>
+                                <SelectItem value="pineapple">Pineapple</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </CardContent>
+                <CardFooter>
+                    <p>Card Footer</p>
+                </CardFooter>
+            </Card>
+            <MapContainer style={styles.map} center={[45.757704, 4.834099]} zoom={13} scrollWheelZoom={false}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-            </FeatureGroup>
-        </MapContainer>
+                <FeatureGroup ref={featureGroupRef}>
+                    <EditControl
+                        position="topright"
+                        onCreated={_onCreate}
+                        onEdited={_onEdited}
+                        onDeleted={_onDeleted}
+                        draw={{
+                            rectangle: false,
+                            polyline: false,
+                            circle: false,
+                            circlemarker: false,
+                            marker: false,
+                        }}
+                    />
+                </FeatureGroup>
+            </MapContainer>
+        </>
+
     );
 }

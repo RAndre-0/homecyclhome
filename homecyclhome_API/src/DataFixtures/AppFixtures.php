@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Entity\Zone;
 use App\Entity\Produit;
 use App\Entity\Intervention;
 use App\Entity\TypeIntervention;
@@ -49,22 +50,24 @@ class AppFixtures extends Fixture
         $manager->persist($type_inter2);
         $types_intervention = [$type_inter1, $type_inter2];
 
-        // Création d'un user normal
-        $user1 = new User();
-        $user1->setEmail("user1@gmail.com");
-        $user1->setPassword($this->userPasswordHasher->hashPassword($user1, "password"));
-        $manager->persist($user1);
-        $user2 = new User();
-        $user2->setEmail("user2@gmail.com");
-        $user2->setPassword($this->userPasswordHasher->hashPassword($user2, "password"));
-        $manager->persist($user2);
+        // Création des users
+        for ($i = 0 ; $i < 10 ; $i++) {
+            $user = new User();
+            $user->setEmail("user" . $i . "@gmail.com");
+            $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
+            $manager->persist($user);
+        }
 
-        // Création d'un user technicien
-        $user_tech = new User();
-        $user_tech->setEmail("tech@gmail.com");
-        $user_tech->setRoles(["ROLE_TECHNICIEN"]);
-        $user_tech->setPassword($this->userPasswordHasher->hashPassword($user_tech, "password"));
-        $manager->persist($user_tech);
+        $technicians = [];
+        // Création des techniciens
+        for ($i = 0 ; $i < 5 ; $i++) {
+            $user_tech = new User();
+            $user_tech->setEmail("tech" . $i . "@gmail.com");
+            $user_tech->setRoles(["ROLE_TECHNICIEN"]);
+            $user_tech->setPassword($this->userPasswordHasher->hashPassword($user_tech, "password"));
+            $technicians[] = $user_tech;
+            $manager->persist($user_tech);
+        }
 
         // Création d'un user admin
         $user_admin = new User();
@@ -72,6 +75,23 @@ class AppFixtures extends Fixture
         $user_admin->setRoles(["ROLE_ADMIN"]);
         $user_admin->setPassword($this->userPasswordHasher->hashPassword($user_admin, "password"));
         $manager->persist($user_admin);
+
+        // Charger le fichier JSON
+        $zonesFilePath = __DIR__ . '/zones.json';
+        $zonesData = json_decode(file_get_contents($zonesFilePath), true);
+
+        foreach ($zonesData as $zoneInfo) {
+            $zone = new Zone();
+            $zone->setName($zoneInfo['name']);
+            $zone->setColour($zoneInfo['colour']);
+            $zone->setCoordinates($zoneInfo['coordinates']);
+
+            // Associer un technicien aléatoire
+            $zone->setTechnician($technicians[0]);
+            array_shift($technicians);
+
+            $manager->persist($zone);
+        }
 
         /* Génération des produits */
         for ($i = 0 ; $i < 30 ; $i++) {

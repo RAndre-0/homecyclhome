@@ -33,20 +33,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    // public function findUsersByRole(string $role)
-    // {
-    //     return $this->createQueryBuilder('u')
-    //         ->where('u.roles LIKE :role')
-    //         ->setParameter('role', '%"' . $role . '"%')
-    //         ->getQuery()
-    //         ->getResult();
-    //     return $this->createQueryBuilder('u')
-    //         ->andWhere('CONTAINS(TO_JSONB(u.roles), :role) = TRUE')
-    //         ->setParameter('role', '["'.$role.'"]')
-    //         ->orderBy('u.id', 'ASC')
-    //         ->getQuery()
-    //         ->getResult()
-    // }
+    public function findUsersByRole(string $role): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = '
+            SELECT id, email, roles 
+            FROM "user"
+            WHERE roles::jsonb @> :role
+        ';
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('role', json_encode([$role]));
+        $resultSet = $stmt->executeQuery();
+    
+        $users = $resultSet->fetchAllAssociative();
+    
+        // Désérialisation du champ 'roles' de JSON string à tableau
+        foreach ($users as &$user) {
+            $user['roles'] = json_decode($user['roles'], true);
+        }
+    
+        return $users;
+    }
 
 
     //    /**
