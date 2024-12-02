@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Zone;
 use App\Repository\ZoneRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -78,22 +79,24 @@ final class ZoneController extends AbstractController
         return new JsonResponse($zone_json, Response::HTTP_OK, [], true);
     }
 
-    #[Route("/api/{id}/edit", name: "edit_zone", methods: ["GET", "POST"])]
-    public function edit(Request $request, Zone $zone, EntityManagerInterface $entityManager): Response
+    #[Route("/api/zones/{id}/edit", name: "update_zone", methods: ["PUT", "PATCH"])]
+    public function edit(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
-        $form = $this->createForm(ZoneType::class, $zone);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            $cache->invalidateTags(["zones_cache"]);
-            return $this->redirectToRoute("app_zone_index", [], Response::HTTP_SEE_OTHER);
+        $data = json_decode($request->getContent(), true);
+        $zone_modifie = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
+            // Gérer la relation avec le technicien
+        if (isset($data['technician'])) {
+            $technician = $userRepository->find(intval($data['technician']));
+            if (!$technician) {
+                return new JsonResponse(['message' => 'Technician not found'], Response::HTTP_BAD_REQUEST);
+            }
+            $zone_modifie->setTechnician($technician);
         }
+        $em->persist($zone_modifie);
+        $em->flush();
+        $cache->invalidateTags(["zones_cache"]);
 
-        return $this->render("zone/edit.html.twig", [
-            "zone" => $zone,
-            "form" => $form,
-        ]);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     /* Supprime une zone */

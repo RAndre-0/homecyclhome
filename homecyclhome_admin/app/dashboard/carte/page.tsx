@@ -37,6 +37,7 @@ const styles = {
 export default function Map() {
     const [polygons, setPolygons] = useState([]);
     const [zoneSelected, setZoneSelected] = useState(null);
+    const [technicians, setTechnicians] = useState([]);
 
     // Référence pour le FeatureGroup
     const featureGroupRef = useRef(null);
@@ -51,6 +52,15 @@ export default function Map() {
             }
         };
         fetchZones();
+        const fetchtechnicians = async () => {
+            try {
+                const fetched_technicians = await apiService("users/ROLE_TECHNICIEN", "GET");
+                setTechnicians(fetched_technicians);
+            } catch (error) {
+                console.error("Error fetching technicians", error);
+            }
+        };
+        fetchtechnicians();
     }, []);
 
     const savePolygon = async (polygon) => {
@@ -65,7 +75,7 @@ export default function Map() {
 
     const updatePolygon = async (polygon) => {
         try {
-            await apiService(`zones/${polygon.id}`, "PUT", polygon);
+            await apiService(`zones/${polygon.id}/edit`, "PUT", polygon);
             console.log(`Zone ${polygon.id} mise à jour.`);
         } catch (error) {
             console.error(`Erreur lors de la mise à jour de la zone ${polygon.id} :`, error);
@@ -144,7 +154,7 @@ export default function Map() {
             );
 
             leafletPolygon.on("click", () => {
-                setZoneSelected(polygon.id);
+                setZoneSelected(polygon);
             });
 
             featureGroup.addLayer(leafletPolygon);
@@ -159,32 +169,62 @@ export default function Map() {
         <>
             <Card>
                 <CardHeader>
-                    <CardTitle>Zone</CardTitle>
-                    <CardDescription>Card Description</CardDescription>
+                    <CardTitle>Modifier la Zone</CardTitle>
+                    <CardDescription>
+                        {zoneSelected ? `Modifier la zone ${zoneSelected.name}` : "Aucune zone sélectionnée"}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Label htmlFor="zoneName">Nom de la zone</Label>
-                    <Input type="text" id="zoneName" placeholder="Nom de la zone" />
-                    <Label htmlFor="userSelect">Technicien</Label>
-                    <Select id="userSelect">
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select a fruit" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Fruits</SelectLabel>
-                                <SelectItem value="apple">Apple</SelectItem>
-                                <SelectItem value="banana">Banana</SelectItem>
-                                <SelectItem value="blueberry">Blueberry</SelectItem>
-                                <SelectItem value="grapes">Grapes</SelectItem>
-                                <SelectItem value="pineapple">Pineapple</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    {zoneSelected && (
+                        <>
+                            <Label htmlFor="zoneName">Nom de la zone</Label>
+                            <Input
+                                type="text"
+                                id="zoneName"
+                                value={zoneSelected.name}
+                                onChange={(e) =>
+                                    setZoneSelected((prev) => ({ ...prev, name: e.target.value }))
+                                }
+                            />
+                            <Label htmlFor="zoneColor">Couleur</Label>
+                            <Input
+                                type="color"
+                                id="zoneColor"
+                                value={zoneSelected.colour}
+                                onChange={(e) =>
+                                    setZoneSelected((prev) => ({ ...prev, colour: e.target.value }))
+                                }
+                            />
+                            <Label htmlFor="technicianSelect">Technicien</Label>
+                            <Select
+                                onValueChange={(value) =>
+                                    setZoneSelected((prev) => ({ ...prev, technician: Number(value) }))
+                                }
+                                defaultValue={String(zoneSelected.technician || "")}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Choisir un technicien">
+                                        {zoneSelected.technician?.email}
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {technicians.map((tech) => (
+                                        <SelectItem key={tech.id} value={String(tech.id)}>
+                                            {tech.email}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <button
+                                onClick={() => updatePolygon(zoneSelected)}
+                                className="btn btn-primary mt-2"
+                            >
+                                Sauvegarder
+                            </button>
+                        </>
+                    )}
                 </CardContent>
-                <CardFooter>
-                    <p>Card Footer</p>
-                </CardFooter>
+
             </Card>
             <MapContainer style={styles.map} center={[45.757704, 4.834099]} zoom={13} scrollWheelZoom={false}>
                 <TileLayer
