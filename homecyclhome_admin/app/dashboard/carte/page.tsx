@@ -24,6 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 
 const styles = {
     map: {
@@ -169,10 +170,7 @@ export default function Map() {
         <>
             <Card>
                 <CardHeader>
-                    <CardTitle>Modifier la Zone</CardTitle>
-                    <CardDescription>
-                        {zoneSelected ? `Modifier la zone ${zoneSelected.name}` : "Aucune zone sélectionnée"}
-                    </CardDescription>
+                    <CardTitle>{zoneSelected ? `Modifier la zone ${zoneSelected.name}` : "Aucune zone sélectionnée"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {zoneSelected && (
@@ -186,21 +184,15 @@ export default function Map() {
                                     setZoneSelected((prev) => ({ ...prev, name: e.target.value }))
                                 }
                             />
-                            <Label htmlFor="zoneColor">Couleur</Label>
-                            <Input
-                                type="color"
-                                id="zoneColor"
-                                value={zoneSelected.colour}
-                                onChange={(e) =>
-                                    setZoneSelected((prev) => ({ ...prev, colour: e.target.value }))
-                                }
-                            />
                             <Label htmlFor="technicianSelect">Technicien</Label>
                             <Select
                                 onValueChange={(value) =>
-                                    setZoneSelected((prev) => ({ ...prev, technician: Number(value) }))
+                                    setZoneSelected((prev) => ({
+                                        ...prev,
+                                        technician: value === "none" ? null : Number(value) // Réinitialiser si "none"
+                                    }))
                                 }
-                                defaultValue={String(zoneSelected.technician || "")}
+                                defaultValue={String(zoneSelected?.technician || "none")}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Choisir un technicien">
@@ -208,19 +200,38 @@ export default function Map() {
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {technicians.map((tech) => (
-                                        <SelectItem key={tech.id} value={String(tech.id)}>
-                                            {tech.email}
-                                        </SelectItem>
-                                    ))}
+                                    {/* Option pour réinitialiser la sélection */}
+                                    <SelectItem value="none">
+                                        Aucun technicien
+                                    </SelectItem>
+
+                                    {/* Liste des techniciens */}
+                                    {technicians.map((tech) => {
+                                        const isAssigned = polygons.some(
+                                            (polygon) =>
+                                                polygon.technician === tech.id &&
+                                                polygon.id !== zoneSelected?.id // Autoriser le technicien de la zone actuelle
+                                        );
+
+                                        return (
+                                            <SelectItem
+                                                key={tech.id}
+                                                value={String(tech.id)}
+                                                disabled={isAssigned} // Désactiver si déjà assigné
+                                            >
+                                                {tech.email} {isAssigned ? "(Assigné)" : ""}
+                                            </SelectItem>
+                                        );
+                                    })}
                                 </SelectContent>
                             </Select>
-                            <button
+
+                            <Button
                                 onClick={() => updatePolygon(zoneSelected)}
                                 className="btn btn-primary mt-2"
                             >
                                 Sauvegarder
-                            </button>
+                            </Button>
                         </>
                     )}
                 </CardContent>

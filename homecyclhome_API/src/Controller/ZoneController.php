@@ -84,7 +84,7 @@ final class ZoneController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $zone_modifie = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
-            // Gérer la relation avec le technicien
+        // Gérer la relation avec le technicien
         if (isset($data['technician'])) {
             $technician = $userRepository->find(intval($data['technician']));
             if (!$technician) {
