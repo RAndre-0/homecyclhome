@@ -79,3 +79,23 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+.bg-velo {
+  background-image: url("../public/media/image/bg_velo.jpeg");
+  background-attachment: fixed;
+  background-size: cover;
+  position: relative;
+}
+
+.bg-velo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(226, 195, 115, 0.2);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
