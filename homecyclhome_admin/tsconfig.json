@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/dashboard/plannings/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]
