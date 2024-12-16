@@ -22,7 +22,7 @@ class Produit
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["get_produits", "get_produit", "get_intervention"])]
+    #[Groups(["get_produits", "get_produit"])]
     #[Assert\NotBlank(message: "La désignation du produit ne peut pas être vide.")]
     #[Assert\Length(min: 3, max: 255, minMessage: "La désignation du produit ne peut pas contenir moins de 3 caractères.", maxMessage: "La désignation ne peut pas contenir plus de 255 caractères.")]
     private ?string $designation = null;

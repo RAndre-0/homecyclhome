@@ -97,7 +97,8 @@ class AppFixtures extends Fixture
         for ($i = 0 ; $i < 30 ; $i++) {
             // Generate produits
             $produit = new Produit();
-            $produit->setDesignation("Designation " . $i);
+            $designation = "Designation " . $i;
+            $produit->setDesignation($designation);
             $prix_produit = random_int(1, 100) - 0.01;
             $produit->setPrix($prix_produit);
             $description = $this->client->request(
@@ -131,6 +132,7 @@ class AppFixtures extends Fixture
                 $quantite = random_int(1, 3);
                 $intervention_produit->setQuantite($quantite);
                 $intervention_produit->setPrix($prix_produit*$quantite);
+                $intervention_produit->setDesignation($designation);
                 $manager->persist($intervention_produit);
             }
 
