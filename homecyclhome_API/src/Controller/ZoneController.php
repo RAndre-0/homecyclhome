@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ZoneController extends AbstractController
 {
     /* Renvoie toutes les zones */
-    #[Route("/api/zones", name: "zones", methods: ["GET"])]
+    #[Route("/api/zones", name: "get_zones", methods: ["GET"])]
     public function get_zones(ZoneRepository $zoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $id_cache = "get_zones";
@@ -80,6 +80,7 @@ final class ZoneController extends AbstractController
         return new JsonResponse($zone_json, Response::HTTP_OK, [], true);
     }
 
+    /* Modifie une zone */
     #[Route("/api/zones/{id}/edit", name: "update_zone", methods: ["PUT", "PATCH"])]
     public function edit_zone(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
