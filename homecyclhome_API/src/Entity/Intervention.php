@@ -54,12 +54,15 @@ class Intervention
     private Collection $interventionProduit;
 
     #[ORM\ManyToOne(inversedBy: 'interventions')]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?TypeIntervention $type_intervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandes_intervention')]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?User $client = null;
 
     #[ORM\ManyToOne(inversedBy: 'interventions')]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?User $technicien = null;
 
     /**

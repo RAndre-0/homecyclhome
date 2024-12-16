@@ -102,7 +102,10 @@ class AppFixtures extends Fixture
             $produit->setPrix($prix_produit);
             $description = $this->client->request(
                 'GET',
-                'https://loripsum.net/api/2/plaintext'
+                'https://loripsum.net/api/2/plaintext',
+                [
+                    "verify_peer" => false,
+                ]
             );
             $produit->setDescription($description->getContent());
 

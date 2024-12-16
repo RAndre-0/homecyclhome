@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TypeInterventionRepository::class)]
 class TypeIntervention
@@ -17,12 +18,15 @@ class TypeIntervention
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?\DateTimeInterface $duree = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?string $prix_depart = null;
 
     /**
