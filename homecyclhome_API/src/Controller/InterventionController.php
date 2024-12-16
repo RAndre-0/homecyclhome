@@ -17,7 +17,7 @@ class InterventionController extends AbstractController
 {
     /* Renvoie tous les interventions */
     #[Route('/api/interventions', name: 'interventions', methods: ["GET"])]
-    public function get_intervention(InterventionRepository $interventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    public function get_interventions(InterventionRepository $interventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $id_cache = "interventions_cache";
         $cache->invalidateTags(["interventions_cache"]);
@@ -28,5 +28,13 @@ class InterventionController extends AbstractController
         });
 
         return new JsonResponse($liste_interventions, Response::HTTP_OK, [], true);
+    }
+
+    /* Retourne un intervention */
+    #[Route('/api/interventions/{id}', name: 'intervention', methods: ["GET"])]
+    public function get_intervention(Intervention $intervention, SerializerInterface $serializer): JsonResponse
+    {
+        $intervention_json = $serializer->serialize($intervention, "json", ["groups" => "get_intervention"]);
+        return new JsonResponse($intervention_json, Response::HTTP_OK, [], true);
     }
 }

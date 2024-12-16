@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["get_users", "get_user", "get_zones"])]
+    #[Groups(["get_users", "get_user", "get_zones", "get_intervention"])]
     private ?string $email = null;
 
     /**

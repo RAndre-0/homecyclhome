@@ -5,14 +5,17 @@ namespace App\Entity;
 use App\Repository\CommentaireInterventionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CommentaireInterventionRepository::class)]
 class CommentaireIntervention
 {
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["get_intervention"])]
     private ?string $contenu = null;
 
     #[ORM\Column]
+    #[Groups(["get_intervention"])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Id]

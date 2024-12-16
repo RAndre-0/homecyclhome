@@ -72,7 +72,7 @@ final class ZoneController extends AbstractController
     }
 
     /* Retourne une zone */
-    #[Route("/api/{id}", name: "get_zone", methods: ["GET"])]
+    #[Route("/api/zones/{id}", name: "get_zone", methods: ["GET"])]
     public function show(Zone $zone, ZoneRepository $zoneRepository, Request $request): JsonResponse
     {
         $zone_json = $serializer->serialize($zone, 'json');

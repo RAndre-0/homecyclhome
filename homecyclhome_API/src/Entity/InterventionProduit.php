@@ -13,12 +13,13 @@ class InterventionProduit
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'interventionProduit')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["get_intervention"])]
     private ?Produit $produit = null;
 
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'interventionProduit')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["get_produit", "get_intervention"])]
+    #[Groups(["get_produit"])]
     private ?Intervention $intervention = null;
 
     #[ORM\Column]
@@ -28,6 +29,10 @@ class InterventionProduit
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     #[Groups(["get_produit", "get_intervention"])]
     private ?string $prix = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["get_intervention"])]
+    private ?string $designation = null;
 
     public function getProduit(): ?Produit
     {
@@ -73,6 +78,18 @@ class InterventionProduit
     public function setPrix(?string $prix): static
     {
         $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(?string $designation): static
+    {
+        $this->designation = $designation;
 
         return $this;
     }
