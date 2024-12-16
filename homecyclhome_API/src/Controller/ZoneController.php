@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class ZoneController extends AbstractController
 {
@@ -38,7 +39,7 @@ final class ZoneController extends AbstractController
 
     /* Créé une nouvelle zone */
     #[Route("/api/zones", name: "create_zone", methods: ["POST"])]
-    public function new(
+    public function new_zone(
         ZoneRepository $zoneRepository,
         Request $request,
         EntityManagerInterface $em,
@@ -73,14 +74,14 @@ final class ZoneController extends AbstractController
 
     /* Retourne une zone */
     #[Route("/api/zones/{id}", name: "get_zone", methods: ["GET"])]
-    public function show(Zone $zone, ZoneRepository $zoneRepository, Request $request): JsonResponse
+    public function show_zone(Zone $zone, SerializerInterface $serializer): JsonResponse
     {
         $zone_json = $serializer->serialize($zone, 'json');
         return new JsonResponse($zone_json, Response::HTTP_OK, [], true);
     }
 
     #[Route("/api/zones/{id}/edit", name: "update_zone", methods: ["PUT", "PATCH"])]
-    public function edit(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
+    public function edit_zone(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $zone_modifie = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
@@ -102,7 +103,7 @@ final class ZoneController extends AbstractController
     /* Supprime une zone */
     #[Route('/api/zones/{id}', name: 'delete_zone', methods: ["DELETE"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function delete_user(Zone $zone, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
+    public function delete_zone(Zone $zone, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
     {
         $em->remove($zone);
         $em->flush();
