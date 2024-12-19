@@ -94,3 +94,7 @@ body {
 .sr-only {
   display: none;
 }
+
+.fc-timegrid-slot {
+  height: 30px !important; /* Ajustez la hauteur selon vos besoins */
+}
