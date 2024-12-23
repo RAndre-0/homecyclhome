@@ -38,25 +38,43 @@ class AppFixtures extends Fixture
             "Heroïn" => ["Dirt Jump", "Fixie", "BMX", "E-BMX"],
             "Stajvelo" => ["Gravel", "Cyclocross", "Tout-terrain", "E-Adventure"]
         ];
+        $firstNames = [
+            'Antoine', 'Baptiste', 'Cécile', 'Dorian', 'Élise', 'Florian', 'Gabriel', 'Hélène', 'Isabelle', 'Julien',
+            'Karine', 'Laurent', 'Mathilde', 'Nicolas', 'Océane', 'Pierre', 'Quentin', 'Raphaël', 'Sophie', 'Thibaut',
+            'Ursule', 'Victor', 'Wilfried', 'Xavier', 'Yves', 'Zoé', 'Adrien', 'Brigitte', 'Charlotte', 'Damien',
+            'Estelle', 'Fabrice', 'Géraldine', 'Hugo', 'Inès', 'Jean', 'Katell', 'Louise', 'Mélanie', 'Nathaniel',
+            'Olivier', 'Pauline', 'Quentin', 'René', 'Séverine', 'Thomas', 'Ulysse', 'Valérie', 'William', 'Xénia'
+        ];
+        $lastNames = [
+            'Dubois', 'Morel', 'Garnier', 'Faure', 'Blanc', 'Dupont', 'Bertrand', 'Lemoine', 'Rousseau', 'Morin',
+            'Noël', 'Simon', 'Lemoine', 'Girard', 'Perrin', 'Bonnet', 'Dupuis', 'Benoit', 'Martel', 'Moulin',
+            'Lefevre', 'Chevalier', 'Bouvier', 'Roy', 'Vidal', 'Gauthier', 'Barbier', 'Denis', 'Marchand', 'Colin',
+            'Perrot', 'Dumas', 'Fontaine', 'Mallet', 'Renard', 'Guérin', 'Lemoine', 'Meunier', 'Clément', 'Dubois',
+            'Lambert', 'Hervé', 'Picard', 'Carpentier', 'Petit', 'Tissier', 'Durand', 'Masson', 'Leclerc', 'Renaud'
+        ];
         
         // Création des types d'intervention
-        $type_inter1 = new TypeIntervention();
-        $type_inter1->setNom("Maintenance");
-        $type_inter1->setPrixDepart(30);
-        $type_inter1->setDuree(new \DateTime('00:30'));
-        $manager->persist($type_inter1);
-        $type_inter2 = new TypeIntervention();
-        $type_inter2->setNom("Réparation");
-        $type_inter2->setPrixDepart(45);
-        $type_inter2->setDuree(new \DateTime('00:45'));
-        $manager->persist($type_inter2);
-        $types_intervention = [$type_inter1, $type_inter2];
+        $typeInter1 = new TypeIntervention();
+        $typeInter1->setNom("Maintenance");
+        $typeInter1->setPrixDepart(30);
+        $typeInter1->setDuree(new \DateTime('00:30'));
+        $manager->persist($typeInter1);
+        $typeInter2 = new TypeIntervention();
+        $typeInter2->setNom("Réparation");
+        $typeInter2->setPrixDepart(45);
+        $typeInter2->setDuree(new \DateTime('00:45'));
+        $manager->persist($typeInter2);
+        $typesIntervention = [$typeInter1, $typeInter2];
 
         $users =  [];
         // Création des users
         for ($i = 0 ; $i < 10 ; $i++) {
             $user = new User();
             $user->setEmail("user" . $i . "@gmail.com");
+            $firstName = $firstNames[array_rand($firstNames)];
+            $lastName = $lastNames[array_rand($lastNames)];
+            $user->setFirstName($firstName);
+            $user->setLastName($lastName);
             $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
             $users[] = $user;
             $manager->persist($user);
@@ -65,20 +83,28 @@ class AppFixtures extends Fixture
         $technicians = [];
         // Création des techniciens
         for ($i = 0 ; $i < 5 ; $i++) {
-            $user_tech = new User();
-            $user_tech->setEmail("tech" . $i . "@gmail.com");
-            $user_tech->setRoles(["ROLE_TECHNICIEN"]);
-            $user_tech->setPassword($this->userPasswordHasher->hashPassword($user_tech, "password"));
-            $technicians[] = $user_tech;
-            $manager->persist($user_tech);
+            $userTech = new User();
+            $userTech->setEmail("tech" . $i . "@gmail.com");
+            $firstName = $firstNames[array_rand($firstNames)];
+            $lastName = $lastNames[array_rand($lastNames)];
+            $userTech->setFirstName($firstName);
+            $userTech->setLastName($lastName);
+            $userTech->setRoles(["ROLE_TECHNICIEN"]);
+            $userTech->setPassword($this->userPasswordHasher->hashPassword($userTech, "password"));
+            $technicians[] = $userTech;
+            $manager->persist($userTech);
         }
 
         // Création d'un user admin
-        $user_admin = new User();
-        $user_admin->setEmail("admin@gmail.com");
-        $user_admin->setRoles(["ROLE_ADMIN"]);
-        $user_admin->setPassword($this->userPasswordHasher->hashPassword($user_admin, "password"));
-        $manager->persist($user_admin);
+        $userAdmin = new User();
+        $userAdmin->setEmail("admin@gmail.com");
+        $firstName = $firstNames[array_rand($firstNames)];
+        $lastName = $lastNames[array_rand($lastNames)];
+        $userAdmin->setFirstName($firstName);
+        $userAdmin->setLastName($lastName);
+        $userAdmin->setRoles(["ROLE_ADMIN"]);
+        $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
+        $manager->persist($userAdmin);
 
         // Charger le fichier JSON
         $zonesFilePath = __DIR__ . '/zones.json';
@@ -103,8 +129,8 @@ class AppFixtures extends Fixture
             $produit = new Produit();
             $designation = "Designation " . $i;
             $produit->setDesignation($designation);
-            $prix_produit = random_int(1, 100) - 0.01;
-            $produit->setPrix($prix_produit);
+            $prixProduit = random_int(1, 100) - 0.01;
+            $produit->setPrix($prixProduit);
             $description = $this->client->request(
                 'GET',
                 'https://loripsum.net/api/2/plaintext',
@@ -124,8 +150,8 @@ class AppFixtures extends Fixture
             $intervention->setVeloMarque($marque);
             $intervention->setVeloModele($modeleAleatoire);
             $intervention->setAdresse("Adresse " . $i);
-            $d = array_rand($types_intervention);
-            $intervention->setTypeIntervention($types_intervention[random_int(0, 1)]);
+            $d = array_rand($typesIntervention);
+            $intervention->setTypeIntervention($typesIntervention[random_int(0, 1)]);
             $pile_face = random_int(0, 1);
             if ($pile_face == 1) {
                 $intervention->setTechnicien($technicians[random_int(0, count($technicians)-1)]);
@@ -145,14 +171,14 @@ class AppFixtures extends Fixture
                 // Génération InterventionProduit
                 $pile_face = random_int(0, 1);
                 if ($pile_face == 1) {
-                    $intervention_produit = new InterventionProduit();
-                    $intervention_produit->setIntervention($intervention);
-                    $intervention_produit->setProduit($produit);
+                    $interventionProduit = new InterventionProduit();
+                    $interventionProduit->setIntervention($intervention);
+                    $interventionProduit->setProduit($produit);
                     $quantite = random_int(1, 3);
-                    $intervention_produit->setQuantite($quantite);
-                    $intervention_produit->setPrix($prix_produit*$quantite);
-                    $intervention_produit->setDesignation($designation);
-                    $manager->persist($intervention_produit);
+                    $interventionProduit->setQuantite($quantite);
+                    $interventionProduit->setPrix($prixProduit*$quantite);
+                    $interventionProduit->setDesignation($designation);
+                    $manager->persist($interventionProduit);
                 }
             }
 

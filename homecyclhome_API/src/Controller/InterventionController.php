@@ -36,7 +36,41 @@ class InterventionController extends AbstractController
         return new JsonResponse($liste_interventions, Response::HTTP_OK, [], true);
     }
 
-    /* Retourne un intervention */
+    /* Renvoie les interventions d'un technicien */
+    #[Route('/api/interventions/technicien/{id}', name: 'get_interventions_technicien', methods: ["GET"])]
+    public function get_interventions_by_technicien(
+        int $id,
+        InterventionRepository $interventionRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $interventions = $interventionRepository->findBy(['technicien' => $id]);
+
+        if (!$interventions) {
+            return new JsonResponse([], Response::HTTP_NOT_FOUND);
+        }
+
+        $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
+        return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
+    }
+
+    /* Renvoie les interventions d'un client */
+    #[Route('/api/interventions/client/{id}', name: 'get_interventions_client', methods: ["GET"])]
+    public function get_interventions_by_client(
+        int $id,
+        InterventionRepository $interventionRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $interventions = $interventionRepository->findBy(['client' => $id]);
+
+        if (!$interventions) {
+            return new JsonResponse([], Response::HTTP_NOT_FOUND);
+        }
+
+        $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
+        return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
+    }
+
+    /* Retourne une intervention */
     #[Route('/api/interventions/{id}', name: 'get_intervention', methods: ["GET"])]
     public function get_intervention(Intervention $intervention, SerializerInterface $serializer): JsonResponse
     {

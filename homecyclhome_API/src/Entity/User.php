@@ -19,11 +19,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["get_users", "get_user", "get_zones"])]
+    #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["get_users", "get_user", "get_zones", "get_intervention"])]
+    #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
     private ?string $email = null;
 
     /**
@@ -59,6 +59,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(mappedBy: 'technician', cascade: ['persist', 'remove'])]
     private ?Zone $zone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
+    private ?string $first_name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
+    private ?string $last_name = null;
 
     public function __construct()
     {
@@ -260,6 +268,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+
+    public function setFirstName(?string $first_name): static
+    {
+        $this->first_name = $first_name;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+    }
+
+    public function setLastName(string $last_name): static
+    {
+        $this->last_name = $last_name;
 
         return $this;
     }
