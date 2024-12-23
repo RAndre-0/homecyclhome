@@ -72,6 +72,7 @@ class Intervention
     private Collection $commentaires;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(["get_interventions", "get_intervention"])]
     private ?\DateTimeInterface $debut = null;
 
     public function __construct()

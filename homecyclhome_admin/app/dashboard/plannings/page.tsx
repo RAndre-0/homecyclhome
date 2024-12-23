@@ -1,4 +1,3 @@
-// app/dashboard/plannings/page.tsx
 import { Metadata } from "next";
 import Calendar from "./Calendar";
 

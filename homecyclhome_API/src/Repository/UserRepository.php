@@ -37,7 +37,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = '
-            SELECT id, email, roles 
+            SELECT id, email, roles, first_name, last_name
             FROM "user"
             WHERE roles::jsonb @> :role
         ';
