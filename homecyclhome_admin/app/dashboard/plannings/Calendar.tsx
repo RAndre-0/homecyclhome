@@ -6,7 +6,7 @@ import frLocale from '@fullcalendar/core/locales/fr';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid'
 
-const events = [{ title: "Intervention", start: new Date("2024-12-19, 19:00:00") }];
+const events = [{ title: "Intervention", start: new Date("2024-12-22, 19:00:00") }];
 
 export default function Calendar() {
     return (

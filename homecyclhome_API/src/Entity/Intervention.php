@@ -71,6 +71,9 @@ class Intervention
     #[ORM\OneToMany(targetEntity: CommentaireIntervention::class, mappedBy: 'intervention')]
     private Collection $commentaires;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $debut = null;
+
     public function __construct()
     {
         $this->interventionProduit = new ArrayCollection();
@@ -258,6 +261,18 @@ class Intervention
                 $commentaire->setIntervention(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDebut(): ?\DateTimeInterface
+    {
+        return $this->debut;
+    }
+
+    public function setDebut(?\DateTimeInterface $debut): static
+    {
+        $this->debut = $debut;
 
         return $this;
     }

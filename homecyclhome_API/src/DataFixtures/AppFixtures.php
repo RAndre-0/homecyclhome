@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use Datetime;
+use DateInterval;
 use App\Entity\User;
 use App\Entity\Zone;
 use App\Entity\Produit;
@@ -50,11 +52,13 @@ class AppFixtures extends Fixture
         $manager->persist($type_inter2);
         $types_intervention = [$type_inter1, $type_inter2];
 
+        $users =  [];
         // Création des users
         for ($i = 0 ; $i < 10 ; $i++) {
             $user = new User();
             $user->setEmail("user" . $i . "@gmail.com");
             $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
+            $users[] = $user;
             $manager->persist($user);
         }
 
@@ -122,18 +126,34 @@ class AppFixtures extends Fixture
             $intervention->setAdresse("Adresse " . $i);
             $d = array_rand($types_intervention);
             $intervention->setTypeIntervention($types_intervention[random_int(0, 1)]);
-
-            // Génération InterventionProduit
             $pile_face = random_int(0, 1);
             if ($pile_face == 1) {
-                $intervention_produit = new InterventionProduit();
-                $intervention_produit->setIntervention($intervention);
-                $intervention_produit->setProduit($produit);
-                $quantite = random_int(1, 3);
-                $intervention_produit->setQuantite($quantite);
-                $intervention_produit->setPrix($prix_produit*$quantite);
-                $intervention_produit->setDesignation($designation);
-                $manager->persist($intervention_produit);
+                $intervention->setTechnicien($technicians[random_int(0, count($technicians)-1)]);
+                $intervention->setClient($users[random_int(0, count($users)-1)]);
+                $now = new \DateTime();
+                $currentYear = (int)$now->format('Y');
+                $currentMonth = (int)$now->format('m');
+                
+                // Génération de la date d'intervention
+                $month = random_int(1, 12);
+                $day = random_int(1, 28); // On limite à 28 pour éviter les problèmes de jours invalides
+                $hour = random_int(8, 20);
+                // Si le mois généré est inférieur ou égal au mois actuel, on garde l'année en cours, sinon, on passe à l'année suivante.
+                $year = $month >= $currentMonth ? $currentYear : $currentYear + 1;
+                $intervention->setDebut(new \DateTime("{$year}-{$month}-{$day} {$hour}:30"));
+
+                // Génération InterventionProduit
+                $pile_face = random_int(0, 1);
+                if ($pile_face == 1) {
+                    $intervention_produit = new InterventionProduit();
+                    $intervention_produit->setIntervention($intervention);
+                    $intervention_produit->setProduit($produit);
+                    $quantite = random_int(1, 3);
+                    $intervention_produit->setQuantite($quantite);
+                    $intervention_produit->setPrix($prix_produit*$quantite);
+                    $intervention_produit->setDesignation($designation);
+                    $manager->persist($intervention_produit);
+                }
             }
 
             $manager->persist($produit);
