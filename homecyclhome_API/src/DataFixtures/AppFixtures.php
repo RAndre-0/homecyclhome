@@ -124,6 +124,7 @@ class AppFixtures extends Fixture
         }
 
         /* Génération des produits */
+        $produits = [];
         for ($i = 0 ; $i < 30 ; $i++) {
             // Generate produits
             $produit = new Produit();
@@ -139,8 +140,13 @@ class AppFixtures extends Fixture
                 ]
             );
             $produit->setDescription($description->getContent());
+            $produits[] = $produit;
+            $manager->persist($produit);
+        }
 
-            // Generate interventions
+
+            // Génération des interventions
+            for ($i = 0 ; $i < 100 ; $i++) {
             $intervention = new Intervention();
             $intervention->setVeloElectrique($i%2);
             $intervention->setVeloCategorie("Catégorie");
@@ -154,8 +160,8 @@ class AppFixtures extends Fixture
             $intervention->setTypeIntervention($typesIntervention[random_int(0, 1)]);
             $pile_face = random_int(0, 1);
             if ($pile_face == 1) {
-                $intervention->setTechnicien($technicians[random_int(0, count($technicians)-1)]);
-                $intervention->setClient($users[random_int(0, count($users)-1)]);
+                $intervention->setTechnicien($technicians[array_rand($technicians)]);
+                $intervention->setClient($users[array_rand($users)]);
                 $now = new \DateTime();
                 $currentYear = (int)$now->format('Y');
                 $currentMonth = (int)$now->format('m');
@@ -173,7 +179,7 @@ class AppFixtures extends Fixture
                 if ($pile_face == 1) {
                     $interventionProduit = new InterventionProduit();
                     $interventionProduit->setIntervention($intervention);
-                    $interventionProduit->setProduit($produit);
+                    $interventionProduit->setProduit($produits[array_rand($produits)]);
                     $quantite = random_int(1, 3);
                     $interventionProduit->setQuantite($quantite);
                     $interventionProduit->setPrix($prixProduit*$quantite);
@@ -181,8 +187,6 @@ class AppFixtures extends Fixture
                     $manager->persist($interventionProduit);
                 }
             }
-
-            $manager->persist($produit);
             $manager->persist($intervention);
         }
 
