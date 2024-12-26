@@ -15,8 +15,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import dayjs from 'dayjs';
 
-const events = [{ title: "Intervention", start: new Date("2024-12-22, 19:00:00") }];
+const events = [{ title: "Intervention", start: new Date("2024-12-24, 16:00:00") }];
 
 export default function Calendar() {
     const [techniciens, setTechniciens] = useState<Technicien[]>([]); // Liste des techniciens
@@ -48,6 +49,8 @@ export default function Calendar() {
                 }
             };
             fetchInterventions();
+        } else {
+            setInterventions([]);
         }
     }, [selectedTechnicien]);
 
@@ -56,7 +59,7 @@ export default function Calendar() {
         const technicien = techniciens.find(t => t.id === technicienIdInt);
         setSelectedTechnicien(technicien || null); // Mettre à jour l'état avec le technicien trouvé ou null
     };
-    
+    console.log("INTERVENTIONS : ")
     console.log(interventions);
 
     return (
@@ -81,14 +84,18 @@ export default function Calendar() {
                 plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
                 initialView="timeGridWeek"
                 weekends={false}
-                events={events}
+                events={interventions.map(intervention => ({
+                    title: intervention.type_intervention.nom,
+                    start: intervention.debut,
+                    end: dayjs(intervention.debut).add(dayjs(intervention.type_intervention.duree).get('minute'), 'minute').toISOString()
+                }))}
                 eventContent={renderEventContent}
                 locale={frLocale}
                 selectable={true}
                 dateClick={getInfo}
                 allDaySlot={false}
-                slotMinTime={"08:00:00"}
-                slotMaxTime={"20:00:00"}
+                slotMinTime={"09:00:00"}
+                slotMaxTime={"18:00:00"}
                 height={"100%"}
                 eventClick={eventClick}
             />
@@ -100,6 +107,7 @@ function renderEventContent(eventInfo: any) {
     return (
         <>
             <b>{eventInfo.timeText}</b>
+            <br />
             <i>{eventInfo.event.title}</i>
         </>
     );

@@ -25,6 +25,8 @@ export interface Technicien {
 export interface Intervention {
   id: number;
   debut: string;
-  type_intervention: { nom: string };
+  type_intervention: {
+      duree: string | number | Date | Dayjs | null | undefined; nom: string 
+};
   technicien: { id: number };
 }

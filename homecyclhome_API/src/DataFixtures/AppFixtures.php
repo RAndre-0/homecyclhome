@@ -163,7 +163,7 @@ class AppFixtures extends Fixture
                 // Génération de la date d'intervention
                 $month = random_int(1, 12);
                 $day = random_int(1, 28); // On limite à 28 pour éviter les problèmes de jours invalides
-                $hour = random_int(8, 20);
+                $hour = random_int(9, 18);
                 // Si le mois généré est inférieur ou égal au mois actuel, on garde l'année en cours, sinon, on passe à l'année suivante.
                 $year = $month >= $currentMonth ? $currentYear : $currentYear + 1;
                 $intervention->setDebut(new \DateTime("{$year}-{$month}-{$day} {$hour}:30"));

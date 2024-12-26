@@ -45,9 +45,9 @@ class InterventionController extends AbstractController
     ): JsonResponse {
         $interventions = $interventionRepository->findBy(['technicien' => $id]);
 
-        if (!$interventions) {
-            return new JsonResponse([], Response::HTTP_NOT_FOUND);
-        }
+        // if (!$interventions) {
+        //     return new JsonResponse([], Response::HTTP_NOT_FOUND);
+        // }
 
         $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
         return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
