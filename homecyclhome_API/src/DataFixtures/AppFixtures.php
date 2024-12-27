@@ -110,16 +110,17 @@ class AppFixtures extends Fixture
         $zonesFilePath = __DIR__ . '/zones.json';
         $zonesData = json_decode(file_get_contents($zonesFilePath), true);
 
+        // Copie du tableau des techniciens pour les zones
+        $techniciansForZones = $technicians;
         foreach ($zonesData as $zoneInfo) {
             $zone = new Zone();
             $zone->setName($zoneInfo['name']);
             $zone->setColour($zoneInfo['colour']);
             $zone->setCoordinates($zoneInfo['coordinates']);
-
-            // Associer un technicien aléatoire
-            $zone->setTechnician($technicians[0]);
-            array_shift($technicians);
-
+        
+            // Associer un technicien unique à chaque zone
+            $zone->setTechnician(array_shift($techniciansForZones));
+        
             $manager->persist($zone);
         }
 
@@ -146,6 +147,9 @@ class AppFixtures extends Fixture
 
 
             // Génération des interventions
+            $now = new \DateTime();
+            $currentYear = (int)$now->format('Y');
+            $currentMonth = (int)$now->format('m');
             for ($i = 0 ; $i < 100 ; $i++) {
             $intervention = new Intervention();
             $intervention->setVeloElectrique($i%2);
@@ -158,21 +162,21 @@ class AppFixtures extends Fixture
             $intervention->setAdresse("Adresse " . $i);
             $d = array_rand($typesIntervention);
             $intervention->setTypeIntervention($typesIntervention[random_int(0, 1)]);
+
+            // Attribution d'un technicien
+            $intervention->setTechnicien($technicians[array_rand($technicians)]);
+
+            // Génération de la date d'intervention
+            $month = random_int(1, 12);
+            $day = random_int(1, 28); // On limite à 28 pour éviter les problèmes de jours invalides
+            $hour = random_int(9, 18);
+            // Si le mois généré est inférieur ou égal au mois actuel, on garde l'année en cours, sinon, on passe à l'année suivante.
+            $year = $month >= $currentMonth ? $currentYear : $currentYear + 1;
+            $intervention->setDebut(new \DateTime("{$year}-{$month}-{$day} {$hour}:30"));
+
             $pile_face = random_int(0, 1);
             if ($pile_face == 1) {
-                $intervention->setTechnicien($technicians[array_rand($technicians)]);
                 $intervention->setClient($users[array_rand($users)]);
-                $now = new \DateTime();
-                $currentYear = (int)$now->format('Y');
-                $currentMonth = (int)$now->format('m');
-                
-                // Génération de la date d'intervention
-                $month = random_int(1, 12);
-                $day = random_int(1, 28); // On limite à 28 pour éviter les problèmes de jours invalides
-                $hour = random_int(9, 18);
-                // Si le mois généré est inférieur ou égal au mois actuel, on garde l'année en cours, sinon, on passe à l'année suivante.
-                $year = $month >= $currentMonth ? $currentYear : $currentYear + 1;
-                $intervention->setDebut(new \DateTime("{$year}-{$month}-{$day} {$hour}:30"));
 
                 // Génération InterventionProduit
                 $pile_face = random_int(0, 1);

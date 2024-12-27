@@ -87,7 +87,8 @@ export default function Calendar() {
                 events={interventions.map(intervention => ({
                     title: intervention.type_intervention.nom,
                     start: intervention.debut,
-                    end: dayjs(intervention.debut).add(dayjs(intervention.type_intervention.duree).get('minute'), 'minute').toISOString()
+                    end: dayjs(intervention.debut).add(dayjs(intervention.type_intervention.duree).get('minute'), 'minute').toISOString(),
+                    color: intervention.client ? '#3e69a0' : '#757575'
                 }))}
                 eventContent={renderEventContent}
                 locale={frLocale}

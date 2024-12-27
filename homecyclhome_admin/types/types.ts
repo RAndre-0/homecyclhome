@@ -22,11 +22,20 @@ export interface Technicien {
   last_name: string;
 }
 
+export interface Client {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
 export interface Intervention {
+  client: Client | number;
   id: number;
   debut: string;
   type_intervention: {
-      duree: string | number | Date | Dayjs | null | undefined; nom: string 
-};
+    duree: string | number | Date | Dayjs | null | undefined;
+    nom: string
+  };
   technicien: { id: number };
 }
