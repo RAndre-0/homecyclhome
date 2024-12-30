@@ -7,7 +7,7 @@ const PUBLIC_FILE = /\.(.*)$/; // Pour gérer les fichiers statiques (images, CS
 const PUBLIC_ROUTES = ['/login']; // Pages accessibles sans authentification
 
 // Rôle requis pour accéder à l'application
-const VALID_ROLES = ['ROLE_ADMIN', 'ROLE_SUPERADMIN'];
+const VALID_ROLES = ['ROLE_TECHNICIEN'];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;

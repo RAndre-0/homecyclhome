@@ -29,6 +29,7 @@
     "clsx": "^2.1.1",
     "cookies-next": "^4.3.0",
     "dayjs": "^1.11.13",
+    "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.445.0",
