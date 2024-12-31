@@ -10,7 +10,7 @@ import {CircleUser, Home, Menu, Package, Search, Users, Map, Calendar} from "luc
 import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import logo from "../../public/media/image/logo_homecyclhome_grayscale.png";
+import logo from "@/public/media/image/logo_homecyclhome_grayscale.png";
 
 interface LayoutProps {
   children: ReactNode;

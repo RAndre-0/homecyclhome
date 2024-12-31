@@ -35,20 +35,20 @@ class InterventionController extends AbstractController
 
         return new JsonResponse($liste_interventions, Response::HTTP_OK, [], true);
     }
-
+    
     /* Renvoie les interventions d'un technicien */
     #[Route('/api/interventions/technicien/{id}', name: 'get_interventions_technicien', methods: ["GET"])]
     public function get_interventions_by_technicien(
         int $id,
+        Request $request,
         InterventionRepository $interventionRepository,
         SerializerInterface $serializer
     ): JsonResponse {
-        $interventions = $interventionRepository->findBy(['technicien' => $id]);
-
-        // if (!$interventions) {
-        //     return new JsonResponse([], Response::HTTP_NOT_FOUND);
-        // }
-
+        // Récupération du paramètre reservedOnly
+        $reservedOnly = filter_var($request->query->get('reservedOnly', false), FILTER_VALIDATE_BOOLEAN);
+    
+        $interventions = $interventionRepository->findByTechnicienWithFilter($id, $reservedOnly);
+    
         $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
         return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
     }

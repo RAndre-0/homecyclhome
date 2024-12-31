@@ -37,7 +37,7 @@ export default function Calendar() {
         const fetchInterventions = async () => {
           if (!userId) return; // Ne pas lancer la requête tant que l'id utilisateur est absent
           try {
-            const data = await apiService(`interventions/technicien/${userId}`, "GET");
+            const data = await apiService(`interventions/technicien/${userId}?reservedOnly=true`, "GET");
             setInterventions(data);
           } catch (error) {
             console.error("Erreur lors de la récupération des interventions :", error);
@@ -46,6 +46,9 @@ export default function Calendar() {
     
         fetchInterventions();
       }, [userId]);
+
+      console.log(interventions);
+      
 
     return (
         <FullCalendar
@@ -56,7 +59,7 @@ export default function Calendar() {
             title: intervention.type_intervention.nom,
             start: intervention.debut,
             end: dayjs(intervention.debut).add(dayjs(intervention.type_intervention.duree).get('minute'), 'minute').toISOString(),
-            color: intervention.client ? '#3e69a0' : '#757575'
+            color: '#3e69a0'
         }))}
         eventContent={renderEventContent}
         locale={frLocale}

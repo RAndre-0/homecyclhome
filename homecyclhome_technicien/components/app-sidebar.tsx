@@ -10,6 +10,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Image from "next/image";
+import Link from "next/link";
+import logo from "@/public/media/image/logo_homecyclhome_grayscale.png";
 
 // Menu items.
 const items = [
@@ -35,7 +38,16 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Image
+                src={logo}
+                alt="Logo Homecyclhome"
+              />
+            </Link>
+          </div>
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
