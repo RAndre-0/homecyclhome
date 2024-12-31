@@ -36,7 +36,7 @@ export const apiService = async (endpoint: string, method: HttpMethod, body?: an
       return await response.json();
     }
 
-    // Retourne null si aucune donnée JSON n'est présente
+    // Aucune donnée JSON présente, on retourne null
     return null;
 
   } catch (error) {

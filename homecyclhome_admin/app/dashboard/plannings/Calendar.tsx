@@ -4,7 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import frLocale from '@fullcalendar/core/locales/fr';
 import interactionPlugin from '@fullcalendar/interaction';
-import timeGridPlugin from '@fullcalendar/timegrid'
+import timeGridPlugin from '@fullcalendar/timegrid';
 import { useState, useEffect } from "react";
 import { apiService } from "@/services/api-service";
 import { Technicien, Intervention } from "@/types/types";
@@ -14,10 +14,10 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import dayjs from 'dayjs';
 
-const events = [{ title: "Intervention", start: new Date("2024-12-24, 16:00:00") }];
+const events = [];
 
 export default function Calendar() {
     const [techniciens, setTechniciens] = useState<Technicien[]>([]); // Liste des techniciens

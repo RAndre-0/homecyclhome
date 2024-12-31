@@ -18,7 +18,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { setTheme } = useTheme()
-  const [count, setCount] = useState(0);
+  
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r md:block">
@@ -72,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">
-            <form>
+            {/* <form>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -81,7 +81,7 @@ export default function Layout({ children }: LayoutProps) {
                   className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
                 />
               </div>
-            </form>
+            </form> */}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -56,7 +56,7 @@ export default function Login() {
 
       const data = await response.json();
       const token = data.token;
-      setCookie('token', token, { path: '/', maxAge: 3600, secure: false, sameSite: 'strict' });
+      setCookie('token', token, { path: '/', maxAge: 60000, secure: false, sameSite: 'strict' });
       router.push('/');
     } catch (error) {
       console.error("Login error:", error);
