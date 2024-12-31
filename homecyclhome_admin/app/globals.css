@@ -95,6 +95,7 @@ body {
   display: none;
 }
 
+/* Évènement fullCalendar */
 .fc-timegrid-slot {
-  height: 40px !important; /* Ajustez la hauteur selon vos besoins */
+  height: 40px !important;
 }

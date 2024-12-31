@@ -92,3 +92,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Évènement fullCalendar */
+.fc-timegrid-slot {
+  height: 40px !important;
+}
