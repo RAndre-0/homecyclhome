@@ -10,6 +10,8 @@ use App\Entity\Produit;
 use App\Entity\Intervention;
 use App\Entity\TypeIntervention;
 use App\Entity\InterventionProduit;
+use App\Entity\ModeleInterventions;
+use App\Entity\ModelePlanning;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -65,6 +67,34 @@ class AppFixtures extends Fixture
         $typeInter2->setDuree(new \DateTime('00:45'));
         $manager->persist($typeInter2);
         $typesIntervention = [$typeInter1, $typeInter2];
+
+        // Création des modèles de planning
+        $modelePlanning1 = new ModelePlanning();
+        $modelePlanning1->setName("modele1");
+        $manager->persist($modelePlanning1);
+
+        // Création des interventions du modèle
+        $hour = 9;
+        $minutes = 0;
+        for ($i = 0 ; $i < 4 ; $i++) {
+            $interventionModele = new ModeleInterventions();
+            $interventionModele->setTypeIntervention($typeInter1);
+            $interventionModele->setModeleIntervention($modelePlanning1);
+            $interventionModele->setInterventionTime(new \DateTime("{$hour}:{$minutes}"));
+            $manager->persist($interventionModele);
+            $hour++;
+        };
+        $hour = 14;
+        $minutes = 0;
+        for ($i = 0 ; $i < 3 ; $i++) {
+            $interventionModele = new ModeleInterventions();
+            $interventionModele->setTypeIntervention($typeInter2);
+            $interventionModele->setModeleIntervention($modelePlanning1);
+            $interventionModele->setInterventionTime(new \DateTime("{$hour}:{$minutes}"));
+            $manager->persist($interventionModele);
+            $hour++;
+            $minutes += 15;
+        };
 
         $users =  [];
         // Création des users
