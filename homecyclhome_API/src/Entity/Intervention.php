@@ -30,7 +30,7 @@ class Intervention
     #[Groups(["get_interventions", "get_intervention"])]
     private ?string $velo_marque = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
     private ?string $velo_modele = null;
 

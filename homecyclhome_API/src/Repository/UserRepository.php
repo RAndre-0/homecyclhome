@@ -37,7 +37,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = '
-            SELECT id, email, roles, first_name, last_name
+            SELECT * 
             FROM "user"
             WHERE roles::jsonb @> :role
         ';
@@ -45,11 +45,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $stmt->bindValue('role', json_encode([$role]));
         $resultSet = $stmt->executeQuery();
     
-        $users = $resultSet->fetchAllAssociative();
-    
-        // Désérialisation du champ 'roles' de JSON string à tableau
-        foreach ($users as &$user) {
-            $user['roles'] = json_decode($user['roles'], true);
+        // Utilisation du convertisseur Doctrine pour mapper les résultats en entités User
+        $users = [];
+        foreach ($resultSet->fetchAllAssociative() as $userData) {
+            $users[] = $this->getEntityManager()->getRepository(User::class)->find($userData['id']);
         }
     
         return $users;
