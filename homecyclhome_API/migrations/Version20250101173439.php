@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241114105933 extends AbstractMigration
+final class Version20250101173439 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,18 +30,18 @@ final class Version20241114105933 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_224C655213457256 ON commentaire_intervention (technicien_id)');
         $this->addSql('CREATE INDEX IDX_224C65528EAE3863 ON commentaire_intervention (intervention_id)');
         $this->addSql('COMMENT ON COLUMN commentaire_intervention.created_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE intervention (id INT NOT NULL, type_intervention_id INT DEFAULT NULL, client_id INT DEFAULT NULL, technicien_id INT DEFAULT NULL, velo_categorie VARCHAR(255) DEFAULT NULL, velo_electrique BOOLEAN DEFAULT NULL, velo_marque VARCHAR(255) DEFAULT NULL, velo_modele VARCHAR(255) NOT NULL, adresse VARCHAR(255) DEFAULT NULL, commentaire_client TEXT DEFAULT NULL, photo VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE intervention (id INT NOT NULL, type_intervention_id INT DEFAULT NULL, client_id INT DEFAULT NULL, technicien_id INT DEFAULT NULL, velo_categorie VARCHAR(255) DEFAULT NULL, velo_electrique BOOLEAN DEFAULT NULL, velo_marque VARCHAR(255) DEFAULT NULL, velo_modele VARCHAR(255) NOT NULL, adresse VARCHAR(255) DEFAULT NULL, commentaire_client TEXT DEFAULT NULL, photo VARCHAR(255) DEFAULT NULL, debut TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_D11814AB799AAC17 ON intervention (type_intervention_id)');
         $this->addSql('CREATE INDEX IDX_D11814AB19EB6921 ON intervention (client_id)');
         $this->addSql('CREATE INDEX IDX_D11814AB13457256 ON intervention (technicien_id)');
-        $this->addSql('CREATE TABLE intervention_produit (produit_id INT NOT NULL, intervention_id INT NOT NULL, quantite INT NOT NULL, prix NUMERIC(10, 2) DEFAULT NULL, PRIMARY KEY(produit_id, intervention_id))');
+        $this->addSql('CREATE TABLE intervention_produit (produit_id INT NOT NULL, intervention_id INT NOT NULL, quantite INT NOT NULL, prix NUMERIC(10, 2) DEFAULT NULL, designation VARCHAR(255) DEFAULT NULL, PRIMARY KEY(produit_id, intervention_id))');
         $this->addSql('CREATE INDEX IDX_624B9842F347EFB ON intervention_produit (produit_id)');
         $this->addSql('CREATE INDEX IDX_624B98428EAE3863 ON intervention_produit (intervention_id)');
         $this->addSql('CREATE TABLE marque (id INT NOT NULL, nom VARCHAR(255) NOT NULL, logo VARCHAR(255) DEFAULT NULL, couleur VARCHAR(7) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE produit (id INT NOT NULL, designation VARCHAR(255) NOT NULL, prix NUMERIC(10, 2) DEFAULT NULL, description TEXT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, modified_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN produit.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE type_intervention (id INT NOT NULL, nom VARCHAR(255) NOT NULL, duree TIME(0) WITHOUT TIME ZONE NOT NULL, prix_depart NUMERIC(10, 2) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, first_name VARCHAR(255) DEFAULT NULL, last_name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL ON "user" (email)');
         $this->addSql('CREATE TABLE zone (id INT NOT NULL, technician_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, colour VARCHAR(7) DEFAULT NULL, coordinates JSON DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_A0EBC007E6C5D496 ON zone (technician_id)');

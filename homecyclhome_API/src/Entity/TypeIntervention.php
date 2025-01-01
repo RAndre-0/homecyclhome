@@ -35,9 +35,16 @@ class TypeIntervention
     #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'type_intervention')]
     private Collection $interventions;
 
+    /**
+     * @var Collection<int, ModeleInterventions>
+     */
+    #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'type_intervention')]
+    private Collection $modeleInterventions;
+
     public function __construct()
     {
         $this->interventions = new ArrayCollection();
+        $this->modeleInterventions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -105,6 +112,36 @@ class TypeIntervention
             // set the owning side to null (unless already changed)
             if ($intervention->getTypeIntervention() === $this) {
                 $intervention->setTypeIntervention(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ModeleInterventions>
+     */
+    public function getModeleInterventions(): Collection
+    {
+        return $this->modeleInterventions;
+    }
+
+    public function addModeleIntervention(ModeleInterventions $modeleIntervention): static
+    {
+        if (!$this->modeleInterventions->contains($modeleIntervention)) {
+            $this->modeleInterventions->add($modeleIntervention);
+            $modeleIntervention->setTypeIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModeleIntervention(ModeleInterventions $modeleIntervention): static
+    {
+        if ($this->modeleInterventions->removeElement($modeleIntervention)) {
+            // set the owning side to null (unless already changed)
+            if ($modeleIntervention->getTypeIntervention() === $this) {
+                $modeleIntervention->setTypeIntervention(null);
             }
         }
 
