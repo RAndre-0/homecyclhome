@@ -37,6 +37,22 @@ class InterventionRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findNonReservedInterventionsByTechnicianAndDateRange(
+        \App\Entity\User $technician,
+        \DateTime $from,
+        \DateTime $to
+    ): array {
+        return $this->createQueryBuilder('i')
+            ->where('i.technicien = :technician')
+            ->andWhere('i.client IS NULL') // Interventions non réservées
+            ->andWhere('i.debut BETWEEN :from AND :to')
+            ->setParameter('technician', $technician)
+            ->setParameter('from', $from->format('Y-m-d 00:00:00'))
+            ->setParameter('to', $to->format('Y-m-d 23:59:59'))
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Intervention[] Returns an array of Intervention objects
 //     */

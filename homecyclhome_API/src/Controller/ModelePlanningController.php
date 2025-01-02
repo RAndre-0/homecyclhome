@@ -29,11 +29,10 @@ class ModelePlanningController extends AbstractController
     }
 
     /* Créé des interventions à partir d'un modèle */
-    #[Route('/api/new-interventions/{idModel}/{idTechnician?}', name: 'create_interventions_from_modele', methods: ["POST"])]
+    #[Route('/api/new-interventions/{idModel}', name: 'create_interventions_from_modele', methods: ["POST"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function createInterventionsFromModele(
         int $idModel,
-        ?int $idTechnician,
         Request $request,
         ModelePlanningRepository $modelePlanningRepository,
         UserRepository $userRepository,
@@ -45,42 +44,48 @@ class ModelePlanningController extends AbstractController
             return new JsonResponse(['error' => 'Modèle de planning introuvable.'], 404);
         }
     
-        // Récupérer les techniciens concernés
+        // Récupérer les données de la requête
+        $data = json_decode($request->getContent(), true);
+    
+        // Valider les techniciens
+        if (!isset($data['technicians']) || !is_array($data['technicians'])) {
+            return new JsonResponse(['error' => 'Les techniciens doivent être spécifiés sous forme de tableau d\'identifiants.'], 400);
+        }
+    
         $technicians = [];
-        if ($idTechnician) {
-            $technician = $userRepository->find($idTechnician);
+        foreach ($data['technicians'] as $technicianId) {
+            $technician = $userRepository->find($technicianId);
             if (!$technician) {
-                return new JsonResponse(['error' => 'Technicien introuvable.'], 404);
+                return new JsonResponse(['error' => "Technicien introuvable avec l'identifiant $technicianId."], 404);
             }
             $technicians[] = $technician;
-        } else {
-            $technicians = $userRepository->findUsersByRole('ROLE_TECHNICIEN');
         }
     
-        // Récupérer les dates depuis le corps de la requête
-        $data = json_decode($request->getContent(), true);
-        if (!isset($data['dates']) || !is_array($data['dates'])) {
-            return new JsonResponse(['error' => 'Les dates doivent être spécifiées sous forme de tableau.'], 400);
+        // Valider les dates "from" et "to"
+        if (!isset($data['from'], $data['to'])) {
+            return new JsonResponse(['error' => 'Les paramètres "from" et "to" doivent être spécifiés.'], 400);
         }
-        $dates = array_map(fn($date) => \DateTime::createFromFormat('Y-m-d', $date), $data['dates']);
     
-        $timezone = new \DateTimeZone('Europe/Paris');
+        $from = \DateTime::createFromFormat('Y-m-d', $data['from']);
+        $to = \DateTime::createFromFormat('Y-m-d', $data['to']);
         
-        // Validation des dates
-        foreach ($dates as $date) {
-            if (!$date) {
-                return new JsonResponse(['error' => 'Format de date invalide. Utilisez le format Y-m-d.'], 400);
-            }
+        if (!$from || !$to || $from > $to) {
+            return new JsonResponse(['error' => 'Les dates "from" et "to" doivent être valides et "from" ne peut pas être après "to".'], 400);
         }
     
-        // Créer des interventions
-        foreach ($dates as $date) {
+        // Générer les dates entre "from" et "to"
+        $interval = new \DateInterval('P1D'); // Intervalle d'un jour
+        $dateRange = new \DatePeriod($from, $interval, (clone $to)->modify('+1 day'));
+    
+        // Créer les interventions
+        foreach ($dateRange as $date) {
             foreach ($technicians as $technician) {
                 foreach ($modelePlanning->getModeleInterventions() as $modeleIntervention) {
                     $intervention = new Intervention();
                     $intervention->setDebut((clone $date)->setTime(
                         (int)$modeleIntervention->getInterventionTime()->format('H'),
-                        (int)$modeleIntervention->getInterventionTime()->format('i')
+                        (int)$modeleIntervention->getInterventionTime()->format('i'),
+                        0
                     ));
                     $intervention->setTypeIntervention($modeleIntervention->getTypeIntervention());
                     $intervention->setTechnicien($technician);
@@ -94,4 +99,6 @@ class ModelePlanningController extends AbstractController
     
         return new JsonResponse(['success' => 'Interventions créées avec succès.'], 201);
     }
+    
+    
 }

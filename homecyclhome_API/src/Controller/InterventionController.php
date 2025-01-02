@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Entity\Intervention;
 use App\Repository\InterventionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -78,17 +80,6 @@ class InterventionController extends AbstractController
         return new JsonResponse($intervention_json, Response::HTTP_OK, [], true);
     }
 
-    /* Supprime une intervention */
-    #[Route('/api/interventions/{id}', name: 'delete_intervention', methods: ["DELETE"])]
-    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function delete_user(Intervention $intervention, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
-    {
-        $em->remove($intervention);
-        $em->flush();
-        $cache->invalidateTags(["interventions_cache"]);
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-
     /* Créé une nouvelle intervention */
     #[Route("/api/interventions", name: "create_intervention", methods: ["POST"])]
     public function new_intervention(
@@ -132,6 +123,75 @@ class InterventionController extends AbstractController
         $em->flush();
         $cache->invalidateTags(["interventions_cache"]);
 
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /* Supprime une intervention */
+    #[Route('/api/interventions/delete', name: 'delete_interventions', methods: ["DELETE"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function deleteInterventions(
+        Request $request,
+        UserRepository $userRepository,
+        InterventionRepository $interventionRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        // Récupérer les données de la requête
+        $data = json_decode($request->getContent(), true);
+    
+        // Valider les techniciens
+        if (!isset($data['technicians']) || !is_array($data['technicians'])) {
+            return new JsonResponse(['error' => 'Les techniciens doivent être spécifiés sous forme de tableau d\'identifiants.'], 400);
+        }
+    
+        $technicians = [];
+        foreach ($data['technicians'] as $technicianId) {
+            $technician = $userRepository->find($technicianId);
+            if (!$technician) {
+                return new JsonResponse(['error' => "Technicien introuvable avec l'identifiant $technicianId."], 404);
+            }
+            $technicians[] = $technician;
+        }
+    
+        // Valider les dates "from" et "to"
+        if (!isset($data['from'], $data['to'])) {
+            return new JsonResponse(['error' => 'Les paramètres "from" et "to" doivent être spécifiés.'], 400);
+        }
+    
+        $from = \DateTime::createFromFormat('Y-m-d', $data['from']);
+        $to = \DateTime::createFromFormat('Y-m-d', $data['to']);
+    
+        if (!$from || !$to || $from > $to) {
+            return new JsonResponse(['error' => 'Les dates "from" et "to" doivent être valides et "from" ne peut pas être après "to".'], 400);
+        }
+    
+        // Supprimer les interventions pour chaque technicien dans la plage de dates
+        foreach ($technicians as $technician) {
+            $interventions = $interventionRepository->findNonReservedInterventionsByTechnicianAndDateRange(
+                $technician,
+                $from,
+                $to
+            );
+    
+            foreach ($interventions as $intervention) {
+                $entityManager->remove($intervention);
+            }
+        }
+    
+        // Sauvegarde des modifications
+        $entityManager->flush();
+    
+        return new JsonResponse(['success' => 'Interventions supprimées avec succès.'], 200);
+    }
+    
+
+    /* Supprime une intervention */
+    #[Route('/api/interventions/{id}', name: 'delete_intervention', methods: ["DELETE"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function delete_user(Intervention $intervention, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
+    {
+        $em->remove($intervention);
+        $em->flush();
+        $cache->invalidateTags(["interventions_cache"]);
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
