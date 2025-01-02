@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class ModelePlanningController extends AbstractController
 {
@@ -22,7 +26,7 @@ class ModelePlanningController extends AbstractController
         $liste_modeles_planning = $cache->get($id_cache, function (ItemInterface $item) use ($modelePlanningRepository, $serializer) {
             $item->tag("modele_planning_cache");
             $liste_modeles_planning = $modelePlanningRepository->findAll();
-            return $serializer->serialize($liste_modeles_planning, "json", ["groups" => "get_modelePlannings"]);
+            return $serializer->serialize($liste_modeles_planning, "json", ["groups" => "get_modeles_planning"]);
         });
 
         return new JsonResponse($liste_modeles_planning, Response::HTTP_OK, [], true);
