@@ -99,5 +99,5 @@ body {
 
 /* Évènement fullCalendar */
 .fc-timegrid-slot {
-  height: 40px !important;
+  height: 4.5vh !important;
 }

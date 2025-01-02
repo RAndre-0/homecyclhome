@@ -45,9 +45,13 @@ export default function Plannings() {
 
   return (
     <>
-      <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
-      <DeleteInterventionsDialog />
-      <CreateInterventionsDialog />
+      <div className="flex justify-between">
+        <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
+          <div className="flex gap-5">
+            <DeleteInterventionsDialog />
+            <CreateInterventionsDialog />
+          </div>
+      </div>
       <FullCalendarAdmin selectedTechnicien={selectedTechnicien} />
     </>
   );
