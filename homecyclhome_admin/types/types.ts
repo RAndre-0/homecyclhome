@@ -39,3 +39,8 @@ export interface Intervention {
   };
   technicien: { id: number };
 }
+
+export interface ModelePlanning {
+  id: number;
+  name: string;
+}

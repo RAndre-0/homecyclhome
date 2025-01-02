@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiService } from "@/services/api-service";
 import DeleteInterventionsDialog from "./DeleteInterventionsDialog";
+import CreateInterventionsDialog from "./CreateInterventionsDialog";
+import TechnicienSelector from "@/components/technicien-selector";
 
 export default function Plannings() {
   const [selectedTechnicien, setSelectedTechnicien] = useState<Technicien | null>(null);
@@ -41,58 +43,11 @@ export default function Plannings() {
     fetchTechniciens();
   }, []);
 
-  // Fonction pour sauvegarder les techniciens sélectionnés
-  const handleSave = () => {
-    console.log("Techniciens sélectionnés :", selectedTechniciens);
-    // Vous pouvez envoyer la requête ici avec `selectedTechniciens`
-  };
-
   return (
     <>
-      <div className="space-y-8">
-        <div>
-          <Label>Techniciens</Label>
-          <TechnicienMultiSelect
-            onChange={setSelectedTechniciens} // Passage de la fonction onChange
-            maxCount={5} // Limite à 5 techniciens sélectionnés
-          />
-        </div>
-        <Button variant="default" onClick={handleSave} className="w-full">
-          Sauvegarder les techniciens
-        </Button>
-      </div>
+      <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
       <DeleteInterventionsDialog />
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Créer des interventions</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] bg-card">
-          <DialogHeader>
-            <DialogTitle>Créer des interventions</DialogTitle>
-            <DialogDescription>
-              Faites des changements ici. Cliquez sur sauvegarder quand c'est fini.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nom
-              </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Nom d'utilisateur
-              </Label>
-              <Input id="username" value="@peduarte" className="col-span-3" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit">Sauvegarder</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
+      <CreateInterventionsDialog />
       <FullCalendarAdmin selectedTechnicien={selectedTechnicien} />
     </>
   );

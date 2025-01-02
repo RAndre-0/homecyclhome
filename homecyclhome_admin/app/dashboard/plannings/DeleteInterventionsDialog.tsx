@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import TechnicienMultiSelect from "@/components/technicien-multi-select";
 import { DatePickerWithRange } from "@/components/ui/date-range";
 import { apiService } from "@/services/api-service";
-import { format } from "date-fns"; // Importer la fonction format
+import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DeleteInterventionsDialog({ }) {
@@ -33,7 +33,7 @@ export default function DeleteInterventionsDialog({ }) {
             const formattedFrom = formatDate(dateRange.startDate);
             const formattedTo = formatDate(dateRange.endDate);
 
-            // Convertsion des IDs techniciens en entiers
+            // Conversion des IDs techniciens en entiers
             const technicianIds = selectedTechniciens.map((id) => parseInt(id, 10));
 
             await apiService("interventions/delete", "DELETE", {
