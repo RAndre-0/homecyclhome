@@ -126,7 +126,7 @@ class InterventionController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    /* Supprime une intervention */
+    /* Supprime les interventions dans une plage de dates pour les techniciens listés */
     #[Route('/api/interventions/delete', name: 'delete_interventions', methods: ["DELETE"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function deleteInterventions(
