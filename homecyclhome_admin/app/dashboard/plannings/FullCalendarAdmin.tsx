@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { apiService } from "@/services/api-service";
 import { Intervention, Technicien } from "@/types/types";
 import dayjs from "dayjs";
+import InterventionDetailsDialog from './InterventionDetailsDialog';
 
 interface CalendarProps {
   selectedTechnicien: Technicien | null;
@@ -16,6 +17,8 @@ interface CalendarProps {
 
 export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps) {
   const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [selectedIntervention, setSelectedIntervention] = useState<Intervention | null>(null);
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
   // Récupérer les interventions d'un technicien
   useEffect(() => {
@@ -37,27 +40,44 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
     }
   }, [selectedTechnicien]);
 
+  const handleEventClick = (info: any) => {
+    info.jsEvent.preventDefault(); // Empêche la navigation par défaut
+    const clickedIntervention = interventions.find(intervention => intervention.id === parseInt(info.event.id));
+    if (clickedIntervention) {
+        setSelectedIntervention(clickedIntervention);
+        setDialogOpen(true);
+    }
+};
+
   return (
+    <>
     <FullCalendar
-      plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-      initialView="timeGridWeek"
-      weekends={false}
-      events={interventions.map((intervention) => ({
-        title: intervention.type_intervention.nom,
-        start: intervention.debut,
-        end: dayjs(intervention.debut)
-          .add(dayjs(intervention.type_intervention.duree).get("minute"), "minute")
-          .toISOString(),
-        color: intervention.client ? "#3e69a0" : "#757575",
-      }))}
-      eventContent={renderEventContent}
-      locale={frLocale}
-      selectable={true}
-      allDaySlot={false}
-      slotMinTime={"09:00:00"}
-      slotMaxTime={"18:00:00"}
-      height={"100%"}
+        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+        initialView="timeGridWeek"
+        weekends={false}
+        events={interventions.map((intervention) => ({
+            id: intervention.id.toString(),
+            title: intervention.type_intervention?.nom ?? 'Intervention',
+            start: intervention.debut,
+            end: dayjs(intervention.debut)
+                .add(dayjs(intervention.type_intervention?.duree ?? 'PT0M').get("minute"), "minute")
+                .toISOString(),
+            color: intervention.client ? "#3e69a0" : "#757575",
+        }))}
+        eventClick={handleEventClick}
+        locale={frLocale}
+        selectable={true}
+        allDaySlot={false}
+        slotMinTime={"09:00:00"}
+        slotMaxTime={"18:00:00"}
+        height={"100%"}
     />
+    <InterventionDetailsDialog
+        intervention={selectedIntervention}
+        isOpen={isDialogOpen}
+        onClose={() => setDialogOpen(false)}
+    />
+</>
   );
 }
 

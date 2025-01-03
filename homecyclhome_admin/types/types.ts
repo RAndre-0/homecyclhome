@@ -18,26 +18,34 @@ export interface Polygon {
 
 export interface Technicien {
   id: number;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
 }
 
 export interface Client {
   id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
+}
+
+export interface TypeIntervention {
+  nom: string;
+  duree: string | number | Date | null | undefined;
+  prix_depart: string | null;
 }
 
 export interface Intervention {
-  client: Client | number;
   id: number;
   debut: string;
-  type_intervention: {
-    duree: string | number | Date | Dayjs | null | undefined;
-    nom: string
-  };
-  technicien: { id: number };
+  commentaire_client: string | null;
+  photo: string | null;
+  velo_categorie: string | null;
+  velo_electrique: boolean | null;
+  type_intervention: TypeIntervention | null;
+  client: Client | null;
+  technicien: Technicien | null;
 }
 
 export interface ModelePlanning {

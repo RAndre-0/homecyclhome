@@ -22,14 +22,11 @@ export function UserMenu({ className = "", ...props }) {
             <DropdownMenuTrigger asChild>
                 <Button variant="secondary" size="icon" className={`rounded-full ${className}`} {...props}>
                     <CircleUser className="h-5 w-5" />
-                    <span className="sr-only">Toggle user menu</span>
+                    <span className="sr-only">Ouvrir menu utilisateur</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem>Mes interventions</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                         <span>Theme</span>

@@ -13,8 +13,7 @@ export function HeroSection() {
             </h1>
             <Separator orientation="horizontal" />
             <p className="mx-auto max-w-[700px] text-lg text-white md:text-xl">
-              Our cutting-edge analytics platform empowers you to make data-driven decisions that drive your business
-              forward.
+              Nos techniciens sont disponibles du Lundi au Vendredi pour entretenir ou réparer votre vélo à domicile.
             </p>
           </div>
         </div>
