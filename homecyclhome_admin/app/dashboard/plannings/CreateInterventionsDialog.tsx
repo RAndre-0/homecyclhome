@@ -21,7 +21,7 @@ type ModelePlanning = {
     name: string;
 };
 
-export default function CreateInterventionsDialog() {
+export default function CreateInterventionsDialog({ onRefresh }: { onRefresh: () => void }) {
     const [selectedTechniciens, setSelectedTechniciens] = useState<string[]>([]);
     const [dateRange, setDateRange] = useState<{ startDate: Date | null; endDate: Date | null }>({
         startDate: null,
@@ -36,7 +36,6 @@ export default function CreateInterventionsDialog() {
         return date ? format(date, 'yyyy-MM-dd') : null;
     };
 
-    // Récupérer les modèles de planning
     useEffect(() => {
         const fetchModeles = async () => {
             try {
@@ -65,7 +64,6 @@ export default function CreateInterventionsDialog() {
                 return;
             }
 
-            // Conversion des IDs techniciens en entiers
             const technicianIds = selectedTechniciens.map((id) => parseInt(id, 10));
 
             await apiService(`new-interventions/${selectedModele}`, "POST", {
@@ -74,11 +72,11 @@ export default function CreateInterventionsDialog() {
                 to: formattedTo,
             });
 
-            console.log("Interventions créées avec succès");
             toast({
                 title: "Succès",
                 description: `Les interventions ont été créées à partir du modèle.`,
             });
+            onRefresh();
         } catch (error) {
             console.error("Erreur lors de la création des interventions", error);
             toast({ title: "Erreur", description: "Une erreur s'est produite lors de la création des interventions." });
@@ -112,7 +110,7 @@ export default function CreateInterventionsDialog() {
                 <TechnicienMultiSelect onChange={setSelectedTechniciens} />
                 <DatePickerWithRange onChange={setDateRange} />
                 <DialogFooter>
-                    <Button variant="primary" onClick={handleCreate}>
+                    <Button onClick={handleCreate}>
                         Créer
                     </Button>
                 </DialogFooter>
@@ -120,3 +118,4 @@ export default function CreateInterventionsDialog() {
         </Dialog>
     );
 }
+

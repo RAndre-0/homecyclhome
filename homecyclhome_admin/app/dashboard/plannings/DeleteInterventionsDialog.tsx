@@ -15,7 +15,7 @@ import { apiService } from "@/services/api-service";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
-export default function DeleteInterventionsDialog({ }) {
+export default function DeleteInterventionsDialog({ onRefresh }: { onRefresh: () => void }) {
     const [selectedTechniciens, setSelectedTechniciens] = useState<string[]>([]);
     const [dateRange, setDateRange] = useState<{ startDate: Date | null; endDate: Date | null }>({
         startDate: null,
@@ -33,7 +33,6 @@ export default function DeleteInterventionsDialog({ }) {
             const formattedFrom = formatDate(dateRange.startDate);
             const formattedTo = formatDate(dateRange.endDate);
 
-            // Conversion des IDs techniciens en entiers
             const technicianIds = selectedTechniciens.map((id) => parseInt(id, 10));
 
             await apiService("interventions/delete", "DELETE", {
@@ -42,11 +41,11 @@ export default function DeleteInterventionsDialog({ }) {
                 to: formattedTo,
             });
 
-            console.log("Interventions supprimées avec succès");
             toast({
                 title: "Interventions supprimées",
-                description: `Les interventions non réservées ont été supprimées du ${formattedFrom} au ${formattedTo}.`
+                description: `Les interventions non réservées ont été supprimées du ${formattedFrom} au ${formattedTo}.`,
             });
+            onRefresh();
         } catch (error) {
             console.error("Erreur lors de la suppression des interventions", error);
         }
@@ -75,3 +74,4 @@ export default function DeleteInterventionsDialog({ }) {
         </Dialog>
     );
 }
+
