@@ -5,7 +5,7 @@ import loginBg from "../../public/media/image/login_bg.jpg";
 import { useState } from "react";
 import { useCookies } from 'react-cookie';
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,33 +14,35 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { loginSchema } from "@/schemas/schemas";
+import { loginSchema } from "@/schemas/schemas"; // Import du schéma de validation
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // État pour gérer les erreurs
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cookies, setCookie] = useCookies(['token']);
   const router = useRouter();
 
+  // Formulaire avec validation Zod
   const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema), // Utilisation du schéma pour la validation
     defaultValues: {
       email: "",
       password: ""
     },
   });
 
+  // Gestion de la soumission
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setLoading(true);
-    setErrorMessage(null); // Réinitialiser le message d'erreur avant de tenter le login
+    setErrorMessage(null);
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_ROUTE + "login_check", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_ROUTE}login_check`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -56,13 +58,19 @@ export default function Login() {
 
       const data = await response.json();
       const token = data.token;
-      setCookie('token', token, { path: '/', maxAge: 60000, secure: false, sameSite: 'strict' });
-      router.push('/');
+
+      // Configuration sécurisée du cookie
+      setCookie('token', token, {
+        path: '/', 
+        maxAge: 60000, 
+        secure: process.env.NODE_ENV === 'production', // Secure en production uniquement
+        sameSite: 'strict',
+      });
+
+      router.push('/'); // Redirection après login
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMessage(
-        "Identifiants incorrects. Veuillez vérifier votre email et votre mot de passe."
-      );
+      setErrorMessage("Identifiants incorrects. Veuillez vérifier votre email et votre mot de passe.");
     } finally {
       setLoading(false);
     }
@@ -89,7 +97,6 @@ export default function Login() {
                     <FormControl>
                       <Input placeholder="exemple@email.com" {...field} />
                     </FormControl>
-                    <FormDescription></FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -103,12 +110,11 @@ export default function Login() {
                     <FormControl>
                       <Input type="password" placeholder="Mot de passe" {...field} />
                     </FormControl>
-                    <FormDescription></FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {errorMessage && ( // Affichage du message d'erreur
+              {errorMessage && (
                 <div className="text-red-500 text-sm">
                   {errorMessage}
                 </div>

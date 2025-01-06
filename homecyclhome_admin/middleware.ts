@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
   }
 
   try {
-    // Décoder le token sans vérifier la signature
+    // Décoder le token
     const decodedToken = jwt.decode(token);
 
     // Vérifiez si le token est un objet et contient les rôles

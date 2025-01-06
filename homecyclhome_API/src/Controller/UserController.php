@@ -42,7 +42,7 @@ class UserController extends AbstractController
         TagAwareCacheInterface $cache,
         string $role = null // Injection du paramètre d'URL (optionnel)
     ): JsonResponse {
-        $cache->invalidateTags(["users_cache"]);
+        $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
         // Génération d'un ID de cache en fonction du rôle
         $idCache = "users_cache" . ($role ? "_role_" . $role : "");
         
@@ -73,7 +73,7 @@ class UserController extends AbstractController
     {
         $em->remove($user);
         $em->flush();
-        $cache->invalidateTags(["users_cache"]);
+        $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -96,7 +96,7 @@ class UserController extends AbstractController
 
         $em->persist($user);
         $em->flush();
-        $cache->invalidateTags(["users_cache"]);
+        $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
         $json_user = $serializer->serialize($user, "json", ["groups" => "get_users"]);
         $location = $urlGenerator->generate("user", ["id" => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($json_user, Response::HTTP_CREATED, ["location" => $location], true);
@@ -109,7 +109,7 @@ class UserController extends AbstractController
         $user_modifie = $serializer->deserialize($request->getContent(), User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
         $em->persist($user_modifie);
         $em->flush();
-        $cache->invalidateTags(["users_cache"]);
+        $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
