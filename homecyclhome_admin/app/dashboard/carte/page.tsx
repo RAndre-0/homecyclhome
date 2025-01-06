@@ -12,9 +12,9 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -23,16 +23,16 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 const styles = {
     map: {
         width: "100%",
         height: "80vh",
         overflow: "hidden",
-        zIndex: "0"
-    }
+        zIndex: "0",
+    },
 };
 
 export default function Map() {
@@ -53,22 +53,21 @@ export default function Map() {
             }
         };
         fetchZones();
-        const fetchtechnicians = async () => {
+        const fetchTechnicians = async () => {
             try {
-                const fetched_technicians = await apiService("users/ROLE_TECHNICIEN", "GET");
-                setTechnicians(fetched_technicians);
+                const fetchedTechnicians = await apiService("users/ROLE_TECHNICIEN", "GET");
+                setTechnicians(fetchedTechnicians);
             } catch (error) {
                 console.error("Error fetching technicians", error);
             }
         };
-        fetchtechnicians();
+        fetchTechnicians();
     }, []);
 
     const savePolygon = async (polygon) => {
         try {
             const response = await apiService("zones", "POST", polygon);
-            console.log("Zone sauvegardée :", response);
-            setPolygons(prevPolygons => [...prevPolygons, { ...polygon, id: response.id }]);
+            setPolygons((prevPolygons) => [...prevPolygons, { ...polygon, id: response.id }]);
         } catch (error) {
             console.error("Erreur lors de la sauvegarde de la zone :", error);
         }
@@ -77,7 +76,9 @@ export default function Map() {
     const updatePolygon = async (polygon) => {
         try {
             await apiService(`zones/${polygon.id}/edit`, "PUT", polygon);
-            console.log(`Zone ${polygon.id} mise à jour.`);
+            setPolygons((prevPolygons) =>
+                prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
+            );
         } catch (error) {
             console.error(`Erreur lors de la mise à jour de la zone ${polygon.id} :`, error);
         }
@@ -86,7 +87,7 @@ export default function Map() {
     const deletePolygon = async (id) => {
         try {
             await apiService(`zones/${id}`, "DELETE");
-            console.log(`Zone ${id} supprimée.`);
+            setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));
         } catch (error) {
             console.error(`Erreur lors de la suppression de la zone ${id} :`, error);
         }
@@ -99,7 +100,7 @@ export default function Map() {
         const payload = {
             name: "Nom par défaut",
             colour: "#FF5733",
-            coordinates: coordinates.map(coord => ({ longitude: coord[0], latitude: coord[1] })),
+            coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
             technician: null,
         };
 
@@ -110,14 +111,14 @@ export default function Map() {
         const layers = e.layers;
         layers.eachLayer((layer) => {
             const updatedPolygon = layer.toGeoJSON();
-            const id = layer.options.id; // Ajouter l'ID en option sur chaque layer
+            const id = layer.options.id;
             const coordinates = updatedPolygon.geometry.coordinates[0];
 
             const payload = {
                 id,
-                name: "Nom modifié", // Vous pouvez récupérer et modifier cela si nécessaire
-                colour: "#FF5733", // Ajoutez des champs spécifiques au besoin
-                coordinates: coordinates.map(coord => ({ longitude: coord[0], latitude: coord[1] })),
+                name: "Nom modifié",
+                colour: "#FF5733",
+                coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
                 technician: null,
             };
 
@@ -136,17 +137,13 @@ export default function Map() {
         });
 
         idsToDelete.forEach((id) => deletePolygon(id));
-
-        setPolygons((prevPolygons) =>
-            prevPolygons.filter((polygon) => !idsToDelete.includes(polygon.id))
-        );
     };
 
     const addPolygonsToFeatureGroup = () => {
         const featureGroup = featureGroupRef.current;
         if (!featureGroup) return;
 
-        featureGroup.clearLayers(); // Efface les couches existantes avant d'ajouter
+        featureGroup.clearLayers();
 
         polygons.forEach((polygon) => {
             const leafletPolygon = new L.Polygon(
@@ -184,12 +181,21 @@ export default function Map() {
                                     setZoneSelected((prev) => ({ ...prev, name: e.target.value }))
                                 }
                             />
+                            <Label htmlFor="zoneColor">Couleur de la zone</Label>
+                            <Input
+                                type="color"
+                                id="zoneColor"
+                                value={zoneSelected.colour}
+                                onChange={(e) =>
+                                    setZoneSelected((prev) => ({ ...prev, colour: e.target.value }))
+                                }
+                            />
                             <Label htmlFor="technicianSelect">Technicien</Label>
                             <Select
                                 onValueChange={(value) =>
                                     setZoneSelected((prev) => ({
                                         ...prev,
-                                        technician: value === "none" ? null : Number(value) // Réinitialiser si "none"
+                                        technician: value === "none" ? null : Number(value),
                                     }))
                                 }
                                 defaultValue={String(zoneSelected?.technician || "none")}
@@ -200,24 +206,19 @@ export default function Map() {
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {/* Option pour réinitialiser la sélection */}
-                                    <SelectItem value="none">
-                                        Aucun technicien
-                                    </SelectItem>
-
-                                    {/* Liste des techniciens */}
+                                    <SelectItem value="none">Aucun technicien</SelectItem>
                                     {technicians.map((tech) => {
                                         const isAssigned = polygons.some(
                                             (polygon) =>
                                                 polygon.technician === tech.id &&
-                                                polygon.id !== zoneSelected?.id // Autoriser le technicien de la zone actuelle
+                                                polygon.id !== zoneSelected?.id
                                         );
 
                                         return (
                                             <SelectItem
                                                 key={tech.id}
                                                 value={String(tech.id)}
-                                                disabled={isAssigned} // Désactiver si déjà assigné
+                                                disabled={isAssigned}
                                             >
                                                 {tech.email} {isAssigned ? "(Assigné)" : ""}
                                             </SelectItem>
@@ -235,9 +236,13 @@ export default function Map() {
                         </>
                     )}
                 </CardContent>
-
             </Card>
-            <MapContainer style={styles.map} center={[45.757704, 4.834099]} zoom={13} scrollWheelZoom={false}>
+            <MapContainer
+                style={styles.map}
+                center={[45.757704, 4.834099]}
+                zoom={13}
+                scrollWheelZoom={false}
+            >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -259,6 +264,5 @@ export default function Map() {
                 </FeatureGroup>
             </MapContainer>
         </>
-
     );
 }
