@@ -40,10 +40,12 @@ import {
 //export const metadata: Metadata = {title: "Utilisateurs"};
 
 export type User = {
-  id: number
-  email: string
-  roles: string[]
-}
+  id: number;
+  email: string;
+  roles: string[];
+  first_name: string;
+  last_name: string;
+};
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -69,6 +71,14 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "full_name",
+    header: "Nom complet",
+    cell: ({ row }) => {
+      const user = row.original;
+      return `${user.first_name} ${user.last_name}`;
+    },
+  },
+  {
     accessorKey: "email",
     header: ({ column }) => {
       return (
@@ -79,7 +89,7 @@ export const columns: ColumnDef<User>[] = [
           Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
@@ -94,7 +104,7 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
 
       return (
         <DropdownMenu>
@@ -113,17 +123,21 @@ export const columns: ColumnDef<User>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/dashboard/utilisateurs/${user.id}/modifier`} className="text-sm underline">
+              <Link
+                href={`/dashboard/utilisateurs/${user.id}/modifier`}
+                className="text-sm underline"
+              >
                 Modifier
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Supprimer</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
+
 
 export default function Users() {
   const [users, setUsers] = React.useState([]);
@@ -151,6 +165,7 @@ export default function Users() {
 
     fetchUsers();
   }, []);
+console.log(users);
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

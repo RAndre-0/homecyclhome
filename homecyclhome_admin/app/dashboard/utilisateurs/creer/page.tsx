@@ -37,6 +37,8 @@ export default function CreateUser() {
             email: "",
             password: "",
             roles: [],
+            first_name: "",
+            last_name: "",
         },
     });
 
@@ -49,7 +51,7 @@ export default function CreateUser() {
             toast({
                 title: "Utilisateur créé avec succès",
                 description: "Un utilisateur a bien été ajouté à l'application.",
-                variant: "success",
+                variant: "default",
             });
             router.push("/dashboard/utilisateurs");
         } catch (error) {
@@ -77,6 +79,32 @@ export default function CreateUser() {
                 <h2 className="text-2xl font-bold mb-4">Nouvel utilisateur</h2>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                        <FormField
+                            control={form.control}
+                            name="first_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Prénom</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Prénom" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nom</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nom" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={form.control}
                             name="email"

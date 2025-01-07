@@ -44,7 +44,7 @@ class UserController extends AbstractController
     ): JsonResponse {
         $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
         // Génération d'un ID de cache en fonction du rôle
-        $idCache = "users_cache" . ($role ? "_role_" . $role : "");
+        $idCache = "users_cache" . ($role ? "_" . $role : "");
         
         $usersData = $cache->get($idCache, function (ItemInterface $item) use ($userRepository, $serializer, $role) {
             $item->tag("users_cache");

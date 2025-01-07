@@ -24,7 +24,16 @@ const registerSchema = z.object({
     .enum(["ROLE_TECHNICIEN", "ROLE_ADMIN"])
     .array()
     .default([]),
+  first_name: z
+    .string()
+    .min(1, { message: "Le prénom est requis" })
+    .max(50, { message: "Le prénom ne peut dépasser 50 caractères" }),
+  last_name: z
+    .string()
+    .min(1, { message: "Le nom est requis" })
+    .max(50, { message: "Le nom ne peut dépasser 50 caractères" }),
 });
+
 
 // Regrouper les schémas dans un objet pour les exporter ensemble
 const schemas = {

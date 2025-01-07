@@ -26,7 +26,6 @@ final class ZoneController extends AbstractController
     public function get_zones(ZoneRepository $zoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $id_cache = "get_zones";
-        $cache->invalidateTags(["zones_cache"]);
 
         $liste_zones = $cache->get($id_cache, function ($item) use ($zoneRepository, $serializer) {
             $item->tag("zones_cache");
