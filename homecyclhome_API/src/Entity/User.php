@@ -57,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: CommentaireIntervention::class, mappedBy: 'technicien')]
     private Collection $commentaireInterventions;
 
-    #[ORM\OneToOne(mappedBy: 'technician', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'technicien', cascade: ['persist', 'remove'])]
     private ?Zone $zone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -259,12 +259,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // unset the owning side of the relation if necessary
         if ($zone === null && $this->zone !== null) {
-            $this->zone->setTechnician(null);
+            $this->zone->setTechnicien(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($zone !== null && $zone->getTechnician() !== $this) {
-            $zone->setTechnician($this);
+        if ($zone !== null && $zone->getTechnicien() !== $this) {
+            $zone->setTechnicien($this);
         }
 
         $this->zone = $zone;

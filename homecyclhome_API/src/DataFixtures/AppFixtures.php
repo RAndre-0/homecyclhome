@@ -145,11 +145,11 @@ class AppFixtures extends Fixture
         foreach ($zonesData as $zoneInfo) {
             $zone = new Zone();
             $zone->setName($zoneInfo['name']);
-            $zone->setColour($zoneInfo['colour']);
+            $zone->setColor($zoneInfo['color']);
             $zone->setCoordinates($zoneInfo['coordinates']);
         
             // Associer un technicien unique à chaque zone
-            $zone->setTechnician(array_shift($techniciansForZones));
+            $zone->setTechnicien(array_shift($techniciansForZones));
         
             $manager->persist($zone);
         }

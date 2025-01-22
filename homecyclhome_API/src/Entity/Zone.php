@@ -26,7 +26,7 @@ class Zone
         message: 'Le code couleur doit être un code hexadécimal valide, par exemple #FFFFFF.'
     )]
     #[Groups(["get_zones"])]
-    private ?string $colour = null;
+    private ?string $color = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(["get_zones"])]
@@ -34,7 +34,7 @@ class Zone
 
     #[ORM\OneToOne(inversedBy: 'zone', cascade: ['persist', 'remove'])]
     #[Groups(["get_zones"])]
-    private ?User $technician = null;
+    private ?User $technicien = null;
 
     public function getId(): ?int
     {
@@ -53,14 +53,14 @@ class Zone
         return $this;
     }
 
-    public function getColour(): ?string
+    public function getColor(): ?string
     {
-        return $this->colour;
+        return $this->color;
     }
 
-    public function setColour(?string $colour): static
+    public function setColor(?string $color): static
     {
-        $this->colour = $colour;
+        $this->color = $color;
 
         return $this;
     }
@@ -77,14 +77,14 @@ class Zone
         return $this;
     }
 
-    public function getTechnician(): ?User
+    public function getTechnicien(): ?User
     {
-        return $this->technician;
+        return $this->technicien;
     }
 
-    public function setTechnician(?User $technician): static
+    public function setTechnicien(?User $technicien): static
     {
-        $this->technician = $technician;
+        $this->technicien = $technicien;
 
         return $this;
     }
