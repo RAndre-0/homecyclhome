@@ -66,7 +66,8 @@ export default function CreateInterventionsDialog({ onRefresh }: { onRefresh: ()
 
             const technicianIds = selectedTechniciens.map((id) => parseInt(id, 10));
 
-            await apiService(`new-interventions/${selectedModele}`, "POST", {
+            await apiService(`new-interventions`, "POST", {
+                model: selectedModele,
                 technicians: technicianIds,
                 from: formattedFrom,
                 to: formattedTo,

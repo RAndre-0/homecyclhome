@@ -124,12 +124,6 @@ export default function Login() {
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
-            Pas encore de compte ?{" "}
-            <Link href="#" className="underline">
-              Inscription
-            </Link>
-          </div>
         </div>
       </div>
       <div className="relative hidden lg:block">

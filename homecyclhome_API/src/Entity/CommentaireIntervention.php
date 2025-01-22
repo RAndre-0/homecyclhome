@@ -10,11 +10,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: CommentaireInterventionRepository::class)]
 class CommentaireIntervention
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(["get_intervention"])]
     private ?string $contenu = null;

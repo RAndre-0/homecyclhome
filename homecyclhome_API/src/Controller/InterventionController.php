@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Entity\Intervention;
 use App\Repository\InterventionRepository;
+use App\Entity\TypeIntervention;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,8 +91,23 @@ class InterventionController extends AbstractController
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache
     ): JsonResponse {
+
+        // Désérialisation partielle pour obtenir les données brutes
+        $data = json_decode($request->getContent(), true);
+
+        // Récupérer les entités associées
+        $typeIntervention = $em->getRepository(TypeIntervention::class)->find(intval($data['type_intervention']));
+        $technicien = $em->getRepository(User::class)->find(intval($data['technicien']));
+
+        if (!$typeIntervention || !$technicien) {
+            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
         // Désérialisation des données JSON en un objet intervention
         $intervention = $serializer->deserialize($request->getContent(), Intervention::class, "json");
+        // Associer le technicien et le type d'intervention
+        $intervention->setTypeIntervention($typeIntervention);
+        $intervention->setTechnicien($technicien);
 
         // Validation des données
         $errors = $validator->validate($intervention);
@@ -108,7 +124,7 @@ class InterventionController extends AbstractController
         // Génération de l'URL de la ressource créée
         $location = $urlGenerator->generate("get_intervention", ["id" => $intervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        // Sérialisation de la intervention créée pour la réponse
+        // Sérialisation de l'intervention créée
         $json_intervention = $serializer->serialize($intervention, "json");
 
         return new JsonResponse($json_intervention, JsonResponse::HTTP_CREATED, ["location" => $location], true);

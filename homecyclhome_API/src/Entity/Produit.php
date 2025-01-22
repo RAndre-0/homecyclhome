@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Assert\Length;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -56,7 +57,7 @@ class Produit
     }
 
     #[ORM\PrePersist]
-    public function setDateValues(): void
+    public function initializeDateValues(): void
     {
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->created_at = new \DateTimeImmutable('now', $timezone);
@@ -64,6 +65,7 @@ class Produit
     }
 
     #[ORM\PreUpdate]
+    #[Ignore]
     public function setModifiedAtValue(): void
     {
         $timezone = new \DateTimeZone('Europe/Paris');
