@@ -57,6 +57,7 @@ class Intervention
 
     #[ORM\ManyToOne(inversedBy: 'interventions')]
     #[Groups(["get_interventions", "get_intervention"])]
+    #[MaxDepth(1)]
     private ?TypeIntervention $type_intervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandes_intervention')]
