@@ -1,7 +1,7 @@
 [
     {
         "name": "Zone 1",
-        "colour": "#FF5733",
+        "color": "#FF5733",
         "coordinates": [
             {"longitude": 4.844069, "latitude": 45.776715},
             {"longitude": 4.840937, "latitude": 45.772672},
@@ -20,7 +20,7 @@
     },
     {
         "name": "Zone 2",
-        "colour": "#33FF57",
+        "color": "#33FF57",
         "coordinates": [
             {"longitude":4.859605,"latitude":45.74963},
             {"longitude":4.857545,"latitude":45.742544},
@@ -32,7 +32,7 @@
     },
     {
         "name": "Zone 3",
-        "colour": "#3357FF",
+        "color": "#3357FF",
         "coordinates": [
             {"longitude":4.82347,"latitude":45.75102},
             {"longitude":4.830723,"latitude":45.748668},

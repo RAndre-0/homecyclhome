@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -43,12 +44,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Intervention>
      */
     #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'client')]
+    #[MaxDepth(1)]
     private Collection $demandes_intervention;
 
     /**
      * @var Collection<int, Intervention>
      */
     #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'technicien')]
+    #[MaxDepth(1)]
     private Collection $interventions;
 
     /**
@@ -57,7 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: CommentaireIntervention::class, mappedBy: 'technicien')]
     private Collection $commentaireInterventions;
 
-    #[ORM\OneToOne(mappedBy: 'technician', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'technicien', cascade: ['persist', 'remove'])]
     private ?Zone $zone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -259,12 +262,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // unset the owning side of the relation if necessary
         if ($zone === null && $this->zone !== null) {
-            $this->zone->setTechnician(null);
+            $this->zone->setTechnicien(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($zone !== null && $zone->getTechnician() !== $this) {
-            $zone->setTechnician($this);
+        if ($zone !== null && $zone->getTechnicien() !== $this) {
+            $zone->setTechnicien($this);
         }
 
         $this->zone = $zone;

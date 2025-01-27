@@ -104,7 +104,7 @@ export default function Map() {
         const payload = {
             name: "Nom par défaut",
             colour: "#FF5733",
-            coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
+            coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
             technician: null,
         };
 
@@ -122,7 +122,7 @@ export default function Map() {
                 id,
                 name: "Nom modifié",
                 colour: "#FF5733",
-                coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
+                coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
                 technician: null,
             };
 
@@ -154,8 +154,8 @@ export default function Map() {
                 return;
             }
             const leafletPolygon = new L.Polygon(
-                polygon.coordinates.map((p: Coordinate) => [p.latitude, p.longitude]),
-                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id } as any
+                polygon.coordinates.map((p) => [p.latitude, p.longitude]),
+                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id }
             );
 
             leafletPolygon.on("click", () => {
@@ -192,9 +192,9 @@ export default function Map() {
                             <Input
                                 type="color"
                                 id="zoneColor"
-                                value={zoneSelected.colour}
+                                value={zoneSelected.color}
                                 onChange={(e) =>
-                                    setZoneSelected((prev) => ({ ...prev, colour: e.target.value }))
+                                    setZoneSelected((prev) => ({ ...prev, color: e.target.value }))
                                 }
                             />
                             <Label htmlFor="technicianSelect">Technicien</Label>

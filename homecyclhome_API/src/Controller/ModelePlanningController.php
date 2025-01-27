@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ModelePlanningController extends AbstractController
 {
@@ -33,23 +34,24 @@ class ModelePlanningController extends AbstractController
     }
 
     /* Créé des interventions à partir d'un modèle */
-    #[Route('/api/new-interventions/{idModel}', name: 'create_interventions_from_modele', methods: ["POST"])]
+    #[Route('/api/new-interventions', name: 'create_interventions_from_modele', methods: ["POST"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function createInterventionsFromModele(
-        int $idModel,
         Request $request,
         ModelePlanningRepository $modelePlanningRepository,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager
     ): JsonResponse {
-        // Récupérer le modèle de planning
-        $modelePlanning = $modelePlanningRepository->find($idModel);
-        if (!$modelePlanning) {
-            return new JsonResponse(['error' => 'Modèle de planning introuvable.'], 404);
-        }
     
         // Récupérer les données de la requête
         $data = json_decode($request->getContent(), true);
+
+        // Récupérer le modèle de planning
+        $idModele = $data["model"] ? intval($data["model"]) : NULL;
+        $modelePlanning = $modelePlanningRepository->find($idModele);
+        if (!$modelePlanning) {
+            return new JsonResponse(['error' => 'Modèle de planning introuvable.'], 404);
+        }
     
         // Valider les techniciens
         if (!isset($data['technicians']) || !is_array($data['technicians'])) {

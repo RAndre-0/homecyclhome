@@ -71,6 +71,7 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
         slotMinTime={"09:00:00"}
         slotMaxTime={"18:00:00"}
         height={"100%"}
+        dateClick={handleDateClick}
     />
     <InterventionDetailsDialog
         intervention={selectedIntervention}
@@ -89,4 +90,8 @@ function renderEventContent(eventInfo: any) {
       <i>{eventInfo.event.title}</i>
     </>
   );
+}
+
+const handleDateClick = (arg) => {
+  alert(arg.dateStr)
 }

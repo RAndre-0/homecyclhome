@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: TypeInterventionRepository::class)]
 class TypeIntervention
@@ -33,6 +34,7 @@ class TypeIntervention
      * @var Collection<int, Intervention>
      */
     #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'type_intervention')]
+    #[MaxDepth(1)]
     private Collection $interventions;
 
     /**
