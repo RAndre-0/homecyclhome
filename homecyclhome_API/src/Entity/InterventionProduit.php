@@ -6,6 +6,7 @@ use App\Repository\InterventionProduitRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: InterventionProduitRepository::class)]
 class InterventionProduit
@@ -19,6 +20,7 @@ class InterventionProduit
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'interventionProduit')]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(1)]
     #[Groups(["get_produit"])]
     private ?Intervention $intervention = null;
 

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
 class Intervention
@@ -51,6 +52,7 @@ class Intervention
      */
     #[ORM\OneToMany(targetEntity: InterventionProduit::class, mappedBy: 'intervention')]
     #[Groups(["get_intervention"])]
+    #[MaxDepth(1)]
     private Collection $interventionProduit;
 
     #[ORM\ManyToOne(inversedBy: 'interventions')]

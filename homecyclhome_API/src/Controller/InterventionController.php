@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\Entity\Intervention;
-use App\Repository\InterventionRepository;
 use App\Entity\TypeIntervention;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\InterventionRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,11 +15,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 
 class InterventionController extends AbstractController
@@ -100,7 +101,7 @@ class InterventionController extends AbstractController
         $technicien = $em->getRepository(User::class)->find(intval($data['technicien']));
 
         if (!$typeIntervention || !$technicien) {
-            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($serializer->serialize("Type d'intervention ou technicien non trouvé.", "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
 
         // Désérialisation des données JSON en un objet intervention
@@ -125,7 +126,12 @@ class InterventionController extends AbstractController
         $location = $urlGenerator->generate("get_intervention", ["id" => $intervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         // Sérialisation de l'intervention créée
-        $json_intervention = $serializer->serialize($intervention, "json");
+        $json_intervention = $serializer->serialize($intervention, 'json', [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => [
+                "typeIntervention",
+                "technicien"
+            ]
+        ]);
 
         return new JsonResponse($json_intervention, JsonResponse::HTTP_CREATED, ["location" => $location], true);
     }
