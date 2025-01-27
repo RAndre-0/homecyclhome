@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import TechnicienMultiSelect from "@/components/technicien-multi-select";
 import { DatePickerWithRange } from "@/components/ui/date-range";
 import { apiService } from "@/services/api-service";
-import { format } from "date-fns";
+import { formatDate } from "@/services/date-formatting";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -30,11 +30,6 @@ export default function CreateInterventionsDialog({ onRefresh }: { onRefresh: ()
     const [modeles, setModeles] = useState<ModelePlanning[]>([]);
     const [selectedModele, setSelectedModele] = useState<number | null>(null);
     const { toast } = useToast();
-
-    // Fonction pour formater les dates en 'Y-m-d'
-    const formatDate = (date: Date | null) => {
-        return date ? format(date, 'yyyy-MM-dd') : null;
-    };
 
     useEffect(() => {
         const fetchModeles = async () => {

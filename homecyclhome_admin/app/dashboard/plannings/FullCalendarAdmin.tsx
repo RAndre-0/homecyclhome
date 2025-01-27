@@ -10,6 +10,7 @@ import { apiService } from "@/services/api-service";
 import { Intervention, Technicien } from "@/types/types";
 import dayjs from "dayjs";
 import InterventionDetailsDialog from './InterventionDetailsDialog';
+import CreateInterventionDialog from "./CreateInterventionDialog";
 
 interface CalendarProps {
   selectedTechnicien: Technicien | null;
@@ -19,6 +20,7 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [selectedIntervention, setSelectedIntervention] = useState<Intervention | null>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialog2Open, setDialog2Open] = useState(false);
 
   // Récupérer les interventions d'un technicien
   useEffect(() => {
@@ -77,6 +79,10 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
         intervention={selectedIntervention}
         isOpen={isDialogOpen}
         onClose={() => setDialogOpen(false)}
+    />
+    <CreateInterventionDialog
+        isOpen={isDialog2Open}
+        onClose={() => setDialog2Open(false)}
     />
 </>
   );
