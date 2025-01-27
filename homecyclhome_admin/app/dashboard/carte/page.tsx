@@ -1,8 +1,10 @@
 "use client";
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import { Technician, Polygon, Coordinate } from '@/types/types';
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import L from "leaflet";
 import { useState, useEffect, useRef } from 'react';
 import { apiService } from "@/services/api-service";
 import {
@@ -36,12 +38,12 @@ const styles = {
 };
 
 export default function Map() {
-    const [polygons, setPolygons] = useState([]);
-    const [zoneSelected, setZoneSelected] = useState(null);
-    const [technicians, setTechnicians] = useState([]);
+    const [polygons, setPolygons] = useState<Polygon[]>([]);
+    const [zoneSelected, setZoneSelected] = useState<Polygon | null>(null);
+    const [technicians, setTechnicians] = useState<Technician[]>([]);
 
     // Référence pour le FeatureGroup
-    const featureGroupRef = useRef(null);
+    const featureGroupRef = useRef<L.FeatureGroup | null>(null);
 
     useEffect(() => {
         const fetchZones = async () => {
@@ -64,7 +66,7 @@ export default function Map() {
         fetchTechnicians();
     }, []);
 
-    const savePolygon = async (polygon) => {
+    const savePolygon = async (polygon: Polygon) => {
         try {
             const response = await apiService("zones", "POST", polygon);
             setPolygons((prevPolygons) => [...prevPolygons, { ...polygon, id: response.id }]);
@@ -73,8 +75,10 @@ export default function Map() {
         }
     };
 
-    const updatePolygon = async (polygon) => {
+    const updatePolygon = async (polygon: Polygon) => {
         try {
+            console.log(polygon);
+            
             await apiService(`zones/${polygon.id}/edit`, "PUT", polygon);
             setPolygons((prevPolygons) =>
                 prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
@@ -84,7 +88,7 @@ export default function Map() {
         }
     };
 
-    const deletePolygon = async (id) => {
+    const deletePolygon = async (id: number) => {
         try {
             await apiService(`zones/${id}`, "DELETE");
             setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));
@@ -93,23 +97,23 @@ export default function Map() {
         }
     };
 
-    const _onCreate = (e) => {
+    const _onCreate = (e: any) => {
         const newPolygon = e.layer.toGeoJSON();
         const coordinates = newPolygon.geometry.coordinates[0];
 
         const payload = {
             name: "Nom par défaut",
             colour: "#FF5733",
-            coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
+            coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
             technician: null,
         };
 
         savePolygon(payload);
     };
 
-    const _onEdited = (e) => {
+    const _onEdited = (e: any) => {
         const layers = e.layers;
-        layers.eachLayer((layer) => {
+        layers.eachLayer((layer: any) => {
             const updatedPolygon = layer.toGeoJSON();
             const id = layer.options.id;
             const coordinates = updatedPolygon.geometry.coordinates[0];
@@ -118,7 +122,7 @@ export default function Map() {
                 id,
                 name: "Nom modifié",
                 colour: "#FF5733",
-                coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
+                coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
                 technician: null,
             };
 
@@ -126,11 +130,11 @@ export default function Map() {
         });
     };
 
-    const _onDeleted = (e) => {
+    const _onDeleted = (e: any) => {
         const layers = e.layers;
-        const idsToDelete = [];
+        const idsToDelete: number[] = [];
 
-        layers.eachLayer((layer) => {
+        layers.eachLayer((layer: any) => {
             if (layer.options.id) {
                 idsToDelete.push(layer.options.id);
             }
@@ -144,11 +148,14 @@ export default function Map() {
         if (!featureGroup) return;
 
         featureGroup.clearLayers();
-
         polygons.forEach((polygon) => {
+            if (!polygon.coordinates) {
+                console.warn(`Les coordonnées sont indéfinies pour le polygon avec l'ID ${polygon.id}`);
+                return;
+            }
             const leafletPolygon = new L.Polygon(
-                polygon.coordinates.map((p) => [p.latitude, p.longitude]),
-                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id }
+                polygon.coordinates.map((p: Coordinate) => [p.latitude, p.longitude]),
+                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id } as any
             );
 
             leafletPolygon.on("click", () => {
@@ -202,7 +209,7 @@ export default function Map() {
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Choisir un technicien">
-                                        {zoneSelected.technician?.email}
+                                        {technicians.find((tech) => tech.id === zoneSelected.technician)?.email || "Aucun"}
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>

@@ -9,11 +9,11 @@ export interface Coordinate {
 }
 
 export interface Polygon {
-  id: number;
+  id?: number;
   name: string;
-  colour: string;
-  coordinates: Coordinate[];
-  technician: number | null;
+  colour?: string;
+  coordinates?: Coordinate[];
+  technician?: number | null;
 }
 
 export interface Technicien {
