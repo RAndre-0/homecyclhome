@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ModeleInterventionsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ModeleInterventionsRepository::class)]
 class ModeleInterventions
@@ -15,9 +16,11 @@ class ModeleInterventions
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups(["get_modele_planning"])]
     private ?\DateTimeInterface $interventiontime = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
+    #[Groups(["get_modele_planning"])]
     private ?TypeIntervention $typeIntervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]

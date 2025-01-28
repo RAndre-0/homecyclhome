@@ -74,7 +74,7 @@ class ProduitController extends AbstractController
     }
 
     /* Écrase un produit existant */
-    #[Route('/api/produits/{id}', name: 'update_produit', methods: ["PUT"])]
+    #[Route('/api/produits/{id}', name: 'update_produit', methods: ["PUT", "PATCH"])]
     public function update_produit(Produit $produit, EntityManagerInterface $em, SerializerInterface $serializer, ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $produitModifie = $serializer->deserialize($request->getContent(), Produit::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $produit]);

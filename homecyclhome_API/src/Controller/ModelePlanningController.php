@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ModelePlanningRepository;
 use App\Repository\UserRepository;
 use App\Entity\Intervention;
+use App\Entity\ModelePlanning;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,78 +34,42 @@ class ModelePlanningController extends AbstractController
         return new JsonResponse($listeModelesPlanning, Response::HTTP_OK, [], true);
     }
 
-    /* Créé des interventions à partir d'un modèle */
-    #[Route('/api/new-interventions', name: 'create_interventions_from_modele', methods: ["POST"])]
-    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function createInterventionsFromModele(
-        Request $request,
-        ModelePlanningRepository $modelePlanningRepository,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
-    
-        // Récupérer les données de la requête
-        $data = json_decode($request->getContent(), true);
-
-        // Récupérer le modèle de planning
-        $idModele = $data["model"] ? intval($data["model"]) : NULL;
-        $modelePlanning = $modelePlanningRepository->find($idModele);
-        if (!$modelePlanning) {
-            return new JsonResponse(['error' => 'Modèle de planning introuvable.'], 404);
-        }
-    
-        // Valider les techniciens
-        if (!isset($data['technicians']) || !is_array($data['technicians'])) {
-            return new JsonResponse(['error' => 'Les techniciens doivent être spécifiés sous forme de tableau d\'identifiants.'], 400);
-        }
-    
-        $technicians = [];
-        foreach ($data['technicians'] as $technicianId) {
-            $technician = $userRepository->find($technicianId);
-            if (!$technician) {
-                return new JsonResponse(['error' => "Technicien introuvable avec l'identifiant $technicianId."], 404);
-            }
-            $technicians[] = $technician;
-        }
-    
-        // Valider les dates "from" et "to"
-        if (!isset($data['from'], $data['to'])) {
-            return new JsonResponse(['error' => 'Les paramètres "from" et "to" doivent être spécifiés.'], 400);
-        }
-    
-        $from = \DateTime::createFromFormat('Y-m-d', $data['from']);
-        $to = \DateTime::createFromFormat('Y-m-d', $data['to']);
-        
-        if (!$from || !$to || $from > $to) {
-            return new JsonResponse(['error' => 'Les dates "from" et "to" doivent être valides et "from" ne peut pas être après "to".'], 400);
-        }
-    
-        // Générer les dates entre "from" et "to"
-        $interval = new \DateInterval('P1D'); // Intervalle d'un jour
-        $dateRange = new \DatePeriod($from, $interval, (clone $to)->modify('+1 day'));
-    
-        // Créer les interventions
-        foreach ($dateRange as $date) {
-            foreach ($technicians as $technician) {
-                foreach ($modelePlanning->getModeleInterventions() as $modeleIntervention) {
-                    $intervention = new Intervention();
-                    $intervention->setDebut((clone $date)->setTime(
-                        (int)$modeleIntervention->getInterventionTime()->format('H'),
-                        (int)$modeleIntervention->getInterventionTime()->format('i'),
-                        0
-                    ));
-                    $intervention->setTypeIntervention($modeleIntervention->getTypeIntervention());
-                    $intervention->setTechnicien($technician);
-                    $entityManager->persist($intervention);
-                }
-            }
-        }
-    
-        // Sauvegarde en base de données
-        $entityManager->flush();
-    
-        return new JsonResponse(['success' => 'Interventions créées avec succès.'], 201);
+    /* Renvoie un modèle de planning */
+    #[Route('/api/modeles-planning/{id}', name: 'get_modele_planning', methods: ["GET"])]
+    public function get_modele(ModelePlanning $modelePlanning, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    {
+        $modelePlanningJson = $serializer->serialize($modelePlanning, "json", ["groups" => "get_modele_planning"]);
+        return new JsonResponse($modelePlanningJson, Response::HTTP_OK, [], true);
     }
-    
-    
+
+    /* Supprime un modèle de planning et les types d'intervention liés */
+    #[Route('/api/modeles-planning/{id}', name: 'delete_modele_planning', methods: ["DELETE"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function delete_modele(
+        ModelePlanning $modelePlanning,
+        TagAwareCacheInterface $cache,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $interventionsModele = $modelePlanning->getModeleInterventions();
+        foreach ($interventionsModele as $intervention) {
+            $em->remove($intervention);
+        }
+        $em->remove($modelePlanning);
+        $em->flush();
+        $cache->invalidateTags(["modele_planning_cache"]);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /* Modifie un modèle */
+
+
+    /* Créé un nouveau modèle de planning */
+    #[Route("/api/modeles-planning", name: "create_modele_planning", methods: ["POST"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function create_modele(
+        EntityManagerInterface $em
+    ): JsonResponse {
+        return new JsonResponse("created", Response::HTTP_OK);
+    }
+
 }

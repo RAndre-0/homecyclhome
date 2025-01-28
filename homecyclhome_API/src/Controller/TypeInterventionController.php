@@ -27,7 +27,6 @@ class TypeInterventionController extends AbstractController
     {
         $idCache = "types_inter_cache";
         $cache->invalidateTags([$idCache]);
-
         $listTypesintervention = $cache->get($idCache, function (ItemInterface $item) use ($typeInterventionRepository, $serializer) {
             $item->tag("types_inter_cache");
             $listTypesintervention = $typeInterventionRepository->findAll();
