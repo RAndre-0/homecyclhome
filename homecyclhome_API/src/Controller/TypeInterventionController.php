@@ -3,14 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\TypeIntervention;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\HttpFoundation\Request;
 use App\Repository\TypeInterventionRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TypeInterventionController extends AbstractController
 {
@@ -37,4 +42,36 @@ class TypeInterventionController extends AbstractController
         $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_Intervention"]);
         return new JsonResponse($typeInterventionJson, Response::HTTP_OK, [], true);
     }
+
+    /* Nouveau type d'intervention */
+    #[Route('/api/types-intervention', name: 'create_type_intervention', methods: ["POST"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function create_type_intervention(
+        SerializerInterface $serializer, 
+        EntityManagerInterface $em, 
+        UrlGeneratorInterface $urlGenerator, 
+        ValidatorInterface $validator, 
+        TagAwareCacheInterface $cache, 
+        Request $request
+        ): JsonResponse
+    {
+        $typeIntervention = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json");
+
+        $errors = $validator->validate($typeIntervention);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $em->persist($typeIntervention);
+        $em->flush();
+        $cache->invalidateTags(["types_inter_cache"]);
+        $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_intervention"]);
+        $location = $urlGenerator->generate("user", ["id" => $typeIntervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($typeInterventionJson, Response::HTTP_CREATED, ["location" => $location], true);
+    }
+
+    /* Modifie un type d'intervention */
+
+
+    /* Supprime un type d'intervention */
 }
