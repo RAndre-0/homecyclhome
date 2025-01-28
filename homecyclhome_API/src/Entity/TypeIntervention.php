@@ -42,6 +42,7 @@ class TypeIntervention
      * @var Collection<int, ModeleInterventions>
      */
     #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'typeIntervention')]
+    #[MaxDepth(1)]
     private Collection $modeleInterventions;
 
     public function __construct()

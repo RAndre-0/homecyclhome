@@ -111,6 +111,6 @@ class UserController extends AbstractController
         $em->flush();
         $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse($serializer->serialize($userModifie, 'json'), Response::HTTP_OK, [], true);
     }
 }

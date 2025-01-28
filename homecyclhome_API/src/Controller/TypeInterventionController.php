@@ -7,15 +7,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\TypeInterventionRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TypeInterventionController extends AbstractController
 {
@@ -70,7 +72,22 @@ class TypeInterventionController extends AbstractController
     }
 
     /* Modifie un type d'intervention */
+    #[Route("api/types-intervention/{id}", name: "update_type_intervention", methods: ["PATCH", "PUT"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function update_type_intervention(
+        TypeIntervention $typeIntervention, 
+        SerializerInterface $serializer, 
+        Request $request,
+        EntityManagerInterface $em,
+        TagAwareCacheInterface $cache
+        ): JsonResponse {
+        $typeInterventionModifie = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $typeIntervention]);
+        $em->persist($typeInterventionModifie);
+        $em->flush();
+        $cache->invalidateTags(["types_inter_cache"]);
 
+        return new JsonResponse($serializer->serialize($typeInterventionModifie, "json", ["groups" => "get_type_intervention"]), Response::HTTP_OK, [], true);
+    }
 
     /* Supprime un type d'intervention et les interventions qui lui sont liées */
     #[Route('/api/types-intervention/{id}', name: 'delete_type_intervention', methods: ["DELETE"])]
