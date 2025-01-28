@@ -16,18 +16,19 @@ class TypeIntervention
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["get_types_intervention", "get_type_Intervention"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["get_interventions", "get_intervention"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention"])]
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(["get_interventions", "get_intervention"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention"])]
     private ?\DateTimeInterface $duree = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(["get_interventions", "get_intervention"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention"])]
     private ?string $prix_depart = null;
 
     /**
