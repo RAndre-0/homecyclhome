@@ -29,15 +29,15 @@ class InterventionController extends AbstractController
     #[Route('/api/interventions', name: 'get_interventions', methods: ["GET"])]
     public function get_interventions(InterventionRepository $interventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $id_cache = "interventions_cache";
+        $idCache = "interventions_cache";
         $cache->invalidateTags(["interventions_cache"]);
-        $liste_interventions = $cache->get($id_cache, function (ItemInterface $item) use ($interventionRepository, $serializer) {
+        $listeInterventions = $cache->get($idCache, function (ItemInterface $item) use ($interventionRepository, $serializer) {
             $item->tag("interventions_cache");
-            $liste_interventions = $interventionRepository->findAll();
-            return $serializer->serialize($liste_interventions, "json", ["groups" => "get_interventions"]);
+            $listeInterventions = $interventionRepository->findAll();
+            return $serializer->serialize($listeInterventions, "json", ["groups" => "get_interventions"]);
         });
 
-        return new JsonResponse($liste_interventions, Response::HTTP_OK, [], true);
+        return new JsonResponse($listeInterventions, Response::HTTP_OK, [], true);
     }
     
     /* Renvoie les interventions d'un technicien */
@@ -53,8 +53,8 @@ class InterventionController extends AbstractController
     
         $interventions = $interventionRepository->findByTechnicienWithFilter($id, $reservedOnly);
     
-        $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
-        return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
+        $interventionsJson = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
+        return new JsonResponse($interventionsJson, Response::HTTP_OK, [], true);
     }
 
     /* Renvoie les interventions d'un client */
@@ -70,16 +70,16 @@ class InterventionController extends AbstractController
             return new JsonResponse([], Response::HTTP_NOT_FOUND);
         }
 
-        $interventions_json = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
-        return new JsonResponse($interventions_json, Response::HTTP_OK, [], true);
+        $interventionsJson = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
+        return new JsonResponse($interventionsJson, Response::HTTP_OK, [], true);
     }
 
     /* Retourne une intervention */
     #[Route('/api/interventions/{id}', name: 'get_intervention', methods: ["GET"])]
     public function get_intervention(Intervention $intervention, SerializerInterface $serializer): JsonResponse
     {
-        $intervention_json = $serializer->serialize($intervention, "json", ["groups" => "get_intervention"]);
-        return new JsonResponse($intervention_json, Response::HTTP_OK, [], true);
+        $interventionJson = $serializer->serialize($intervention, "json", ["groups" => "get_intervention"]);
+        return new JsonResponse($interventionJson, Response::HTTP_OK, [], true);
     }
 
     /* Créé une nouvelle intervention */
@@ -126,22 +126,22 @@ class InterventionController extends AbstractController
         $location = $urlGenerator->generate("get_intervention", ["id" => $intervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         // Sérialisation de l'intervention créée
-        $json_intervention = $serializer->serialize($intervention, 'json', [
+        $interventionsJson = $serializer->serialize($intervention, 'json', [
             AbstractNormalizer::IGNORED_ATTRIBUTES => [
                 "typeIntervention",
                 "technicien"
             ]
         ]);
 
-        return new JsonResponse($json_intervention, JsonResponse::HTTP_CREATED, ["location" => $location], true);
+        return new JsonResponse($interventionsJson, JsonResponse::HTTP_CREATED, ["location" => $location], true);
     }
 
     /* Modifie une intervention */
     #[Route("/api/interventions/{id}/edit", name: "update_intervention", methods: ["PUT", "PATCH"])]
     public function edit_intervention(Request $request, Intervention $intervention, EntityManagerInterface $em, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
-        $intervention_modifiee = $serializer->deserialize($request->getContent(), Intervention::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $intervention]);
-        $em->persist($intervention_modifiee);
+        $interventionModifiee = $serializer->deserialize($request->getContent(), Intervention::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $intervention]);
+        $em->persist($interventionModifiee);
         $em->flush();
         $cache->invalidateTags(["interventions_cache"]);
 

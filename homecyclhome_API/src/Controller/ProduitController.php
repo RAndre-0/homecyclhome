@@ -24,23 +24,23 @@ class ProduitController extends AbstractController
     #[Route('/api/produits', name: 'produits', methods: ["GET"])]
     public function get_produits(ProduitRepository $produitRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $id_cache = "get_produits";
+        $idCache = "get_produits";
 
-        $liste_produits = $cache->get($id_cache, function (ItemInterface $item) use ($produitRepository, $serializer) {
+        $listeProduits = $cache->get($idCache, function (ItemInterface $item) use ($produitRepository, $serializer) {
             $item->tag("produits_cache");
-            $liste_produits = $produitRepository->findAll();
-            return $serializer->serialize($liste_produits, "json", ["groups" => "get_produits"]);
+            $listeProduits = $produitRepository->findAll();
+            return $serializer->serialize($listeProduits, "json", ["groups" => "get_produits"]);
         });
 
-        return new JsonResponse($liste_produits, Response::HTTP_OK, [], true);
+        return new JsonResponse($listeProduits, Response::HTTP_OK, [], true);
     }
 
     /* Retourne un produit */
     #[Route('/api/produits/{id}', name: 'produit', methods: ["GET"])]
     public function get_produit(Produit $produit, ProduitRepository $produitRepository, SerializerInterface $serializer): JsonResponse
     {
-        $produit_json = $serializer->serialize($produit, 'json', ["groups" => "get_produit"]);
-        return new JsonResponse($produit_json, Response::HTTP_OK, [], true);
+        $produitjson = $serializer->serialize($produit, 'json', ["groups" => "get_produit"]);
+        return new JsonResponse($produitjson, Response::HTTP_OK, [], true);
     }
 
     /* Supprime un produit */
@@ -68,17 +68,17 @@ class ProduitController extends AbstractController
 
         $em->persist($produit);
         $em->flush();
-        $json_produit = $serializer->serialize($produit, "json", ["groups" => "get_produits"]);
+        $produitJson = $serializer->serialize($produit, "json", ["groups" => "get_produits"]);
         $location = $urlGenerator->generate("produit", ["id" => $produit->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        return new JsonResponse($json_produit, Response::HTTP_CREATED, ["location" => $location], true);
+        return new JsonResponse($produitJson, Response::HTTP_CREATED, ["location" => $location], true);
     }
 
     /* Écrase un produit existant */
     #[Route('/api/produits/{id}', name: 'update_produit', methods: ["PUT"])]
     public function update_produit(Produit $produit, EntityManagerInterface $em, SerializerInterface $serializer, ProduitRepository $produitRepository, Request $request): JsonResponse
     {
-        $produit_modifie = $serializer->deserialize($request->getContent(), Produit::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $produit]);
-        $em->persist($produit_modifie);
+        $produitModifie = $serializer->deserialize($request->getContent(), Produit::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $produit]);
+        $em->persist($produitModifie);
         $em->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);

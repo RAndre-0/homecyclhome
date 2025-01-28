@@ -24,7 +24,7 @@ class AppFixtures extends Fixture
     }
     public function load(ObjectManager $manager): void
     {
-        $velos_references = [
+        $velosReferences = [
             "Peugeot" => ["Citystar", "RC500", "RCZ", "E-Legend"],
             "Lapierre" => ["Overvolt", "Aircode", "Xelius"],
             "Look" => ["999 Race", "795 Blade", "695", "E-765"],
@@ -184,8 +184,8 @@ class AppFixtures extends Fixture
             $intervention = new Intervention();
             $intervention->setVeloElectrique($i%2);
             $intervention->setVeloCategorie("Catégorie");
-            $marque = array_rand($velos_references);
-            $modeles = $velos_references[$marque];
+            $marque = array_rand($velosReferences);
+            $modeles = $velosReferences[$marque];
             $modeleAleatoire = $modeles[array_rand($modeles)];
             $intervention->setVeloMarque($marque);
             $intervention->setVeloModele($modeleAleatoire);

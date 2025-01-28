@@ -62,8 +62,8 @@ class UserController extends AbstractController
     #[Route('/api/users/{id}', name: 'user', methods: ["GET"])]
     public function get_user(User $user, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
     {
-        $user_json = $serializer->serialize($user, 'json', ["groups" => "get_user"]);
-        return new JsonResponse($user_json, Response::HTTP_OK, [], true);
+        $userJson = $serializer->serialize($user, 'json', ["groups" => "get_user"]);
+        return new JsonResponse($userJson, Response::HTTP_OK, [], true);
     }
 
     /* Supprime un utilisateur */
@@ -90,24 +90,24 @@ class UserController extends AbstractController
         }
 
         /* Hash le mot de passe de l'utilisateur */
-        $plaintext_password = $user->getPassword();
-        $hashedPassword = $passwordHasher->hashPassword($user, $plaintext_password);
+        $plaintextpassword = $user->getPassword();
+        $hashedPassword = $passwordHasher->hashPassword($user, $plaintextpassword);
         $user->setPassword($hashedPassword);
 
         $em->persist($user);
         $em->flush();
         $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
-        $json_user = $serializer->serialize($user, "json", ["groups" => "get_users"]);
+        $jsonUser = $serializer->serialize($user, "json", ["groups" => "get_users"]);
         $location = $urlGenerator->generate("user", ["id" => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        return new JsonResponse($json_user, Response::HTTP_CREATED, ["location" => $location], true);
+        return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["location" => $location], true);
     }
 
     /* Met à jour un utilisateur existant */
     #[Route('/api/users/{id}', name: 'update_user', methods: ["PUT", "PATCH"])]
     public function update_user(User $user, EntityManagerInterface $em, SerializerInterface $serializer, UserRepository $userRepository, Request $request, TagAwareCacheInterface $cache): JsonResponse
     {
-        $user_modifie = $serializer->deserialize($request->getContent(), User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
-        $em->persist($user_modifie);
+        $userModifie = $serializer->deserialize($request->getContent(), User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+        $em->persist($userModifie);
         $em->flush();
         $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
 

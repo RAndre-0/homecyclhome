@@ -16,7 +16,7 @@ class CommentaireIntervention
 
     #[ORM\Column]
     #[Groups(["get_intervention"])]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'commentaireInterventions')]
@@ -25,11 +25,6 @@ class CommentaireIntervention
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     private ?Intervention $intervention = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getContenu(): ?string
     {
@@ -45,12 +40,12 @@ class CommentaireIntervention
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

@@ -23,16 +23,16 @@ class TypeInterventionController extends AbstractController
     #[Route('/api/types-intervention', name: 'get_types_intervention', methods: ["GET"])]
     public function get_types_intervention(TypeInterventionRepository $typeInterventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $id_cache = "types_inter_cache";
-        $cache->invalidateTags([$id_cache]);
+        $idCache = "types_inter_cache";
+        $cache->invalidateTags([$idCache]);
 
-        $list_types_intervention = $cache->get($id_cache, function (ItemInterface $item) use ($typeInterventionRepository, $serializer) {
+        $listTypesintervention = $cache->get($idCache, function (ItemInterface $item) use ($typeInterventionRepository, $serializer) {
             $item->tag("types_inter_cache");
-            $list_types_intervention = $typeInterventionRepository->findAll();
-            return $serializer->serialize($list_types_intervention, "json", ["groups" => "get_types_intervention"]);
+            $listTypesintervention = $typeInterventionRepository->findAll();
+            return $serializer->serialize($listTypesintervention, "json", ["groups" => "get_types_intervention"]);
         });
 
-        return new JsonResponse($list_types_intervention, Response::HTTP_OK, [], true);
+        return new JsonResponse($listTypesintervention, Response::HTTP_OK, [], true);
     }
 
     /* Retourne un type d'intervention */

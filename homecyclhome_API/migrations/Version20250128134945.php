@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250122132033 extends AbstractMigration
+final class Version20250128134945 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -40,7 +40,7 @@ final class Version20250122132033 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_624B9842F347EFB ON intervention_produit (produit_id)');
         $this->addSql('CREATE INDEX IDX_624B98428EAE3863 ON intervention_produit (intervention_id)');
         $this->addSql('CREATE TABLE marque (id INT NOT NULL, nom VARCHAR(255) NOT NULL, logo VARCHAR(255) DEFAULT NULL, couleur VARCHAR(7) DEFAULT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE modele_interventions (id INT NOT NULL, type_intervention_id INT DEFAULT NULL, modele_intervention_id INT DEFAULT NULL, intervention_time TIME(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE modele_interventions (id INT NOT NULL, type_intervention_id INT DEFAULT NULL, modele_intervention_id INT DEFAULT NULL, interventiontime TIME(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_1E51F4AA799AAC17 ON modele_interventions (type_intervention_id)');
         $this->addSql('CREATE INDEX IDX_1E51F4AA6056A4E3 ON modele_interventions (modele_intervention_id)');
         $this->addSql('CREATE TABLE modele_planning (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');

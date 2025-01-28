@@ -21,19 +21,19 @@ class Intervention
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
-    private ?string $velo_categorie = null;
+    private ?string $veloCategorie = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
-    private ?bool $velo_electrique = null;
+    private ?bool $veloElectrique = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
-    private ?string $velo_marque = null;
+    private ?string $veloMarque = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
-    private ?string $velo_modele = null;
+    private ?string $veloModele = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
@@ -41,7 +41,7 @@ class Intervention
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
-    private ?string $commentaire_client = null;
+    private ?string $commentaireClient = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_interventions", "get_intervention"])]
@@ -58,7 +58,7 @@ class Intervention
     #[ORM\ManyToOne(inversedBy: 'interventions')]
     #[Groups(["get_interventions", "get_intervention"])]
     #[MaxDepth(1)]
-    private ?TypeIntervention $type_intervention = null;
+    private ?TypeIntervention $typeIntervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandes_intervention')]
     #[Groups(["get_interventions", "get_intervention"])]
@@ -91,48 +91,48 @@ class Intervention
 
     public function getVeloCategorie(): ?string
     {
-        return $this->velo_categorie;
+        return $this->veloCategorie;
     }
 
-    public function setVeloCategorie(?string $velo_categorie): static
+    public function setVeloCategorie(?string $veloCategorie): static
     {
-        $this->velo_categorie = $velo_categorie;
+        $this->veloCategorie = $veloCategorie;
 
         return $this;
     }
 
     public function isVeloElectrique(): ?bool
     {
-        return $this->velo_electrique;
+        return $this->veloElectrique;
     }
 
-    public function setVeloElectrique(?bool $velo_electrique): static
+    public function setVeloElectrique(?bool $veloElectrique): static
     {
-        $this->velo_electrique = $velo_electrique;
+        $this->veloElectrique = $veloElectrique;
 
         return $this;
     }
 
     public function getVeloMarque(): ?string
     {
-        return $this->velo_marque;
+        return $this->veloMarque;
     }
 
-    public function setVeloMarque(?string $velo_marque): static
+    public function setVeloMarque(?string $veloMarque): static
     {
-        $this->velo_marque = $velo_marque;
+        $this->veloMarque = $veloMarque;
 
         return $this;
     }
 
     public function getVeloModele(): ?string
     {
-        return $this->velo_modele;
+        return $this->veloModele;
     }
 
-    public function setVeloModele(string $velo_modele): static
+    public function setVeloModele(string $veloModele): static
     {
-        $this->velo_modele = $velo_modele;
+        $this->veloModele = $veloModele;
 
         return $this;
     }
@@ -151,12 +151,12 @@ class Intervention
 
     public function getCommentaireClient(): ?string
     {
-        return $this->commentaire_client;
+        return $this->commentaireClient;
     }
 
-    public function setCommentaireClient(?string $commentaire_client): static
+    public function setCommentaireClient(?string $commentaireClient): static
     {
-        $this->commentaire_client = $commentaire_client;
+        $this->commentaireClient = $commentaireClient;
 
         return $this;
     }
@@ -205,12 +205,12 @@ class Intervention
 
     public function getTypeIntervention(): ?TypeIntervention
     {
-        return $this->type_intervention;
+        return $this->typeIntervention;
     }
 
-    public function setTypeIntervention(?TypeIntervention $type_intervention): static
+    public function setTypeIntervention(?TypeIntervention $typeIntervention): static
     {
-        $this->type_intervention = $type_intervention;
+        $this->typeIntervention = $typeIntervention;
 
         return $this;
     }

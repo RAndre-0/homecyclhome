@@ -45,7 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'client')]
     #[MaxDepth(1)]
-    private Collection $demandes_intervention;
+    private Collection $demandesIntervention;
 
     /**
      * @var Collection<int, Intervention>
@@ -73,7 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->demandes_intervention = new ArrayCollection();
+        $this->demandesIntervention = new ArrayCollection();
         $this->interventions = new ArrayCollection();
         $this->commentaireInterventions = new ArrayCollection();
     }
@@ -168,13 +168,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getDemandesIntervention(): Collection
     {
-        return $this->demandes_intervention;
+        return $this->demandesIntervention;
     }
 
     public function addDemandesIntervention(Intervention $demandesIntervention): static
     {
-        if (!$this->demandes_intervention->contains($demandesIntervention)) {
-            $this->demandes_intervention->add($demandesIntervention);
+        if (!$this->demandesIntervention->contains($demandesIntervention)) {
+            $this->demandesIntervention->add($demandesIntervention);
             $demandesIntervention->setClient($this);
         }
 
@@ -183,7 +183,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeDemandesIntervention(Intervention $demandesIntervention): static
     {
-        if ($this->demandes_intervention->removeElement($demandesIntervention)) {
+        if ($this->demandesIntervention->removeElement($demandesIntervention)) {
             // set the owning side to null (unless already changed)
             if ($demandesIntervention->getClient() === $this) {
                 $demandesIntervention->setClient(null);

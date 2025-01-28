@@ -22,15 +22,15 @@ class ModelePlanningController extends AbstractController
     #[Route('/api/modeles-planning', name: 'get_modeles_planning', methods: ["GET"])]
     public function get_modeles(ModelePlanningRepository $modelePlanningRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $id_cache = "modele_planning_cache";
+        $idCache = "modele_planning_cache";
         $cache->invalidateTags(["modele_planning_cache"]);
-        $liste_modeles_planning = $cache->get($id_cache, function (ItemInterface $item) use ($modelePlanningRepository, $serializer) {
+        $listeModelesPlanning = $cache->get($idCache, function (ItemInterface $item) use ($modelePlanningRepository, $serializer) {
             $item->tag("modele_planning_cache");
-            $liste_modeles_planning = $modelePlanningRepository->findAll();
-            return $serializer->serialize($liste_modeles_planning, "json", ["groups" => "get_modeles_planning"]);
+            $listeModelesPlanning = $modelePlanningRepository->findAll();
+            return $serializer->serialize($listeModelesPlanning, "json", ["groups" => "get_modeles_planning"]);
         });
 
-        return new JsonResponse($liste_modeles_planning, Response::HTTP_OK, [], true);
+        return new JsonResponse($listeModelesPlanning, Response::HTTP_OK, [], true);
     }
 
     /* Créé des interventions à partir d'un modèle */

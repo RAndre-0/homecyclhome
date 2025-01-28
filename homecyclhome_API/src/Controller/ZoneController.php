@@ -27,13 +27,13 @@ final class ZoneController extends AbstractController
     {
         $id_cache = "get_zones";
 
-        $liste_zones = $cache->get($id_cache, function ($item) use ($zoneRepository, $serializer) {
+        $listeZones = $cache->get($id_cache, function ($item) use ($zoneRepository, $serializer) {
             $item->tag("zones_cache");
-            $liste_zones = $zoneRepository->findAll();
-            return $serializer->serialize($liste_zones, "json", ["groups" => "get_zones"]);
+            $listeZones = $zoneRepository->findAll();
+            return $serializer->serialize($listeZones, "json", ["groups" => "get_zones"]);
         });
 
-        return new JsonResponse($liste_zones, Response::HTTP_OK, [], true);
+        return new JsonResponse($listeZones, Response::HTTP_OK, [], true);
     }
 
     /* Créé une nouvelle zone */
@@ -66,17 +66,17 @@ final class ZoneController extends AbstractController
         $location = $urlGenerator->generate("get_zone", ["id" => $zone->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         // Sérialisation de la zone créée pour la réponse
-        $json_zone = $serializer->serialize($zone, "json");
+        $zoneJson = $serializer->serialize($zone, "json");
 
-        return new JsonResponse($json_zone, JsonResponse::HTTP_CREATED, ["location" => $location], true);
+        return new JsonResponse($zoneJson, JsonResponse::HTTP_CREATED, ["location" => $location], true);
     }
 
     /* Retourne une zone */
     #[Route("/api/zones/{id}", name: "get_zone", methods: ["GET"])]
     public function show_zone(Zone $zone, SerializerInterface $serializer): JsonResponse
     {
-        $zone_json = $serializer->serialize($zone, 'json');
-        return new JsonResponse($zone_json, Response::HTTP_OK, [], true);
+        $zoneJson = $serializer->serialize($zone, 'json');
+        return new JsonResponse($zoneJson, Response::HTTP_OK, [], true);
     }
 
     /* Modifie une zone */
@@ -84,16 +84,16 @@ final class ZoneController extends AbstractController
     public function edit_zone(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $zone_modifie = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
+        $zoneModifiee = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
         // Gérer la relation avec le technicien
         if (isset($data['technician'])) {
             $technician = $userRepository->find(intval($data['technician']));
             if (!$technician) {
                 return new JsonResponse(['message' => 'Technician not found'], Response::HTTP_BAD_REQUEST);
             }
-            $zone_modifie->setTechnician($technician);
+            $zoneModifiee->setTechnician($technician);
         }
-        $em->persist($zone_modifie);
+        $em->persist($zoneModifiee);
         $em->flush();
         $cache->invalidateTags(["zones_cache"]);
 

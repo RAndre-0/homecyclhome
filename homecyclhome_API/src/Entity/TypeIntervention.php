@@ -29,7 +29,7 @@ class TypeIntervention
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention"])]
-    private ?string $prix_depart = null;
+    private ?string $prixDepart = null;
 
     /**
      * @var Collection<int, Intervention>
@@ -81,12 +81,12 @@ class TypeIntervention
 
     public function getPrixDepart(): ?string
     {
-        return $this->prix_depart;
+        return $this->prixDepart;
     }
 
-    public function setPrixDepart(string $prix_depart): static
+    public function setPrixDepart(string $prixDepart): static
     {
-        $this->prix_depart = $prix_depart;
+        $this->prixDepart = $prixDepart;
 
         return $this;
     }

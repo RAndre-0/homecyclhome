@@ -38,11 +38,11 @@ class Produit
 
     #[ORM\Column]
     #[Groups(["get_produits", "get_produit"])]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["get_produits", "get_produit"])]
-    private ?\DateTimeInterface $modified_at = null;
+    private ?\DateTimeInterface $modifiedAt = null;
 
     /**
      * @var Collection<int, InterventionProduit>
@@ -60,8 +60,8 @@ class Produit
     public function initializeDateValues(): void
     {
         $timezone = new \DateTimeZone('Europe/Paris');
-        $this->created_at = new \DateTimeImmutable('now', $timezone);
-        $this->modified_at = new \DateTime('now', $timezone);
+        $this->createdAt = new \DateTimeImmutable('now', $timezone);
+        $this->modifiedAt = new \DateTime('now', $timezone);
     }
 
     #[ORM\PreUpdate]
@@ -69,7 +69,7 @@ class Produit
     public function setModifiedAtValue(): void
     {
         $timezone = new \DateTimeZone('Europe/Paris');
-        $this->modified_at = new \DateTime('now', $timezone);
+        $this->modifiedAt = new \DateTime('now', $timezone);
     }
 
     public function getId(): ?int
@@ -115,24 +115,24 @@ class Produit
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getModifiedAt(): ?\DateTimeInterface
     {
-        return $this->modified_at;
+        return $this->modifiedAt;
     }
 
-    public function setModifiedAt(\DateTimeInterface $modified_at): static
+    public function setModifiedAt(\DateTimeInterface $modifiedAt): static
     {
-        $this->modified_at = $modified_at;
+        $this->modifiedAt = $modifiedAt;
 
         return $this;
     }

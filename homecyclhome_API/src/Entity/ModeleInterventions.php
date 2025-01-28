@@ -15,13 +15,13 @@ class ModeleInterventions
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $intervention_time = null;
+    private ?\DateTimeInterface $interventiontime = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
-    private ?TypeIntervention $type_intervention = null;
+    private ?TypeIntervention $typeIntervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
-    private ?ModelePlanning $modele_intervention = null;
+    private ?ModelePlanning $modeleIntervention = null;
 
     public function getId(): ?int
     {
@@ -30,36 +30,36 @@ class ModeleInterventions
 
     public function getInterventionTime(): ?\DateTimeInterface
     {
-        return $this->intervention_time;
+        return $this->interventiontime;
     }
 
-    public function setInterventionTime(\DateTimeInterface $intervention_time): static
+    public function setInterventionTime(\DateTimeInterface $interventiontime): static
     {
-        $this->intervention_time = $intervention_time;
+        $this->interventiontime = $interventiontime;
 
         return $this;
     }
 
     public function getTypeIntervention(): ?TypeIntervention
     {
-        return $this->type_intervention;
+        return $this->typeIntervention;
     }
 
-    public function setTypeIntervention(?TypeIntervention $type_intervention): static
+    public function setTypeIntervention(?TypeIntervention $typeIntervention): static
     {
-        $this->type_intervention = $type_intervention;
+        $this->typeIntervention = $typeIntervention;
 
         return $this;
     }
 
     public function getModeleIntervention(): ?ModelePlanning
     {
-        return $this->modele_intervention;
+        return $this->modeleIntervention;
     }
 
-    public function setModeleIntervention(?ModelePlanning $modele_intervention): static
+    public function setModeleIntervention(?ModelePlanning $modeleIntervention): static
     {
-        $this->modele_intervention = $modele_intervention;
+        $this->modeleIntervention = $modeleIntervention;
 
         return $this;
     }
