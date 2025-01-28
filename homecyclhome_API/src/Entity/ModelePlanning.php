@@ -24,7 +24,7 @@ class ModelePlanning
     /**
      * @var Collection<int, ModeleInterventions>
      */
-    #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'modele_intervention')]
+    #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'modeleIntervention')]
     private Collection $modeleInterventions;
 
     public function __construct()

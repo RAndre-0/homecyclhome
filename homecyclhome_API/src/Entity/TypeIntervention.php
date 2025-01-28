@@ -34,14 +34,14 @@ class TypeIntervention
     /**
      * @var Collection<int, Intervention>
      */
-    #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'type_intervention')]
+    #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'typeIntervention')]
     #[MaxDepth(1)]
     private Collection $interventions;
 
     /**
      * @var Collection<int, ModeleInterventions>
      */
-    #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'type_intervention')]
+    #[ORM\OneToMany(targetEntity: ModeleInterventions::class, mappedBy: 'typeIntervention')]
     private Collection $modeleInterventions;
 
     public function __construct()

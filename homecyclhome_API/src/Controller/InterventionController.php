@@ -97,15 +97,18 @@ class InterventionController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Récupérer les entités associées
-        $typeIntervention = $em->getRepository(TypeIntervention::class)->find(intval($data['type_intervention']));
-        $technicien = $em->getRepository(User::class)->find(intval($data['technicien']));
+        $typeIntervention = $em->getRepository(TypeIntervention::class)->find(intval($data["type_intervention"]));
+        $technicien = $em->getRepository(User::class)->find(intval($data["technicien"]));
 
         if (!$typeIntervention || !$technicien) {
             return new JsonResponse($serializer->serialize("Type d'intervention ou technicien non trouvé.", "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
 
+        unset($data["type_intervention"], $data["technicien"]);
+
         // Désérialisation des données JSON en un objet intervention
-        $intervention = $serializer->deserialize($request->getContent(), Intervention::class, "json");
+        $intervention = $serializer->deserialize(json_encode($data), Intervention::class, "json");
+
         // Associer le technicien et le type d'intervention
         $intervention->setTypeIntervention($typeIntervention);
         $intervention->setTechnicien($technicien);
@@ -124,9 +127,8 @@ class InterventionController extends AbstractController
 
         // Génération de l'URL de la ressource créée
         $location = $urlGenerator->generate("get_intervention", ["id" => $intervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
         // Sérialisation de l'intervention créée
-        $interventionsJson = $serializer->serialize($intervention, 'json', [
+        $interventionsJson = $serializer->serialize($intervention, "json", [
             AbstractNormalizer::IGNORED_ATTRIBUTES => [
                 "typeIntervention",
                 "technicien"

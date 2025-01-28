@@ -47,14 +47,13 @@ class TypeInterventionController extends AbstractController
     #[Route('/api/types-intervention', name: 'create_type_intervention', methods: ["POST"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function create_type_intervention(
-        SerializerInterface $serializer, 
-        EntityManagerInterface $em, 
-        UrlGeneratorInterface $urlGenerator, 
-        ValidatorInterface $validator, 
-        TagAwareCacheInterface $cache, 
+        SerializerInterface $serializer,
+        EntityManagerInterface $em,
+        UrlGeneratorInterface $urlGenerator,
+        ValidatorInterface $validator,
+        TagAwareCacheInterface $cache,
         Request $request
-        ): JsonResponse
-    {
+    ): JsonResponse {
         $typeIntervention = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json");
 
         $errors = $validator->validate($typeIntervention);
@@ -73,5 +72,17 @@ class TypeInterventionController extends AbstractController
     /* Modifie un type d'intervention */
 
 
-    /* Supprime un type d'intervention */
+    /* Supprime un type d'intervention et les interventions qui lui sont liées */
+    #[Route('/api/types-intervention/{id}', name: 'delete_type_intervention', methods: ["DELETE"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function delete_type_intervention(EntityManagerInterface $em, TypeIntervention $typeIntervention, TagAwareCacheInterface $cache): JsonResponse {
+        $interventions = $typeIntervention->getInterventions();
+        foreach ($interventions as $intervention) {
+            $em->remove($intervention);
+        }
+        $em->remove($typeIntervention);
+        $em->flush();
+        $cache->invalidateTags(["types_inter_cache"]);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
 }
