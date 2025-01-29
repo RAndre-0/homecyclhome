@@ -30,15 +30,18 @@ class InterventionController extends AbstractController
     #[Route('/api/interventions', name: 'get_interventions', methods: ["GET"])]
     public function get_interventions(InterventionRepository $interventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $idCache = "interventions_cache";
-        $cache->invalidateTags(["interventions_cache"]);
-        $listeInterventions = $cache->get($idCache, function (ItemInterface $item) use ($interventionRepository, $serializer) {
-            $item->tag("interventions_cache");
-            $listeInterventions = $interventionRepository->findAll();
-            return $serializer->serialize($listeInterventions, "json", ["groups" => "get_interventions"]);
-        });
-
-        return new JsonResponse($listeInterventions, Response::HTTP_OK, [], true);
+        try {
+            $idCache = "interventions_cache";
+            $cache->invalidateTags(["interventions_cache"]);
+            $listeInterventions = $cache->get($idCache, function (ItemInterface $item) use ($interventionRepository, $serializer) {
+                $item->tag("interventions_cache");
+                $listeInterventions = $interventionRepository->findAll();
+                return $serializer->serialize($listeInterventions, "json", ["groups" => "get_interventions"]);
+            });
+            return new JsonResponse($listeInterventions, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur s'est produite"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /* Renvoie les interventions d'un technicien */
