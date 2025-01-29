@@ -13,17 +13,19 @@ class ModeleInterventions
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["get_modele_interventions", "get_modele_planning"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(["get_modele_planning"])]
+    #[Groups(["get_modele_planning", "get_modele_interventions"])]
     private ?\DateTimeInterface $interventiontime = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
-    #[Groups(["get_modele_planning"])]
+    #[Groups(["get_modele_planning", "get_modele_interventions"])]
     private ?TypeIntervention $typeIntervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
+    #[Groups(["get_modele_interventions"])]
     private ?ModelePlanning $modeleIntervention = null;
 
     public function getId(): ?int

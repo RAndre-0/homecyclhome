@@ -2,20 +2,24 @@
 
 namespace App\Controller;
 
-use App\Repository\ModelePlanningRepository;
-use App\Repository\UserRepository;
 use App\Entity\Intervention;
 use App\Entity\ModelePlanning;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use App\Repository\ModelePlanningRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ModelePlanningController extends AbstractController
 {
@@ -60,16 +64,48 @@ class ModelePlanningController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    /* Modifie un modèle */
+    /* Modifie un modèle de planning */
+    #[Route("/api/modeles-planning/{id}", name: "update_modele_planning", methods: ["PUT", "PATCH"])]
+    #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
+    public function update_modele(
+        SerializerInterface $serializer, 
+        EntityManagerInterface $em, 
+        TagAwareCacheInterface $cache, 
+        Request $request,
+        ModelePlanning $modelePlanning
+        ): JsonResponse {
+        $modeleplanningModifie = $serializer->deserialize($request->getContent(), ModelePlanning::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $modelePlanning]);
+        $em->persist($modeleplanningModifie);
+        $em->flush();
+        $cache->invalidateTags(["modele_planning_cache"]);
+
+        return new JsonResponse($serializer->serialize($modeleplanningModifie, "json", ["groups" => "get_modele_planning"]), Response::HTTP_OK, [], true);
+    }
 
 
     /* Créé un nouveau modèle de planning */
     #[Route("/api/modeles-planning", name: "create_modele_planning", methods: ["POST"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function create_modele(
-        EntityManagerInterface $em
+        SerializerInterface $serializer,
+        EntityManagerInterface $em,
+        UrlGeneratorInterface $urlGenerator,
+        ValidatorInterface $validator,
+        TagAwareCacheInterface $cache,
+        Request $request
     ): JsonResponse {
-        return new JsonResponse("created", Response::HTTP_OK);
-    }
+        $modelePlanning = $serializer->deserialize($request->getContent(), ModelePlanning::class, "json");
 
+        $errors = $validator->validate($modelePlanning);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $em->persist($modelePlanning);
+        $em->flush();
+        $cache->invalidateTags(["modele_planning_cache"]);
+        $modelePlanningJson = $serializer->serialize($modelePlanning, "json", ["groups" => "get_modele_planning"]);
+        $location = $urlGenerator->generate("user", ["id" => $modelePlanning->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($modelePlanningJson, Response::HTTP_CREATED, ["location" => $location], true);
+    }
 }
