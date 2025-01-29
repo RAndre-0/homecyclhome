@@ -105,7 +105,7 @@ class ModelePlanningController extends AbstractController
         $em->flush();
         $cache->invalidateTags(["modele_planning_cache"]);
         $modelePlanningJson = $serializer->serialize($modelePlanning, "json", ["groups" => "get_modele_planning"]);
-        $location = $urlGenerator->generate("user", ["id" => $modelePlanning->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("get_modele_planning", ["id" => $modelePlanning->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($modelePlanningJson, Response::HTTP_CREATED, ["location" => $location], true);
     }
 }
