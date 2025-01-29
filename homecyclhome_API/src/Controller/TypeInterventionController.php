@@ -66,7 +66,7 @@ class TypeInterventionController extends AbstractController
         $em->flush();
         $cache->invalidateTags(["types_inter_cache"]);
         $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_intervention"]);
-        $location = $urlGenerator->generate("user", ["id" => $typeIntervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("type_intervention", ["id" => $typeIntervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($typeInterventionJson, Response::HTTP_CREATED, ["location" => $location], true);
     }
 

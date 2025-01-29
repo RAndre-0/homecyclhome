@@ -25,7 +25,7 @@ class ModelePlanningController extends AbstractController
 {
     /* Renvoie tous les modeles */
     #[Route('/api/modeles-planning', name: 'get_modeles_planning', methods: ["GET"])]
-    public function get_modeles(ModelePlanningRepository $modelePlanningRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    public function get_modeles_planning(ModelePlanningRepository $modelePlanningRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $idCache = "modele_planning_cache";
         $cache->invalidateTags(["modele_planning_cache"]);
@@ -40,7 +40,7 @@ class ModelePlanningController extends AbstractController
 
     /* Renvoie un modèle de planning */
     #[Route('/api/modeles-planning/{id}', name: 'get_modele_planning', methods: ["GET"])]
-    public function get_modele(ModelePlanning $modelePlanning, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    public function get_modele_planning(ModelePlanning $modelePlanning, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $modelePlanningJson = $serializer->serialize($modelePlanning, "json", ["groups" => "get_modele_planning"]);
         return new JsonResponse($modelePlanningJson, Response::HTTP_OK, [], true);
@@ -49,7 +49,7 @@ class ModelePlanningController extends AbstractController
     /* Supprime un modèle de planning et les types d'intervention liés */
     #[Route('/api/modeles-planning/{id}', name: 'delete_modele_planning', methods: ["DELETE"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function delete_modele(
+    public function delete_modele_planning(
         ModelePlanning $modelePlanning,
         TagAwareCacheInterface $cache,
         EntityManagerInterface $em
@@ -67,7 +67,7 @@ class ModelePlanningController extends AbstractController
     /* Modifie un modèle de planning */
     #[Route("/api/modeles-planning/{id}", name: "update_modele_planning", methods: ["PUT", "PATCH"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function update_modele(
+    public function update_modele_planning(
         SerializerInterface $serializer, 
         EntityManagerInterface $em, 
         TagAwareCacheInterface $cache, 
@@ -86,7 +86,7 @@ class ModelePlanningController extends AbstractController
     /* Créé un nouveau modèle de planning */
     #[Route("/api/modeles-planning", name: "create_modele_planning", methods: ["POST"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function create_modele(
+    public function create_modele_planning(
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,

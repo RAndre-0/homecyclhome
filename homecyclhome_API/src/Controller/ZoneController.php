@@ -45,69 +45,129 @@ final class ZoneController extends AbstractController
         SerializerInterface $serializer,
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
-        TagAwareCacheInterface $cache): JsonResponse
-    {
-        // Désérialisation des données JSON en un objet Zone
-        $zone = $serializer->deserialize($request->getContent(), Zone::class, "json");
+        TagAwareCacheInterface $cache
+    ): JsonResponse {
+        try {
+            $data = $request->getContent();
+            if (empty($data)) {
+                return new JsonResponse(["error" => "Données JSON manquantes"], JsonResponse::HTTP_BAD_REQUEST);
+            }
 
-        // Validation des données
-        $errors = $validator->validate($zone);
-        if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            try {
+                $zone = $serializer->deserialize($data, Zone::class, "json");
+            } catch (\Exception $e) {
+                return new JsonResponse(["error" => "Format JSON invalide"], JsonResponse::HTTP_BAD_REQUEST);
+            }
+
+            // Validation des données
+            $errors = $validator->validate($zone);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+
+            // Vérification si une zone du même nom existe déjà
+            if ($zoneRepository->findOneBy(['nom' => $zone->getNom()])) {
+                return new JsonResponse(["error" => "Une zone avec ce nom existe déjà"], JsonResponse::HTTP_CONFLICT);
+            }
+
+            $em->persist($zone);
+            $em->flush();
+            $cache->invalidateTags(["zones_cache"]);
+
+            // Génération de l'URL de la ressource créée
+            $location = $urlGenerator->generate("get_zone", ["id" => $zone->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            return new JsonResponse($serializer->serialize($zone, "json"), JsonResponse::HTTP_CREATED, ["location" => $location], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur interne s'est produite"], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $em->persist($zone);
-        $em->flush();
-
-        // Suppression du cache lié aux zones
-        $cache->invalidateTags(["zones_cache"]);
-
-        // Génération de l'URL de la ressource créée
-        $location = $urlGenerator->generate("get_zone", ["id" => $zone->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        // Sérialisation de la zone créée pour la réponse
-        $zoneJson = $serializer->serialize($zone, "json");
-
-        return new JsonResponse($zoneJson, JsonResponse::HTTP_CREATED, ["location" => $location], true);
     }
+
 
     /* Retourne une zone */
     #[Route("/api/zones/{id}", name: "get_zone", methods: ["GET"])]
-    public function show_zone(Zone $zone, SerializerInterface $serializer): JsonResponse
+    public function show_zone(Zone $zone = null, SerializerInterface $serializer): JsonResponse
     {
-        $zoneJson = $serializer->serialize($zone, 'json');
-        return new JsonResponse($zoneJson, Response::HTTP_OK, [], true);
+        if (!$zone) {
+            return new JsonResponse(["error" => "Zone non trouvée"], Response::HTTP_NOT_FOUND);
+        }
+        return new JsonResponse($serializer->serialize($zone, 'json'), Response::HTTP_OK, [], true);
     }
 
     /* Modifie une zone */
+    /* Modifie une zone */
     #[Route("/api/zones/{id}/edit", name: "update_zone", methods: ["PUT", "PATCH"])]
-    public function edit_zone(Request $request, Zone $zone, EntityManagerInterface $em, ZoneRepository $zoneRepository, UserRepository $userRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $zoneModifiee = $serializer->deserialize($request->getContent(), Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
+    public function edit_zone(
+        Request $request,
+        Zone $zone = null,
+        EntityManagerInterface $em,
+        ZoneRepository $zoneRepository,
+        UserRepository $userRepository,
+        TagAwareCacheInterface $cache,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator
+    ): JsonResponse {
+        if (!$zone) {
+            return new JsonResponse(["error" => "Zone non trouvée"], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $request->getContent();
+        if (empty($data)) {
+            return new JsonResponse(["error" => "Données JSON manquantes"], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $zoneModifiee = $serializer->deserialize($data, Zone::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $zone]);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Format JSON invalide"], Response::HTTP_BAD_REQUEST);
+        }
+
         // Gérer la relation avec le technicien
-        if (isset($data['technician'])) {
-            $technician = $userRepository->find(intval($data['technician']));
+        $decodedData = json_decode($data, true);
+        if (isset($decodedData['technician'])) {
+            $technician = $userRepository->find(intval($decodedData['technician']));
             if (!$technician) {
-                return new JsonResponse(['message' => 'Technician not found'], Response::HTTP_BAD_REQUEST);
+                return new JsonResponse(["error" => "Technicien non trouvé"], Response::HTTP_BAD_REQUEST);
             }
             $zoneModifiee->setTechnician($technician);
         }
-        $em->persist($zoneModifiee);
-        $em->flush();
-        $cache->invalidateTags(["zones_cache"]);
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        // Validation des données
+        $errors = $validator->validate($zoneModifiee);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, "json"), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        try {
+            $em->persist($zoneModifiee);
+            $em->flush();
+            $cache->invalidateTags(["zones_cache"]);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return new JsonResponse($serializer->serialize($zoneModifiee, "json"), Response::HTTP_OK, [], true);
     }
+
 
     /* Supprime une zone */
     #[Route('/api/zones/{id}', name: 'delete_zone', methods: ["DELETE"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function delete_zone(Zone $zone, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
+    public function delete_zone(Zone $zone = null, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
     {
-        $em->remove($zone);
-        $em->flush();
-        $cache->invalidateTags(["zones_cache"]);
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        if (!$zone) {
+            return new JsonResponse(["error" => "Zone non trouvée"], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $em->remove($zone);
+            $em->flush();
+            $cache->invalidateTags(["zones_cache"]);
+
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue lors de la suppression"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
+
 }
