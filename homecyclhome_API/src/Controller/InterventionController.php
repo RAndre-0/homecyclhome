@@ -51,8 +51,9 @@ class InterventionController extends AbstractController
         Request $request,
         InterventionRepository $interventionRepository,
         SerializerInterface $serializer
-    ): JsonResponse {
-        // Récupération du paramètre reservedOnly
+    ): JsonResponse 
+    {
+        // Récupération du paramètre reservedOnly avec validation, false par défaut
         $reservedOnly = filter_var($request->query->get('reservedOnly', false), FILTER_VALIDATE_BOOLEAN);
 
         $interventions = $interventionRepository->findByTechnicienWithFilter($id, $reservedOnly);
@@ -67,7 +68,8 @@ class InterventionController extends AbstractController
         int $id,
         InterventionRepository $interventionRepository,
         SerializerInterface $serializer
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         $interventions = $interventionRepository->findBy(['client' => $id]);
 
         if (!$interventions) {
@@ -95,7 +97,8 @@ class InterventionController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache
-    ): JsonResponse {
+    ): JsonResponse 
+    {
 
         // Désérialisation partielle pour obtenir les données brutes
         $data = json_decode($request->getContent(), true);
@@ -162,7 +165,8 @@ class InterventionController extends AbstractController
         UserRepository $userRepository,
         InterventionRepository $interventionRepository,
         EntityManagerInterface $entityManager
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         // Récupérer les données de la requête
         $data = json_decode($request->getContent(), true);
 
@@ -231,7 +235,8 @@ class InterventionController extends AbstractController
         ModelePlanningRepository $modelePlanningRepository,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager
-    ): JsonResponse {
+    ): JsonResponse 
+    {
 
         // Récupérer les données de la requête
         $data = json_decode($request->getContent(), true);

@@ -60,7 +60,8 @@ class ModelePlanningController extends AbstractController
         ModelePlanning $modelePlanning,
         TagAwareCacheInterface $cache,
         EntityManagerInterface $em
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         if (!$modelePlanning) {
             return new JsonResponse(["message" => "Modèle de planning non trouvé"], Response::HTTP_NOT_FOUND);
         }
@@ -88,7 +89,8 @@ class ModelePlanningController extends AbstractController
         Request $request,
         ModelePlanning $modelePlanning,
         ValidatorInterface $validator
-        ): JsonResponse {
+        ): JsonResponse 
+        {
         if (!$modelePlanning) {
             return new JsonResponse(["message" => "Modèle de planning non trouvé"], Response::HTTP_NOT_FOUND);
         }
@@ -119,7 +121,8 @@ class ModelePlanningController extends AbstractController
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache,
         Request $request
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         try {
             $modelePlanning = $serializer->deserialize($request->getContent(), ModelePlanning::class, "json");
 

@@ -46,7 +46,8 @@ final class ZoneController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         try {
             $data = $request->getContent();
             if (empty($data)) {
@@ -106,7 +107,8 @@ final class ZoneController extends AbstractController
         TagAwareCacheInterface $cache,
         SerializerInterface $serializer,
         ValidatorInterface $validator
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         if (!$zone) {
             return new JsonResponse(["error" => "Zone non trouvée"], Response::HTTP_NOT_FOUND);
         }

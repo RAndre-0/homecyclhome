@@ -41,7 +41,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
         string $role = null // Injection du paramètre d'URL (optionnel)
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
         // Génération d'un ID de cache en fonction du rôle
         $idCache = "users_cache" . ($role ? "_" . $role : "");

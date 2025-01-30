@@ -25,23 +25,34 @@ class ModeleInterventionsController extends AbstractController
     #[Route('/api/modele-interventions', name: 'get_modele_interventions', methods: ["GET"])]
     public function get_modele_interventions(ModeleInterventionsRepository $modeleInterventionsRepository, TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
-        $idCache = "modele_interventions_cache";
-        $cache->invalidateTags(["modele_interventions_cache"]);
-        $listModeleInterventions = $cache->get($idCache, function (ItemInterface $item) use ($modeleInterventionsRepository, $serializer) {
-            $item->tag("modele_interventions_cache");
-            $listModeleInterventions = $modeleInterventionsRepository->findAll();
-            return $serializer->serialize($listModeleInterventions, "json", ["groups" => "get_modele_interventions"]);
-        });
-
-        return new JsonResponse($listModeleInterventions, Response::HTTP_OK, [], true);
+        try {
+            $idCache = "modele_interventions_cache";
+            $cache->invalidateTags(["modele_interventions_cache"]);
+            $listModeleInterventions = $cache->get($idCache, function (ItemInterface $item) use ($modeleInterventionsRepository, $serializer) {
+                $item->tag("modele_interventions_cache");
+                $listModeleInterventions = $modeleInterventionsRepository->findAll();
+                return $serializer->serialize($listModeleInterventions, "json", ["groups" => "get_modele_interventions"]);
+            });
+    
+            return new JsonResponse($listModeleInterventions, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /* Retourne un type d'intervention du modèle */
     #[Route('/api/modele-interventions/{id}', name: "get_modele_intervention", methods: ["GET"])]
     public function get_modele_intervention(ModeleInterventions $modeleInterventions, SerializerInterface $serializer): JsonResponse
     {
-        $modeleInterventionsJson = $serializer->serialize($modeleInterventions, "json", ["groups" => "get_modele_intervention"]);
-        return new JsonResponse($modeleInterventionsJson, Response::HTTP_OK, [], true);
+        if (!$modeleInterventions) {
+            return new JsonResponse(["message" => "Intervention de modèle non trouvée"], Response::HTTP_NOT_FOUND);
+        }
+        try {
+            $modeleInterventionsJson = $serializer->serialize($modeleInterventions, "json", ["groups" => "get_modele_intervention"]);
+            return new JsonResponse($modeleInterventionsJson, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /* Supprime une intervention du modèle */
@@ -49,10 +60,18 @@ class ModeleInterventionsController extends AbstractController
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function delete_modele_intervention(ModeleInterventions $modeleInterventions, TagAwareCacheInterface $cache, EntityManagerInterface $em): JsonResponse
     {
-        $em->remove($modeleInterventions);
-        $em->flush();
-        $cache->invalidateTags(["modele_interventions_cache"]);
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        if (!$modeleInterventions) {
+            return new JsonResponse(["message" => "Intervention de modèle non trouvée"], Response::HTTP_NOT_FOUND);
+        }
+        try {
+            $em->remove($modeleInterventions);
+            $em->flush();
+            $cache->invalidateTags(["modele_interventions_cache"]);
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Erreur lors de la suppression"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     /* Créé une intervention dans le modèle */
@@ -65,7 +84,8 @@ class ModeleInterventionsController extends AbstractController
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache,
         Request $request
-    ): JsonResponse {
+    ): JsonResponse 
+    {
         $data = json_decode($request->getContent(), true);
     
         if (!isset($data["type_intervention"], $data["modele_planning"], $data["intervention_time"])) {

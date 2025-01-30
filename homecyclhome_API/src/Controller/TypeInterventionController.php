@@ -25,23 +25,33 @@ class TypeInterventionController extends AbstractController
     #[Route('/api/types-intervention', name: 'get_types_intervention', methods: ["GET"])]
     public function get_types_intervention(TypeInterventionRepository $typeInterventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $idCache = "types_inter_cache";
-        $cache->invalidateTags([$idCache]);
-        $listTypesintervention = $cache->get($idCache, function (ItemInterface $item) use ($typeInterventionRepository, $serializer) {
-            $item->tag("types_inter_cache");
-            $listTypesintervention = $typeInterventionRepository->findAll();
-            return $serializer->serialize($listTypesintervention, "json", ["groups" => "get_types_intervention"]);
-        });
-
-        return new JsonResponse($listTypesintervention, Response::HTTP_OK, [], true);
+        try {
+            $idCache = "types_inter_cache";
+            $cache->invalidateTags([$idCache]);
+            $listTypesintervention = $cache->get($idCache, function (ItemInterface $item) use ($typeInterventionRepository, $serializer) {
+                $item->tag("types_inter_cache");
+                $listTypesintervention = $typeInterventionRepository->findAll();
+                return $serializer->serialize($listTypesintervention, "json", ["groups" => "get_types_intervention"]);
+            });
+            return new JsonResponse($listTypesintervention, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /* Retourne un type d'intervention */
     #[Route('/api/types-intervention/{id}', name: 'get_type_intervention', methods: ["GET"])]
     public function get_type_intervention(TypeIntervention $typeIntervention, SerializerInterface $serializer): JsonResponse
     {
-        $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_Intervention"]);
-        return new JsonResponse($typeInterventionJson, Response::HTTP_OK, [], true);
+        if (!$typeIntervention) {
+            return new JsonResponse(["message" => "Type d'intervention non trouvé"], Response::HTTP_NOT_FOUND);
+        }
+        try {
+            $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_Intervention"]);
+            return new JsonResponse($typeInterventionJson, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue", Response::HTTP_INTERNAL_SERVER_ERROR]);
+        }
     }
 
     /* Nouveau type d'intervention */
@@ -54,20 +64,26 @@ class TypeInterventionController extends AbstractController
         ValidatorInterface $validator,
         TagAwareCacheInterface $cache,
         Request $request
-    ): JsonResponse {
-        $typeIntervention = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json");
+    ): JsonResponse 
+    {
+        try {
+            $typeIntervention = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json");
 
-        $errors = $validator->validate($typeIntervention);
-        if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            $errors = $validator->validate($typeIntervention);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize(["error" => "Données non conformes"], "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+    
+            $em->persist($typeIntervention);
+            $em->flush();
+            $cache->invalidateTags(["types_inter_cache"]);
+            $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_intervention"]);
+            $location = $urlGenerator->generate("get_type_intervention", ["id" => $typeIntervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return new JsonResponse($typeInterventionJson, Response::HTTP_CREATED, ["location" => $location], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur est survenue", Response::HTTP_INTERNAL_SERVER_ERROR]);
         }
 
-        $em->persist($typeIntervention);
-        $em->flush();
-        $cache->invalidateTags(["types_inter_cache"]);
-        $typeInterventionJson = $serializer->serialize($typeIntervention, "json", ["groups" => "get_type_intervention"]);
-        $location = $urlGenerator->generate("get_type_intervention", ["id" => $typeIntervention->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        return new JsonResponse($typeInterventionJson, Response::HTTP_CREATED, ["location" => $location], true);
     }
 
     /* Modifie un type d'intervention */
@@ -78,20 +94,33 @@ class TypeInterventionController extends AbstractController
         SerializerInterface $serializer, 
         Request $request,
         EntityManagerInterface $em,
-        TagAwareCacheInterface $cache
-        ): JsonResponse {
-        $typeInterventionModifie = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $typeIntervention]);
-        $em->persist($typeInterventionModifie);
-        $em->flush();
-        $cache->invalidateTags(["types_inter_cache"]);
-
-        return new JsonResponse($serializer->serialize($typeInterventionModifie, "json", ["groups" => "get_type_intervention"]), Response::HTTP_OK, [], true);
+        TagAwareCacheInterface $cache,
+        ValidatorInterface $validator
+        ): JsonResponse 
+        {
+        if (!$typeIntervention) {
+            return new JsonResponse(["message" => "Type d'intervention non trouvé"], Response::HTTP_NOT_FOUND);
+        }
+        try {
+            $typeInterventionModifie = $serializer->deserialize($request->getContent(), TypeIntervention::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $typeIntervention]);
+            $errors = $validator->validate($typeInterventionModifie);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize(["error" => "Données non conformes"], "json"), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+            $em->persist($typeInterventionModifie);
+            $em->flush();
+            $cache->invalidateTags(["types_inter_cache"]);
+            return new JsonResponse($serializer->serialize($typeInterventionModifie, "json", ["groups" => "get_type_intervention"]), Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Erreur lors de la mise à jour du type d'intervention"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /* Supprime un type d'intervention et les interventions qui lui sont liées */
     #[Route('/api/types-intervention/{id}', name: 'delete_type_intervention', methods: ["DELETE"])]
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
-    public function delete_type_intervention(EntityManagerInterface $em, TypeIntervention $typeIntervention, TagAwareCacheInterface $cache): JsonResponse {
+    public function delete_type_intervention(EntityManagerInterface $em, TypeIntervention $typeIntervention, TagAwareCacheInterface $cache): JsonResponse 
+    {
         $interventions = $typeIntervention->getInterventions();
         foreach ($interventions as $intervention) {
             $em->remove($intervention);
