@@ -6,6 +6,7 @@ use App\Repository\ZoneRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\Validator as AcmeAssert;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 class Zone
@@ -21,15 +22,16 @@ class Zone
     private ?string $name = null;
 
     #[ORM\Column(length: 7, nullable: true)]
-    #[Assert\Regex(
-        pattern: '/^#[0-9A-Fa-f]{6}$/',
-        message: 'Le code couleur doit être un code hexadécimal valide, par exemple #FFFFFF.'
+    #[Assert\CssColor(
+        formats: Assert\CssColor::HEX_LONG,
+        message: 'La couleur doit être une suite de 6 caractère hexadécimaux.',
     )]
     #[Groups(["get_zones"])]
-    private ?string $color = null;
+    private ?string $color = "#757575";
 
     #[ORM\Column(nullable: true)]
     #[Groups(["get_zones"])]
+    #[AcmeAssert\ValidCoordinates()]
     private ?array $coordinates = null;
 
     #[ORM\OneToOne(inversedBy: 'zone', cascade: ['persist', 'remove'])]
