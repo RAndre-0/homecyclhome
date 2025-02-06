@@ -99,7 +99,6 @@ class InterventionController extends AbstractController
         TagAwareCacheInterface $cache
     ): JsonResponse 
     {
-
         // Désérialisation partielle pour obtenir les données brutes
         $data = json_decode($request->getContent(), true);
 

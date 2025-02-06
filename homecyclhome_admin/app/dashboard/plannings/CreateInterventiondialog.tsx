@@ -1,52 +1,79 @@
-"use client"
-
-import * as React from "react";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { useEffect, useState } from "react";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { apiService } from "@/services/api-service";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
+import TypeInterventionSelector from "@/components/types-intervention-selector";
+import TechnicienSelector from "@/components/technicien-selector";
 
-interface NewInterventionProps {
+interface CreateInterventionDialogProps {
     isOpen: boolean;
-    onClose : () => void;
+    onClose: () => void;
+    selectedDate: string | null; // Ajout de la date sélectionnée
+    onRefresh: () => void;
 }
 
-export default function CreateInterventionDialog({ onRefresh, isOpen }: { onRefresh: () => void }) {
-    const [date, setDate] = React.useState<Date>()
+export default function CreateInterventionDialog({ isOpen, onClose, selectedDate, onRefresh }: CreateInterventionDialogProps) {
+    const [typeIntervention, setTypeIntervention] = useState("");
     const { toast } = useToast();
+    const [selectedTypeIntervention, setSelectedTypeIntervention] = useState<number | null>(null);
+    const [selectedTechnicien, setSelectedTechnicien] = useState<Technicien | null>(null);
 
+    const handleCreate = async () => {
+        if (!selectedDate || !selectedTypeIntervention || !selectedTechnicien) {
+            toast({ title: "Erreur", description: "Veuillez remplir tous les champs." });
+            return;
+        }
+
+        try {
+            await apiService("interventions", "POST", {
+                type_intervention: selectedTypeIntervention,
+                debut: selectedDate, 
+                technicien: selectedTechnicien.id, 
+            });
     
+            toast({ title: "Succès", description: "Intervention créée avec succès." });
+            onRefresh();
+            onClose();
+        } catch (error) {
+            console.error("Erreur lors de la création", error);
+            toast({ title: "Erreur", description: "Une erreur est survenue." });
+        }
+    };
 
     return (
-        <Popover>
-            <PopoverTrigger asChild>
-                <Button
-                    variant={"outline"}
-                    className={cn(
-                        "w-[280px] justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                    )}
-                >
-                    <CalendarIcon />
-                    {date ? format(date, "PPP") : <span>Sélectionnez une date</span>}
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                />
-            </PopoverContent>
-        </Popover>
-    )
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Créer une intervention</DialogTitle>
+                    <DialogDescription>
+                        Sélectionnez un type d'intervention et confirmez la création.
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <div>
+                    <label>Date sélectionnée</label>
+                    <Input value={selectedDate ? format(new Date(selectedDate), "yyyy-MM-dd HH:mm") : ""} readOnly />
+                </div>
+                
+                <TypeInterventionSelector onTypeInterventionChange={setSelectedTypeIntervention} />
+                
+                <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
+
+                <DialogFooter>
+                    <Button onClick={handleCreate}>Créer</Button>
+                    <Button variant="outline" onClick={onClose}>Annuler</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }

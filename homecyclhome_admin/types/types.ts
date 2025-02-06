@@ -39,6 +39,7 @@ export interface TypeIntervention {
 export interface Intervention {
   id: number;
   debut: string;
+  fin: string | null;
   commentaire_client: string | null;
   photo: string | null;
   velo_categorie: string | null;

@@ -9,8 +9,11 @@ import { useEffect, useState } from "react";
 import { apiService } from "@/services/api-service";
 import { Intervention, Technicien } from "@/types/types";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import InterventionDetailsDialog from './InterventionDetailsDialog';
 import CreateInterventionDialog from "./CreateInterventionDialog";
+
+dayjs.extend(duration);
 
 interface CalendarProps {
   selectedTechnicien: Technicien | null;
@@ -21,6 +24,7 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
   const [selectedIntervention, setSelectedIntervention] = useState<Intervention | null>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isDialog2Open, setDialog2Open] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   // Récupérer les interventions d'un technicien
   useEffect(() => {
@@ -51,6 +55,12 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
     }
 };
 
+  // Gérer le clic sur une date vide
+  const handleDateClick = (arg: any) => {
+    setSelectedDate(arg.dateStr); // Stocke la date cliquée
+    setDialog2Open(true); // Ouvre le formulaire
+  };
+
   return (
     <>
     <FullCalendar
@@ -58,14 +68,12 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
         initialView="timeGridWeek"
         weekends={false}
         events={interventions.map((intervention) => ({
-            id: intervention.id.toString(),
-            title: intervention.type_intervention?.nom ?? 'Intervention',
-            start: intervention.debut,
-            end: dayjs(intervention.debut)
-                .add(dayjs(intervention.type_intervention?.duree ?? 'PT0M').get("minute"), "minute")
-                .toISOString(),
-            color: intervention.client ? "#3e69a0" : "#757575",
-        }))}
+          id: intervention.id.toString(),
+          title: intervention.type_intervention?.nom ?? 'Intervention',
+          start: intervention.debut,
+          end: intervention.fin,
+          color: intervention.client ? "#3e69a0" : "#757575",
+      }))}
         eventClick={handleEventClick}
         locale={frLocale}
         selectable={true}
@@ -80,10 +88,11 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
         isOpen={isDialogOpen}
         onClose={() => setDialogOpen(false)}
     />
-    <CreateInterventionDialog
+      <CreateInterventionDialog
         isOpen={isDialog2Open}
         onClose={() => setDialog2Open(false)}
-    />
+        selectedDate={selectedDate} // Passe la date sélectionnée
+      />
 </>
   );
 }
@@ -98,6 +107,3 @@ function renderEventContent(eventInfo: any) {
   );
 }
 
-const handleDateClick = (arg) => {
-  alert(arg.dateStr)
-}

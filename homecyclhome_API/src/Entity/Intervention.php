@@ -78,6 +78,10 @@ class Intervention
     #[Groups(["get_interventions", "get_intervention"])]
     private ?\DateTimeInterface $debut = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(["get_interventions", "get_intervention"])]
+    private ?\DateTimeInterface $fin = null;
+
     public function __construct()
     {
         $this->interventionProduit = new ArrayCollection();
@@ -277,6 +281,18 @@ class Intervention
     public function setDebut(?\DateTimeInterface $debut): static
     {
         $this->debut = $debut;
+
+        return $this;
+    }
+
+    public function getFin(): ?\DateTimeInterface
+    {
+        return $this->fin;
+    }
+
+    public function setFin(?\DateTimeInterface $fin): static
+    {
+        $this->fin = $fin;
 
         return $this;
     }

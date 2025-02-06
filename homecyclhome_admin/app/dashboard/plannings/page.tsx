@@ -36,7 +36,8 @@ export default function Plannings() {
   return (
       <>
           <div className="flex justify-between">
-              <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
+          <TechnicienSelector onTechnicienChange={setSelectedTechnicien} defaultTechnicien={selectedTechnicien} />
+
               <div className="flex gap-5">
                   <DeleteInterventionsDialog onRefresh={refreshInterventions} />
                   <CreateInterventionsDialog onRefresh={refreshInterventions} />
