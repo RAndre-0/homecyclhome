@@ -72,7 +72,7 @@ export default function FullCalendarAdmin({ selectedTechnicien, onRefresh }: Cal
           id: intervention.id.toString(),
           title: intervention.type_intervention?.nom ?? 'Intervention',
           start: intervention.debut,
-          end: intervention.fin,
+          end: intervention.fin || undefined,
           color: intervention.client ? "#3e69a0" : "#757575",
       }))}
         eventClick={handleEventClick}

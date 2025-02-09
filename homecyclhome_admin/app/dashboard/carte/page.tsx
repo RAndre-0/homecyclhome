@@ -10,8 +10,6 @@ import { apiService } from "@/services/api-service";
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -20,9 +18,7 @@ import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -36,6 +32,11 @@ const styles = {
         zIndex: "0",
     },
 };
+
+// Extend PolylineOptions to include id
+interface ExtendedPolylineOptions extends L.PolylineOptions {
+    id?: number;
+}
 
 export default function Map() {
     const [polygons, setPolygons] = useState<Polygon[]>([]);
@@ -77,8 +78,6 @@ export default function Map() {
 
     const updatePolygon = async (polygon: Polygon) => {
         try {
-            console.log(polygon);
-            
             await apiService(`zones/${polygon.id}/edit`, "PUT", polygon);
             setPolygons((prevPolygons) =>
                 prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
@@ -101,10 +100,11 @@ export default function Map() {
         const newPolygon = e.layer.toGeoJSON();
         const coordinates = newPolygon.geometry.coordinates[0];
 
-        const payload = {
+        const payload: Polygon = {
+            id: 0, // Temporary ID, will be replaced by the server response
             name: "Nom par défaut",
-            colour: "#FF5733",
-            coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
+            color: "#FF5733",
+            coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
             technician: null,
         };
 
@@ -118,11 +118,11 @@ export default function Map() {
             const id = layer.options.id;
             const coordinates = updatedPolygon.geometry.coordinates[0];
 
-            const payload = {
+            const payload: Polygon = {
                 id,
                 name: "Nom modifié",
-                colour: "#FF5733",
-                coordinates: coordinates.map((coord) => ({ longitude: coord[0], latitude: coord[1] })),
+                color: "#FF5733",
+                coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
                 technician: null,
             };
 
@@ -155,7 +155,7 @@ export default function Map() {
             }
             const leafletPolygon = new L.Polygon(
                 polygon.coordinates.map((p) => [p.latitude, p.longitude]),
-                { color: polygon.colour, fillColor: polygon.colour, id: polygon.id }
+                { color: polygon.color, fillColor: polygon.color, id: polygon.id } as ExtendedPolylineOptions
             );
 
             leafletPolygon.on("click", () => {

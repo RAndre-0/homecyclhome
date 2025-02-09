@@ -67,7 +67,7 @@ final class ZoneController extends AbstractController
             }
 
             // Vérification si une zone du même nom existe déjà
-            if ($zoneRepository->findOneBy(['nom' => $zone->getNom()])) {
+            if ($zoneRepository->findOneBy(['nom' => $zone->getName()])) {
                 return new JsonResponse(["error" => "Une zone avec ce nom existe déjà"], JsonResponse::HTTP_CONFLICT);
             }
 

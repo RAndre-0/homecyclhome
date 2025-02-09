@@ -36,12 +36,6 @@ export default function CreateInterventionDialog({ isOpen, onClose, selectedDate
         }
 
         try {
-            console.log({
-                type_intervention: selectedTypeIntervention,
-                debut: selectedDate, 
-                technicien: selectedTechnicien.id, 
-            });
-            
             await apiService("interventions", "POST", {
                 type_intervention: selectedTypeIntervention,
                 debut: selectedDate, 

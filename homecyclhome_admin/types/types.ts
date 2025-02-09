@@ -3,6 +3,14 @@ export interface Technician {
   email: string;
 }
 
+export interface Zone {
+  id: number;
+  name: string;
+  color: string;
+  coordinates: Coordinate[];
+  technician: Technician | null | number;
+}
+
 export interface Coordinate {
   latitude: number;
   longitude: number;
@@ -11,7 +19,7 @@ export interface Coordinate {
 export interface Polygon {
   id?: number;
   name: string;
-  colour?: string;
+  color?: string;
   coordinates?: Coordinate[];
   technician?: number | null;
 }
