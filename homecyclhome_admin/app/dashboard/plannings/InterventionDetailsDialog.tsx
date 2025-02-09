@@ -10,6 +10,7 @@ import {
 import { Intervention } from "@/types/types";
 import { apiService } from "@/services/api-service";
 import { useToast } from "@/hooks/use-toast";
+import { log } from "node:console";
 
 // Définition de l'interface du composant
 interface InterventionDetailsProps {
@@ -77,7 +78,7 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
                                 <strong>Adresse :</strong> {intervention.adresse ?? "Non définie"}
                             </p>
                             <p>
-                                <strong>Vélo :</strong> {`${intervention.velo_categorie ?? "Non défini"} - ${intervention.velo_marque ?? "Non définie"} ${intervention.velo_modele ?? ""}`}
+                                <strong>Vélo :</strong> {`${intervention.veloCategorie ?? "Non défini"} - ${intervention.veloMarque ?? "Non définie"} ${intervention.veloModele ?? ""}`}
                             </p>
                             <p>
                                 <strong>Électrique :</strong> {intervention.velo_electrique ? "Oui" : "Non"}
@@ -96,13 +97,13 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
                         <strong>Technicien :</strong> {`${intervention.technicien?.first_name ?? "Non défini"} ${intervention.technicien?.last_name ?? "Non défini"}`}
                     </p>
                     <p>
-                        <strong>Type d’intervention :</strong> {intervention.type_intervention?.nom ?? "Non défini"}
+                        <strong>Type d’intervention :</strong> {intervention.typeIntervention?.nom ?? "Non défini"}
                     </p>
                     <p>
-                        <strong>Durée :</strong> {formatDuration(intervention.type_intervention?.duree)}
+                        <strong>Durée :</strong> {formatDuration(intervention.typeIntervention?.duree)}
                     </p>
                     <p>
-                        <strong>Prix :</strong> {intervention.type_intervention?.prix_depart ?? "Non défini"} €
+                        <strong>Prix :</strong> {intervention.typeIntervention?.prixDepart ?? "Non défini"} €
                     </p>
                 </div>
                 <DialogFooter>

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import TypeInterventionSelector from "@/components/types-intervention-selector";
 import TechnicienSelector from "@/components/technicien-selector";
+import { Technicien } from "@/types/types";
 
 interface CreateInterventionDialogProps {
     isOpen: boolean;
@@ -35,6 +36,12 @@ export default function CreateInterventionDialog({ isOpen, onClose, selectedDate
         }
 
         try {
+            console.log({
+                type_intervention: selectedTypeIntervention,
+                debut: selectedDate, 
+                technicien: selectedTechnicien.id, 
+            });
+            
             await apiService("interventions", "POST", {
                 type_intervention: selectedTypeIntervention,
                 debut: selectedDate, 
@@ -52,7 +59,7 @@ export default function CreateInterventionDialog({ isOpen, onClose, selectedDate
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className="bg-card">
                 <DialogHeader>
                     <DialogTitle>Créer une intervention</DialogTitle>
                     <DialogDescription>
@@ -70,8 +77,8 @@ export default function CreateInterventionDialog({ isOpen, onClose, selectedDate
                 <TechnicienSelector onTechnicienChange={setSelectedTechnicien} />
 
                 <DialogFooter>
-                    <Button onClick={handleCreate}>Créer</Button>
                     <Button variant="outline" onClick={onClose}>Annuler</Button>
+                    <Button onClick={handleCreate}>Créer</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

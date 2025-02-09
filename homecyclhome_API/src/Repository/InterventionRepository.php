@@ -53,6 +53,14 @@ class InterventionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    // Équivalent SQL
+    // SELECT * 
+    // FROM intervention i
+    // WHERE i.technicien_id = :technician_id
+    // AND i.client_id IS NULL
+    // AND i.debut BETWEEN :from AND :to;
+
+
 //    /**
 //     * @return Intervention[] Returns an array of Intervention objects
 //     */

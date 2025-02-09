@@ -180,7 +180,7 @@ class AppFixtures extends Fixture
             $now = new \DateTime();
             $currentYear = (int)$now->format('Y');
             $currentMonth = (int)$now->format('m');
-            for ($i = 0 ; $i < 100 ; $i++) {
+            for ($i = 0 ; $i < 1000 ; $i++) {
             $intervention = new Intervention();
             $intervention->setVeloElectrique($i%2);
             $intervention->setVeloCategorie("Catégorie");

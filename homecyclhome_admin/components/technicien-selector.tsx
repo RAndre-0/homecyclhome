@@ -18,7 +18,9 @@ interface TechnicienSelectorProps {
 
 export default function TechnicienSelector({ onTechnicienChange, defaultTechnicien }: TechnicienSelectorProps) {
   const [techniciens, setTechniciens] = useState<Technicien[]>([]);
-  const [selectedTechnicienId, setSelectedTechnicienId] = useState<string>("default");
+  const [selectedTechnicienId, setSelectedTechnicienId] = useState<string>(
+      defaultTechnicien ? defaultTechnicien.id.toString() : "default"
+  );
 
   useEffect(() => {
     const fetchTechniciens = async () => {

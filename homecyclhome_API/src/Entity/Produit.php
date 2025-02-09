@@ -51,6 +51,9 @@ class Produit
     #[Groups(["get_produit"])]
     private Collection $interventionProduit;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
     public function __construct()
     {
         $this->interventionProduit = new ArrayCollection();
@@ -163,6 +166,18 @@ class Produit
                 $interventionProduit->setProduit(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }

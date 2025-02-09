@@ -43,7 +43,7 @@ export default function Plannings() {
                   <CreateInterventionsDialog onRefresh={refreshInterventions} />
               </div>
           </div>
-          <FullCalendarAdmin selectedTechnicien={selectedTechnicien} key={refreshKey} />
+          <FullCalendarAdmin selectedTechnicien={selectedTechnicien} key={refreshKey} onRefresh={refreshInterventions} />
       </>
   );
 }

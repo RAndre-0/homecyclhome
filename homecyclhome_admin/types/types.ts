@@ -44,6 +44,9 @@ export interface Intervention {
   photo: string | null;
   velo_categorie: string | null;
   velo_electrique: boolean | null;
+  velo_modele: string | null;
+  velo_marque: string | null;
+  adresse: string | null;
   type_intervention: TypeIntervention | null;
   client: Client | null;
   technicien: Technicien | null;

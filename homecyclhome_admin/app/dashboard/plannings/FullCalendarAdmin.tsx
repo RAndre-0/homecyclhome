@@ -17,9 +17,10 @@ dayjs.extend(duration);
 
 interface CalendarProps {
   selectedTechnicien: Technicien | null;
+  onRefresh: () => void;
 }
 
-export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps) {
+export default function FullCalendarAdmin({ selectedTechnicien, onRefresh }: CalendarProps) {
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [selectedIntervention, setSelectedIntervention] = useState<Intervention | null>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -92,6 +93,7 @@ export default function FullCalendarAdmin({ selectedTechnicien }: CalendarProps)
         isOpen={isDialog2Open}
         onClose={() => setDialog2Open(false)}
         selectedDate={selectedDate} // Passe la date sélectionnée
+        onRefresh={onRefresh} // Rafraîchit les interventions
       />
 </>
   );
