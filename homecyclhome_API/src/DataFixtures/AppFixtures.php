@@ -178,8 +178,8 @@ class AppFixtures extends Fixture
 
             // Génération des interventions
             $now = new \DateTime();
-            $currentYear = (int)$now->format('Y');
-            $currentMonth = (int)$now->format('m');
+            $oneYearAgo = (clone $now)->modify('-1 year');
+            $oneYearLater = (clone $now)->modify('+1 year');
             for ($i = 0 ; $i < 1000 ; $i++) {
             $intervention = new Intervention();
             $intervention->setVeloElectrique($i%2);
@@ -196,13 +196,15 @@ class AppFixtures extends Fixture
             // Attribution d'un technicien
             $intervention->setTechnicien($technicians[array_rand($technicians)]);
 
-            // Génération de la date d'intervention
-            $month = random_int(1, 12);
-            $day = random_int(1, 28); // On limite à 28 pour éviter les problèmes de jours invalides
+            // Génération d'une date d'intervention aléatoire entre aujourd'hui - 1 an et aujourd'hui + 1 an
+            $timestamp = random_int($oneYearAgo->getTimestamp(), $oneYearLater->getTimestamp());
+            $dateIntervention = (new \DateTime())->setTimestamp($timestamp);
+
+            // Assurer que l'heure soit entre 9h et 18h
             $hour = random_int(9, 18);
-            // Si le mois généré est inférieur ou égal au mois actuel, on garde l'année en cours, sinon, on passe à l'année suivante.
-            $year = $month >= $currentMonth ? $currentYear : $currentYear + 1;
-            $intervention->setDebut(new \DateTime("{$year}-{$month}-{$day} {$hour}:30"));
+            $dateIntervention->setTime($hour, 30);
+            
+            $intervention->setDebut($dateIntervention);
 
             $pile_face = random_int(0, 1);
             if ($pile_face == 1) {
