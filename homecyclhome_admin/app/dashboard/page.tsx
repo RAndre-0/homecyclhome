@@ -15,14 +15,10 @@ export default function Dashboard() {
         <div className="p-5 w-1/3 border rounded-lg">
           <p>hello</p>
         </div>
-        <div className="p-5 w-1/3 border rounded-lg">
-          <p>hello</p>
-        </div>
-        <div className="p-5 w-1/3 border rounded-lg">
-          <p>hello</p>
+        <div className="w-2/3">
+          <InterventionsChart/>
         </div>
       </div>
-          <InterventionsChart/>
     </div>
   );
 }
