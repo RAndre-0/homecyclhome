@@ -59,9 +59,9 @@ class InterventionRepository extends ServiceEntityRepository
 
         $sql = "
             SELECT 
-                TO_CHAR(debut, 'Month') AS month,
-                COUNT(CASE WHEN ti.nom = 'Maintenance' THEN 1 END) AS maintenance,
-                COUNT(CASE WHEN ti.nom = 'Réparation' THEN 1 END) AS reparation
+                TO_CHAR(debut, 'FMMonth') AS month,
+                COUNT(*) FILTER (WHERE ti.nom = 'Maintenance') AS maintenance,
+                COUNT(*) FILTER (WHERE ti.nom = 'Réparation') AS reparation
             FROM intervention i
             JOIN type_intervention ti ON i.type_intervention_id = ti.id
             WHERE debut >= DATE_TRUNC('month', NOW() - INTERVAL '11 months') 
@@ -69,8 +69,8 @@ class InterventionRepository extends ServiceEntityRepository
             AND client_id IS NOT NULL
             AND NOT (EXTRACT(MONTH FROM debut) = EXTRACT(MONTH FROM NOW()) 
                     AND EXTRACT(YEAR FROM debut) = EXTRACT(YEAR FROM NOW()) - 1)
-            GROUP BY month, EXTRACT(MONTH FROM debut)
-            ORDER BY EXTRACT(MONTH FROM debut);
+            GROUP BY month, DATE_TRUNC('month', debut)
+            ORDER BY DATE_TRUNC('month', debut);
             ";
 
         $resultSet = $conn->executeQuery($sql);

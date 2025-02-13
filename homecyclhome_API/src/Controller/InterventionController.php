@@ -80,6 +80,27 @@ class InterventionController extends AbstractController
         return new JsonResponse($interventionsJson, Response::HTTP_OK, [], true);
     }
 
+    /* Renvoie le nombre d'interventions par type et par mois pour les 12 derniers mois */
+    #[Route('/api/interventions/stats', name: 'get_interventions_stats', methods: ['GET'])]
+    public function interventionsStats(InterventionRepository $interventionRepository): JsonResponse
+    {
+        try {
+            // Récupérer les statistiques des interventions
+            $data = $interventionRepository->interventionsByTypeLastTwelveMonths();
+
+            // Si aucune donnée n'est retournée, on renvoie un HTTP_NO_CONTENT
+            if (empty($data)) {
+                return new JsonResponse(["message" => "Aucune donnée trouvée"], JsonResponse::HTTP_NO_CONTENT);
+            }
+
+            // Retourner les données sous forme de JSON
+            return $this->json($data);
+        } catch (\Exception $e) {
+            // Gestion d'erreur : envoi d'une réponse JSON avec erreur
+            return new JsonResponse(["error" => "Une erreur s'est produite lors de la récupération des statistiques."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /* Retourne une intervention */
     #[Route('/api/interventions/{id}', name: 'get_intervention', methods: ["GET"])]
     public function get_intervention(Intervention $intervention, SerializerInterface $serializer): JsonResponse
@@ -298,29 +319,5 @@ class InterventionController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => 'Interventions créées avec succès.'], 201);
-    }
-
-    /* Renvoie le nombre d'interventions par type et par mois pour les 12 derniers mois */
-    #[Route('/api/interventions/stats', name: 'get_interventions_stats', methods: ['GET'])]
-    public function interventionsStats(InterventionRepository $interventionRepository, LoggerInterface $logger): JsonResponse
-    {
-        try {
-            // Récupérer les statistiques des interventions
-            $data = $interventionRepository->interventionsByTypeLastTwelveMonths();
-
-            // Si aucune donnée n'est retournée, on renvoie un HTTP_NO_CONTENT
-            if (empty($data)) {
-                return new JsonResponse(["message" => "Aucune donnée trouvée"], JsonResponse::HTTP_NO_CONTENT);
-            }
-
-            // Retourner les données sous forme de JSON
-            return $this->json($data);
-        } catch (\Exception $e) {
-            // Log de l'erreur pour diagnostic
-            $logger->error("Erreur lors de la récupération des statistiques d'interventions: " . $e->getMessage());
-
-            // Gestion d'erreur : envoi d'une réponse JSON avec erreur
-            return new JsonResponse(["error" => "Une erreur s'est produite lors de la récupération des statistiques."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 }
