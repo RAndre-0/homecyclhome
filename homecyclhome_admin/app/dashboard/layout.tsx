@@ -6,8 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import {CircleUser, Home, Menu, Package, Search, Users, Map, Calendar} from "lucide-react"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
+import { CircleUser, Home, Menu, Package, Search, Users, Map, Calendar, Layers2 } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import logo from "@/public/media/image/logo_homecyclhome_grayscale.png";
@@ -18,7 +18,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { setTheme } = useTheme()
-  
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r md:block">
@@ -34,9 +34,10 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
               <SidebarLink href="/dashboard" label="Accueil" icon={Home} />
-              <SidebarLink href="/dashboard/produits" label="Produits" icon={Package} />
-              <SidebarLink href="/dashboard/plannings" label="Plannings" icon={Calendar} />
               <SidebarLink href="/dashboard/carte" label="Carte" icon={Map} />
+              <SidebarLink href="/dashboard/plannings" label="Plannings" icon={Calendar} />
+              <SidebarLink href="/dashboard/plannings/modeles" label="Modèles de planning" icon={Layers2} />
+              <SidebarLink href="/dashboard/produits" label="Produits" icon={Package} />
               <SidebarLink href="/dashboard/utilisateurs" label="Utilisateurs" icon={Users} />
             </nav>
           </div>
@@ -66,6 +67,9 @@ export default function Layout({ children }: LayoutProps) {
               </div>
               <nav className="grid gap-2 text-lg font-medium">
                 <SidebarLink href="/dashboard" label="Accueil" icon={Home} />
+                <SidebarLink href="/dashboard/carte" label="Carte" icon={Map} />
+                <SidebarLink href="/dashboard/plannings" label="Plannings" icon={Calendar} />
+                <SidebarLink href="/dashboard/plannings/modeles" label="Modèles de planning" icon={Layers2} />
                 <SidebarLink href="/dashboard/produits" label="Produits" icon={Package} />
                 <SidebarLink href="/dashboard/utilisateurs" label="Utilisateurs" icon={Users} />
               </nav>
