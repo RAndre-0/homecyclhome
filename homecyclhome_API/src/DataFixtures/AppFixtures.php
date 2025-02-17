@@ -71,9 +71,12 @@ class AppFixtures extends Fixture
         // Création des modèles de planning
         $modelePlanning1 = new ModelePlanning();
         $modelePlanning1->setName("modele1");
+        $modelePlanning2 = new ModelePlanning();
+        $modelePlanning2->setName("modele2");
         $manager->persist($modelePlanning1);
+        $manager->persist($modelePlanning2);
 
-        // Création des interventions du modèle
+        // Création des interventions du modèle 1
         $hour = 9;
         $minutes = 0;
         for ($i = 0 ; $i < 4 ; $i++) {
@@ -95,6 +98,30 @@ class AppFixtures extends Fixture
             $hour++;
             $minutes += 15;
         };
+
+        // Création des interventions du modèle 2
+        $hour = 9;
+        $minutes = 0;
+        $intervals = [0, 75, 150, 225]; // Correspond à 9:00, 10:15, 11:30, 12:45
+
+        foreach ($intervals as $interval) {
+            $interventionModele = new ModeleInterventions();
+            $interventionModele->setTypeIntervention($typeInter2); // Réparation
+            $interventionModele->setModeleIntervention($modelePlanning2);
+            $interventionModele->setInterventionTime((new \DateTime("09:00"))->modify("+{$interval} minutes"));
+            $manager->persist($interventionModele);
+        }
+
+        $hour = 14;
+        $minutes = 30;
+        for ($i = 0; $i < 3; $i++) {
+            $interventionModele = new ModeleInterventions();
+            $interventionModele->setTypeIntervention($typeInter1); // Maintenance
+            $interventionModele->setModeleIntervention($modelePlanning2);
+            $interventionModele->setInterventionTime(new \DateTime("{$hour}:{$minutes}"));
+            $manager->persist($interventionModele);
+            $hour++;
+        }
 
         $users =  [];
         // Création des users

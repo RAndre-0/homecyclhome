@@ -42,6 +42,14 @@ export default function ModelesDePlanning() {
         fetchModels();
     }, []);
 
+    const formatDuration = (duration: string) => {
+        const date = new Date(duration);
+        if (isNaN(date.getTime())) {
+            return "Durée invalide";
+        }
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
     if (loading) {
         return <div>Chargement en cours...</div>;
     }
@@ -51,25 +59,33 @@ export default function ModelesDePlanning() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center">
-            <div>
-                <h1>Modèles</h1>
-                {models.map((model) => (
-                    <div key={model.id} onClick={() => setSelectedModel(model)}>
-                        <h2>{model.name}</h2>
-                        {selectedModel && selectedModel.id === model.id && (
-                            <div>
-                                {model.modeleInterventions.map((intervention) => (
-                                    <div key={intervention.id}>
-                                        <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString()}</p>
-                                        <p>Type: {intervention.typeIntervention.nom}</p>
-                                        <p>Durée: {new Date(intervention.typeIntervention.duree).toLocaleTimeString()}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))}
+        <div className="flex flex-col gap-5">
+            <div className="flex flex-row gap-5">
+                <div className="p-5 w-1/3 border rounded-lg">
+                    <h1>Modèles</h1>
+                    {models.map((model) => (
+                        <div key={model.id} onClick={() => setSelectedModel(model)} className="cursor-pointer">
+                            <h2>{model.name}</h2>
+                        </div>
+                    ))}
+                </div>
+                <div className="w-2/3 p-5 border rounded-lg">
+                    {selectedModel ? (
+                        <div>
+                            <h2>Détails du modèle: {selectedModel.name}</h2>
+                            {selectedModel.modeleInterventions.map((intervention) => (
+                                <div key={intervention.id} className="mb-4">
+                                    {/* <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString()}</p> */}
+                                    <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString()}</p>
+                                    <p>Type: {intervention.typeIntervention.nom}</p>
+                                    <p>Durée: {formatDuration(intervention.typeIntervention.duree)}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>Sélectionnez un modèle pour voir les détails</p>
+                    )}
+                </div>
             </div>
         </div>
     );
