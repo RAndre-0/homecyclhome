@@ -39,7 +39,7 @@ class ZoneTest extends KernelTestCase
     public function testValidColor()
     {
         $zone = (new Zone())
-            ->setName('Zone Est')
+            ->setName('Zone Ouest')
             ->setColor('#A1B2C3'); // Couleur hexadécimale valide
 
         $errors = $this->validateEntity($zone);

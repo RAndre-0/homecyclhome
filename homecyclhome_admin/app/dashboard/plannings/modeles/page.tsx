@@ -28,6 +28,7 @@ export default function ModelesDePlanning() {
                 const detailedModels = await Promise.all(
                     data.map(async (model: { id: number; name: string }) => {
                         const detailedModel = await apiService(`modeles-planning/${model.id}`, "GET");
+                        console.log(detailedModel.modeleInterventions[0].interventionTime);
                         return detailedModel;
                     })
                 );
@@ -47,8 +48,9 @@ export default function ModelesDePlanning() {
         if (isNaN(date.getTime())) {
             return "Durée invalide";
         }
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return date.toISOString().substring(11, 16);
     };
+    
 
     if (loading) {
         return <div>Chargement en cours...</div>;
@@ -76,9 +78,9 @@ export default function ModelesDePlanning() {
                             {selectedModel.modeleInterventions.map((intervention) => (
                                 <div key={intervention.id} className="mb-4">
                                     {/* <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString()}</p> */}
-                                    <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString()}</p>
+                                    <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</p>
                                     <p>Type: {intervention.typeIntervention.nom}</p>
-                                    <p>Durée: {formatDuration(intervention.typeIntervention.duree)}</p>
+                                    <p>Durée: {formatDuration(String(intervention.typeIntervention.duree))}</p>
                                 </div>
                             ))}
                         </div>

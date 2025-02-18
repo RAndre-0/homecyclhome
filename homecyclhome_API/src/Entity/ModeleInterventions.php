@@ -18,7 +18,7 @@ class ModeleInterventions
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     #[Groups(["get_modele_planning", "get_modele_interventions"])]
-    private ?\DateTimeInterface $interventiontime = null;
+    private ?\DateTimeInterface $interventionTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'modeleInterventions')]
     #[Groups(["get_modele_planning", "get_modele_interventions"])]
@@ -35,12 +35,12 @@ class ModeleInterventions
 
     public function getInterventionTime(): ?\DateTimeInterface
     {
-        return $this->interventiontime;
+        return $this->interventionTime;
     }
 
-    public function setInterventionTime(\DateTimeInterface $interventiontime): static
+    public function setInterventionTime(\DateTimeInterface $interventionTime): static
     {
-        $this->interventiontime = $interventiontime;
+        $this->interventionTime = $interventionTime;
 
         return $this;
     }
