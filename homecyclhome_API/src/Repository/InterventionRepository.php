@@ -77,37 +77,4 @@ class InterventionRepository extends ServiceEntityRepository
 
         return $resultSet->fetchAllAssociative();
     }
-
-    // Équivalent SQL
-    // SELECT * 
-    // FROM intervention i
-    // WHERE i.technicien_id = :technician_id
-    // AND i.client_id IS NULL
-    // AND i.debut BETWEEN :from AND :to;
-
-
-//    /**
-//     * @return Intervention[] Returns an array of Intervention objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Intervention
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

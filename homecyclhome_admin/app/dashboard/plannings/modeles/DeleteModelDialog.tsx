@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api-service";
-import { X } from "lucide-react"
+import { X } from "lucide-react";
 
 export function DeleteModelDialog({ modelId, onDelete }: { modelId: number; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
