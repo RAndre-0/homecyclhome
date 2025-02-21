@@ -11,7 +11,7 @@ import { Intervention, Technicien } from "@/types/types";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import InterventionDetailsDialog from './InterventionDetailsDialog';
-import CreateInterventionDialog from "./CreateInterventionDialog";
+import CreateInterventionDialog from "./CreateInterventiondialog";
 
 dayjs.extend(duration);
 
@@ -83,6 +83,7 @@ export default function FullCalendarAdmin({ selectedTechnicien, onRefresh }: Cal
         slotMaxTime={"18:00:00"}
         height={"100%"}
         dateClick={handleDateClick}
+        timeZone="Europe/Paris"
     />
     <InterventionDetailsDialog
         intervention={selectedIntervention}

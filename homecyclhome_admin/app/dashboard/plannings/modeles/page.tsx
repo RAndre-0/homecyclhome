@@ -92,7 +92,7 @@ export default function ModelesDePlanning() {
                         <div>
                             <h2>Détails du modèle: {selectedModel.name}</h2>
                             {selectedModel.modeleInterventions.map((intervention) => (
-                                <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-l-4 border-${intervention.typeIntervention.nom === "Maintenance" ? "emerald-400" : "cyan-200"}`}>
+                                <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-l-4 ${intervention.typeIntervention.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
                                     <p>Heure: {new Date(intervention.interventionTime).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</p>
                                     <p>Type: {intervention.typeIntervention.nom}</p>
                                     <p>Durée: {formatDuration(String(intervention.typeIntervention.duree))}</p>
