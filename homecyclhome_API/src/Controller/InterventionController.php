@@ -241,6 +241,10 @@ class InterventionController extends AbstractController
     #[IsGranted("ROLE_ADMIN", message: "Droits insuffisants.")]
     public function delete_user(Intervention $intervention, EntityManagerInterface $em, TagAwareCacheInterface $cache): JsonResponse
     {
+        $produits = $intervention->getInterventionProduit();
+        foreach ($produits as $produit) {
+            $em->remove($produit);
+        }
         $em->remove($intervention);
         $em->flush();
         $cache->invalidateTags(["interventions_cache"]);
