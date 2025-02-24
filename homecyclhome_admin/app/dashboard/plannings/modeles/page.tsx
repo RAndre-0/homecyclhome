@@ -5,7 +5,7 @@ import { TypeIntervention } from "@/types/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { DeleteModelDialog } from "./DeleteModelDialog";
-import { X, Clock, Timer } from "lucide-react";
+import { X, Clock, Timer, Plus } from "lucide-react";
 
 interface InterventionModel {
     id: number;
@@ -74,27 +74,27 @@ export default function ModelesDePlanning() {
     const removeIntervention = async (interventionId: number) => {
         try {
             await apiService(`modele-interventions/${interventionId}`, "DELETE");
-    
+
             if (selectedModel) {
                 const updatedInterventions = selectedModel.modeleInterventions.filter(
                     (intervention) => intervention.id !== interventionId
                 );
-    
+
                 setSelectedModel({ ...selectedModel, modeleInterventions: updatedInterventions });
-    
-                setModels(models.map(model => 
-                    model.id === selectedModel.id 
-                        ? { ...model, modeleInterventions: updatedInterventions } 
+
+                setModels(models.map(model =>
+                    model.id === selectedModel.id
+                        ? { ...model, modeleInterventions: updatedInterventions }
                         : model
                 ));
             }
-    
+
             toast({ title: "Succès", description: "Intervention supprimée avec succès." });
         } catch (error) {
             toast({ title: "Erreur", description: "Échec de la suppression de l'intervention." });
         }
     };
-    
+
 
     if (loading) {
         return <div>Chargement en cours...</div>;
@@ -112,7 +112,11 @@ export default function ModelesDePlanning() {
             </div>
             <div className="flex flex-row gap-5">
                 <div className="p-5 w-1/3 border rounded-lg flex flex-col gap-5">
-                    <h1 className="border-b pb-2 text-3xl font-semibold">Modèles</h1>
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-3xl font-semibold">Modèles</h1>
+                        <Plus className="cursor-pointer"></Plus>
+                    </div>
+
                     {models.map((model) => (
                         <div className="flex items-center justify-between">
                             <Button key={model.id} onClick={() => setSelectedModel(model)}>{model.name}</Button>
@@ -123,7 +127,10 @@ export default function ModelesDePlanning() {
                 <div className="w-2/3 p-5 border rounded-lg">
                     {selectedModel ? (
                         <div>
-                            <h2 className="border-b pb-2 text-3xl font-semibold mb-4">Interventions du modèle: {selectedModel.name}</h2>
+                            <div className="border-b pb-2 mb-4 flex flex-row justify-between">
+                                <h2 className="text-3xl font-semibold">Interventions du modèle: {selectedModel.name}</h2>
+                                <Plus className="cursor-pointer"></Plus>
+                            </div>
                             {selectedModel.modeleInterventions.map((intervention) => (
                                 <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
                                     <div>
