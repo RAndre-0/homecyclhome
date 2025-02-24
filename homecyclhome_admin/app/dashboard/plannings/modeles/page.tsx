@@ -71,6 +71,31 @@ export default function ModelesDePlanning() {
         }
     };
 
+    const removeIntervention = async (interventionId: number) => {
+        try {
+            await apiService(`modele-interventions/${interventionId}`, "DELETE");
+    
+            if (selectedModel) {
+                const updatedInterventions = selectedModel.modeleInterventions.filter(
+                    (intervention) => intervention.id !== interventionId
+                );
+    
+                setSelectedModel({ ...selectedModel, modeleInterventions: updatedInterventions });
+    
+                setModels(models.map(model => 
+                    model.id === selectedModel.id 
+                        ? { ...model, modeleInterventions: updatedInterventions } 
+                        : model
+                ));
+            }
+    
+            toast({ title: "Succès", description: "Intervention supprimée avec succès." });
+        } catch (error) {
+            toast({ title: "Erreur", description: "Échec de la suppression de l'intervention." });
+        }
+    };
+    
+
     if (loading) {
         return <div>Chargement en cours...</div>;
     }
@@ -100,18 +125,21 @@ export default function ModelesDePlanning() {
                         <div>
                             <h2 className="border-b pb-2 text-3xl font-semibold mb-4">Interventions du modèle: {selectedModel.name}</h2>
                             {selectedModel.modeleInterventions.map((intervention) => (
-                                <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 ${intervention.typeIntervention.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
-                                    <p>{intervention.typeIntervention.nom}</p>
-                                    <div className="flex">
-                                        <div className="flex items-center justify-start mr-4">
-                                            <Clock className="mr-2" />
-                                            <p>{new Date(intervention.interventionTime).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</p>
-                                        </div>
-                                        <div className="flex items-center justify-start">
-                                            <Timer className="mr-2" />
-                                            <p>{formatDuration(String(intervention.typeIntervention.duree))}</p>
+                                <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
+                                    <div>
+                                        <p>{intervention.typeIntervention.nom}</p>
+                                        <div className="flex">
+                                            <div className="flex items-center justify-start mr-4">
+                                                <Clock className="mr-2" />
+                                                <p>{new Date(intervention.interventionTime).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</p>
+                                            </div>
+                                            <div className="flex items-center justify-start">
+                                                <Timer className="mr-2" />
+                                                <p>{formatDuration(String(intervention.typeIntervention.duree))}</p>
+                                            </div>
                                         </div>
                                     </div>
+                                    <X className="cursor-pointer" onClick={() => removeIntervention(intervention.id)}></X>
                                 </div>
                             ))}
                         </div>
