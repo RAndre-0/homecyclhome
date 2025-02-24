@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DeleteModelDialog } from "./DeleteModelDialog";
 import { X, Clock, Timer, Plus } from "lucide-react";
 import CreateModelDialog from "./CreateModelDialog";
+import CreateModelInterventionDialog from "./CreateModelInterventionDialog";
 import { Model } from "@/types/types";
 
 export default function ModelesDePlanning() {
@@ -101,30 +102,49 @@ export default function ModelesDePlanning() {
                         <div>
                             <div className="border-b pb-2 mb-4 flex flex-row justify-between">
                                 <h2 className="text-3xl font-semibold">Interventions du modèle: {selectedModel.name}</h2>
-                                <Plus className="cursor-pointer"></Plus>
+                                <CreateModelInterventionDialog
+                                    selectedModelId={selectedModel.id}
+                                    onInterventionCreated={(newIntervention) => {
+                                        const updatedInterventions = [...selectedModel.modeleInterventions, newIntervention];
+                                        setSelectedModel({ ...selectedModel, modeleInterventions: updatedInterventions });
+
+                                        setModels(models.map(model =>
+                                            model.id === selectedModel.id
+                                                ? { ...model, modeleInterventions: updatedInterventions }
+                                                : model
+                                        ));
+                                    }}
+                                />
                             </div>
-                            {selectedModel.modeleInterventions.map((intervention) => (
-                                <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
-                                    <div>
-                                        <p>{intervention.typeIntervention.nom}</p>
-                                        <div className="flex">
-                                            <div className="flex items-center justify-start mr-4">
-                                                <Clock className="mr-2" />
-                                                <p>{dayjs(intervention.interventionTime).format("HH:mm")}</p>
-                                            </div>
-                                            <div className="flex items-center justify-start">
-                                                <Timer className="mr-2" />
-                                                <p>{formatDuration(String(intervention.typeIntervention.duree))}</p>
+
+                            {selectedModel.modeleInterventions.length > 0 ? (
+                                selectedModel.modeleInterventions.map((intervention) => (
+                                    <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention?.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
+                                        <div>
+                                        <p>{intervention.typeIntervention?.nom || "Type inconnu"}</p>
+                                            <div className="flex">
+                                                <div className="flex items-center justify-start mr-4">
+                                                    <Clock className="mr-2" />
+                                                    <p>{dayjs(intervention.interventionTime).format("HH:mm")}</p>
+                                                </div>
+                                                <div className="flex items-center justify-start">
+                                                    <Timer className="mr-2" />
+                                                    <p>{formatDuration(String(intervention.typeIntervention?.duree))}</p>
+                                                </div>
                                             </div>
                                         </div>
+                                        <X className="cursor-pointer" onClick={() => removeIntervention(intervention.id)}></X>
                                     </div>
-                                    <X className="cursor-pointer" onClick={() => removeIntervention(intervention.id)}></X>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p>Aucune intervention pour ce modèle.</p>
+                            )}
                         </div>
                     ) : (
                         <p>Sélectionnez un modèle pour voir les détails</p>
                     )}
+
+
                 </div>
             </div>
         </div>
