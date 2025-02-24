@@ -64,3 +64,15 @@ export interface ModelePlanning {
   id: number;
   name: string;
 }
+
+export interface InterventionModel {
+  id: number;
+  interventionTime: string;
+  typeIntervention: TypeIntervention;
+}
+
+export interface Model {
+  id: number;
+  name: string;
+  modeleInterventions: InterventionModel[];
+}

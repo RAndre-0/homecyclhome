@@ -1,28 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import { apiService } from "@/services/api-service";
 import { TypeIntervention } from "@/types/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { DeleteModelDialog } from "./DeleteModelDialog";
 import { X, Clock, Timer, Plus } from "lucide-react";
-
-interface InterventionModel {
-    id: number;
-    interventionTime: string;
-    typeIntervention: TypeIntervention;
-}
-
-interface Model {
-    id: number;
-    name: string;
-    modeleInterventions: InterventionModel[];
-}
+import CreateModelDialog from "./CreateModelDialog";
+import { Model } from "@/types/types";
 
 export default function ModelesDePlanning() {
     const [selectedModel, setSelectedModel] = useState<Model | null>(null);
     const [models, setModels] = useState<Model[]>([]);
-    const [newModelName, setNewModelName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
@@ -49,26 +39,11 @@ export default function ModelesDePlanning() {
     }, []);
 
     const formatDuration = (duration: string) => {
-        const date = new Date(duration);
-        if (isNaN(date.getTime())) {
+        const date = dayjs(duration);
+        if (!date.isValid()) {
             return "Durée invalide";
         }
-        return date.toISOString().substring(11, 16);
-    };
-
-    const createModel = async () => {
-        if (newModelName.length > 2) {
-            try {
-                const newModel = await apiService("modeles-planning", "POST", { name: newModelName });
-                setModels([...models, newModel]);
-                setNewModelName("");
-                toast({ title: "Succès", description: "Modèle créé avec succès." });
-            } catch (error) {
-                toast({ title: "Erreur", description: "Échec de la création du modèle." });
-            }
-        } else {
-            toast({ title: "Erreur", description: "3 caractères minimum." });
-        }
+        return date.format("HH:mm");
     };
 
     const removeIntervention = async (interventionId: number) => {
@@ -95,7 +70,6 @@ export default function ModelesDePlanning() {
         }
     };
 
-
     if (loading) {
         return <div>Chargement en cours...</div>;
     }
@@ -106,15 +80,13 @@ export default function ModelesDePlanning() {
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="p-5 border rounded-lg">
-                <input type="text" value={newModelName} onChange={(e) => setNewModelName(e.target.value)} placeholder="Nom du modèle" className="border p-2 me-5" />
-                <Button onClick={createModel}>Nouveau modèle</Button>
-            </div>
             <div className="flex flex-row gap-5">
                 <div className="p-5 w-1/3 border rounded-lg flex flex-col gap-5">
-                    <div className="flex items-center justify-between">
+                    <div className="border-b pb-2 flex flex-row justify-between">
                         <h1 className="text-3xl font-semibold">Modèles</h1>
-                        <Plus className="cursor-pointer"></Plus>
+                        <CreateModelDialog onModelCreated={(newModel) => {
+                            setModels((prevModels) => [...prevModels, newModel]);
+                        }} />
                     </div>
 
                     {models.map((model) => (
@@ -138,7 +110,7 @@ export default function ModelesDePlanning() {
                                         <div className="flex">
                                             <div className="flex items-center justify-start mr-4">
                                                 <Clock className="mr-2" />
-                                                <p>{new Date(intervention.interventionTime).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</p>
+                                                <p>{dayjs(intervention.interventionTime).format("HH:mm")}</p>
                                             </div>
                                             <div className="flex items-center justify-start">
                                                 <Timer className="mr-2" />
