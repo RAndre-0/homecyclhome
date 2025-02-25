@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs-plugin-utc";
 import { apiService } from "@/services/api-service";
 import { TypeIntervention } from "@/types/types";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ import { X, Clock, Timer, Plus } from "lucide-react";
 import CreateModelDialog from "./CreateModelDialog";
 import CreateModelInterventionDialog from "./CreateModelInterventionDialog";
 import { Model } from "@/types/types";
+
+dayjs.extend(utc);
 
 export default function ModelesDePlanning() {
     const [selectedModel, setSelectedModel] = useState<Model | null>(null);
