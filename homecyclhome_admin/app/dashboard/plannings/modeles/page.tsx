@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
+import utc from "dayjs/plugin/utc";
 import { apiService } from "@/services/api-service";
 import { TypeIntervention } from "@/types/types";
 import { Button } from "@/components/ui/button";

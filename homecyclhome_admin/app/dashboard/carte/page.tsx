@@ -249,6 +249,7 @@ export default function Map() {
                 center={[45.757704, 4.834099]}
                 zoom={13}
                 scrollWheelZoom={false}
+                className="rounded-xl"
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
