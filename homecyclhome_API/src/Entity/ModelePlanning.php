@@ -18,7 +18,7 @@ class ModelePlanning
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["get_modele_planning", "get_modeles_planning", "get_modele_interventions"])]
+    #[Groups(["get_modele_planning", "get_modeles_planning", "get_modele_interventions", "get_modele_intervention"])]
     private ?string $name = null;
 
     /**

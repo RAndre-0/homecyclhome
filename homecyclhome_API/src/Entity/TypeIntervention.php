@@ -20,15 +20,15 @@ class TypeIntervention
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_planning", "get_modele_interventions"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_planning", "get_modele_interventions", "get_modele_intervention"])]
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_planning", "get_modele_interventions"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_planning", "get_modele_interventions", "get_modele_intervention"])]
     private ?\DateTimeInterface $duree = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_interventions"])]
+    #[Groups(["get_interventions", "get_intervention", "get_types_intervention", "get_type_Intervention", "get_modele_interventions", "get_modele_intervention"])]
     private ?string $prixDepart = null;
 
     /**
