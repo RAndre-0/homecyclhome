@@ -96,7 +96,6 @@ final class ZoneController extends AbstractController
     }
 
     /* Modifie une zone */
-    /* Modifie une zone */
     #[Route("/api/zones/{id}/edit", name: "update_zone", methods: ["PUT", "PATCH"])]
     public function edit_zone(
         Request $request,

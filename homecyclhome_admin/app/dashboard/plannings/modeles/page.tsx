@@ -42,14 +42,6 @@ export default function ModelesDePlanning() {
         fetchModels();
     }, []);
 
-    const formatDuration = (duration: string) => {
-        const date = dayjs(duration);
-        if (!date.isValid()) {
-            return "Durée invalide";
-        }
-        return date.format("HH:mm");
-    };
-
     const removeIntervention = async (interventionId: number) => {
         try {
             await apiService(`modele-interventions/${interventionId}`, "DELETE");
@@ -128,11 +120,12 @@ export default function ModelesDePlanning() {
                                             <div className="flex">
                                                 <div className="flex items-center justify-start mr-4">
                                                     <Clock className="mr-2" />
-                                                    <p>{dayjs(intervention.interventionTime).format("HH:mm")}</p>
+                                                    <p>{dayjs.utc(intervention.interventionTime).format("HH:mm")}</p>
                                                 </div>
                                                 <div className="flex items-center justify-start">
                                                     <Timer className="mr-2" />
-                                                    <p>{formatDuration(String(intervention.typeIntervention?.duree))}</p>
+                                                    {/* <p>{formatDuration(String(intervention.typeIntervention?.duree))}</p> */}
+                                                    <p>{dayjs.utc(intervention.typeIntervention?.duree).format("HH:mm")}</p>
                                                 </div>
                                             </div>
                                         </div>
