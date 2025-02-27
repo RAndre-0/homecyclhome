@@ -88,7 +88,16 @@ export default function ModelesDePlanning() {
                     {models.map((model) => (
                         <div className="flex items-center justify-between">
                             <Button key={model.id} onClick={() => setSelectedModel(model)}>{model.name}</Button>
-                            <DeleteModelDialog modelId={model.id} onDelete={() => setModels(models.filter(m => m.id !== model.id))} />
+                            <DeleteModelDialog
+                                modelId={model.id}
+                                onDelete={() => {
+                                    setModels(models.filter(m => m.id !== model.id));
+                                    if (selectedModel?.id === model.id) {
+                                        setSelectedModel(null);
+                                    }
+                                }}
+                            />
+
                         </div>
                     ))}
                 </div>
@@ -116,7 +125,7 @@ export default function ModelesDePlanning() {
                                 selectedModel.modeleInterventions.map((intervention) => (
                                     <div key={intervention.id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention?.nom === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
                                         <div>
-                                        <p>{intervention.typeIntervention?.nom || "Type inconnu"}</p>
+                                            <p>{intervention.typeIntervention?.nom || "Type inconnu"}</p>
                                             <div className="flex">
                                                 <div className="flex items-center justify-start mr-4">
                                                     <Clock className="mr-2" />
