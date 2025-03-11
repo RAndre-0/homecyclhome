@@ -23,6 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import TechnicienSelector from '@/components/technicien-selector';
 
 const styles = {
     map: {
@@ -33,7 +34,6 @@ const styles = {
     },
 };
 
-// Extend PolylineOptions to include id
 interface ExtendedPolylineOptions extends L.PolylineOptions {
     id?: number;
 }
@@ -43,7 +43,6 @@ export default function Map() {
     const [zoneSelected, setZoneSelected] = useState<Polygon | null>(null);
     const [technicians, setTechnicians] = useState<Technician[]>([]);
 
-    // Référence pour le FeatureGroup
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
 
     useEffect(() => {
@@ -59,6 +58,7 @@ export default function Map() {
         const fetchTechnicians = async () => {
             try {
                 const fetchedTechnicians = await apiService("users/ROLE_TECHNICIEN", "GET");
+                console.log("Technicians fetched:", fetchedTechnicians);
                 setTechnicians(fetchedTechnicians);
             } catch (error) {
                 console.error("Error fetching technicians", error);
@@ -66,6 +66,10 @@ export default function Map() {
         };
         fetchTechnicians();
     }, []);
+
+    useEffect(() => {
+        console.log("Zone sélectionnée mise à jour:", zoneSelected);
+    }, [zoneSelected]);
 
     const savePolygon = async (polygon: Polygon) => {
         try {
@@ -78,7 +82,10 @@ export default function Map() {
 
     const updatePolygon = async (polygon: Polygon) => {
         try {
-            await apiService(`zones/${polygon.id}/edit`, "PUT", polygon);
+            await apiService(`zones/${polygon.id}/edit`, "PUT", {
+                ...polygon,
+                technician: polygon.technician ? polygon.technician.id : null,
+            });
             setPolygons((prevPolygons) =>
                 prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
             );
@@ -86,6 +93,7 @@ export default function Map() {
             console.error(`Erreur lors de la mise à jour de la zone ${polygon.id} :`, error);
         }
     };
+
 
     const deletePolygon = async (id: number) => {
         try {
@@ -101,7 +109,7 @@ export default function Map() {
         const coordinates = newPolygon.geometry.coordinates[0];
 
         const payload: Polygon = {
-            id: 0, // Temporary ID, will be replaced by the server response
+            id: 0,
             name: "Nom par défaut",
             color: "#FF5733",
             coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
@@ -198,7 +206,16 @@ export default function Map() {
                                 }
                             />
                             <Label htmlFor="technicianSelect">Technicien</Label>
-                            <Select
+                            <TechnicienSelector
+                                defaultTechnicien={zoneSelected?.technician || null}
+                                onTechnicienChange={(selectedTechnician) =>
+                                    setZoneSelected((prev) => ({
+                                        ...prev!,
+                                        technician: selectedTechnician,
+                                    }))
+                                }
+                            />
+                            {/* <Select
                                 onValueChange={(value) =>
                                     setZoneSelected((prev) => ({
                                         ...prev,
@@ -232,8 +249,7 @@ export default function Map() {
                                         );
                                     })}
                                 </SelectContent>
-                            </Select>
-
+                            </Select> */}
                             <Button
                                 onClick={() => updatePolygon(zoneSelected)}
                                 className="btn btn-primary mt-2"

@@ -130,7 +130,7 @@ final class ZoneController extends AbstractController
             if (!$technician) {
                 return new JsonResponse(["error" => "Technicien non trouvé"], Response::HTTP_BAD_REQUEST);
             }
-            $zoneModifiee->setTechnician($technician);
+            $zoneModifiee->setTechnicien($technician);
         }
 
         // Validation des données
@@ -147,7 +147,7 @@ final class ZoneController extends AbstractController
             return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données"], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return new JsonResponse($serializer->serialize($zoneModifiee, "json"), Response::HTTP_OK, [], true);
+        return new JsonResponse($serializer->serialize($zoneModifiee, "json", ["groups" => ["get_zones"]]), Response::HTTP_OK, [], true);
     }
 
 
