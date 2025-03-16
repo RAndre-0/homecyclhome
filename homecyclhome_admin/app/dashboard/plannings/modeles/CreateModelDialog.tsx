@@ -33,7 +33,7 @@ export default function CreateModelDialog({ onModelCreated }: CreateModelDialogP
             setNewModelName("");
             toast({ title: "Succès", description: "Modèle créé avec succès." });
             setOpen(false);
-            onModelCreated(newModel); // Maintenant, on passe bien le modèle créé
+            onModelCreated(newModel);
           } catch (error) {
             toast({ title: "Erreur", description: "Échec de la création du modèle." });
           }

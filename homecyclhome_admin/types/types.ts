@@ -1,14 +1,9 @@
-export interface Technician {
-  id: number;
-  email: string;
-}
-
 export interface Zone {
   id: number;
   name: string;
   color: string;
   coordinates: Coordinate[];
-  technician: Technician | null | number;
+  technicien: Technicien | null;
 }
 
 export interface Coordinate {
@@ -21,14 +16,14 @@ export interface Polygon {
   name: string;
   color?: string;
   coordinates?: Coordinate[];
-  technician?: number | null;
+  technicien?: Technicien | null;
 }
 
 export interface Technicien {
   id: number;
+  email: string;
   first_name: string | null;
   last_name: string | null;
-  email: string | null;
 }
 
 export interface Client {

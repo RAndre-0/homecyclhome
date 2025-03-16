@@ -1,6 +1,6 @@
 "use client";
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import { Technician, Polygon, Coordinate } from '@/types/types';
+import { Polygon, Coordinate, Technicien } from '@/types/types';
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -15,15 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import TechnicienSelector from '@/components/technicien-selector';
+import TechnicienSelector from './TechnicienSelector';
+import { useToast } from "@/hooks/use-toast";
 
 const styles = {
     map: {
@@ -41,7 +35,8 @@ interface ExtendedPolylineOptions extends L.PolylineOptions {
 export default function Map() {
     const [polygons, setPolygons] = useState<Polygon[]>([]);
     const [zoneSelected, setZoneSelected] = useState<Polygon | null>(null);
-    const [technicians, setTechnicians] = useState<Technician[]>([]);
+    const [techniciens, setTechniciens] = useState<Technicien[]>([]);
+    const { toast } = useToast();
 
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
 
@@ -55,21 +50,17 @@ export default function Map() {
             }
         };
         fetchZones();
-        const fetchTechnicians = async () => {
+
+        const fetchTechniciens = async () => {
             try {
-                const fetchedTechnicians = await apiService("users/ROLE_TECHNICIEN", "GET");
-                console.log("Technicians fetched:", fetchedTechnicians);
-                setTechnicians(fetchedTechnicians);
+                const fetchedTechniciens = await apiService("users/ROLE_TECHNICIEN", "GET");
+                setTechniciens(fetchedTechniciens);
             } catch (error) {
-                console.error("Error fetching technicians", error);
+                console.error("Error fetching techniciens", error);
             }
         };
-        fetchTechnicians();
+        fetchTechniciens();
     }, []);
-
-    useEffect(() => {
-        console.log("Zone sélectionnée mise à jour:", zoneSelected);
-    }, [zoneSelected]);
 
     const savePolygon = async (polygon: Polygon) => {
         try {
@@ -82,18 +73,20 @@ export default function Map() {
 
     const updatePolygon = async (polygon: Polygon) => {
         try {
+            console.log("Updating polygon:", polygon);
             await apiService(`zones/${polygon.id}/edit`, "PUT", {
                 ...polygon,
-                technician: polygon.technician ? polygon.technician.id : null,
+                technicien: polygon.technicien ? polygon.technicien.id : null,
             });
             setPolygons((prevPolygons) =>
                 prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
             );
+            toast({ title: "Succès", description: "Zone modifiée avec succès." });
         } catch (error) {
             console.error(`Erreur lors de la mise à jour de la zone ${polygon.id} :`, error);
+            toast({ title: "Erreur", description: "Échec de la modification de la zone." });
         }
     };
-
 
     const deletePolygon = async (id: number) => {
         try {
@@ -113,42 +106,10 @@ export default function Map() {
             name: "Nom par défaut",
             color: "#FF5733",
             coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
-            technician: null,
+            technicien: null,
         };
 
         savePolygon(payload);
-    };
-
-    const _onEdited = (e: any) => {
-        const layers = e.layers;
-        layers.eachLayer((layer: any) => {
-            const updatedPolygon = layer.toGeoJSON();
-            const id = layer.options.id;
-            const coordinates = updatedPolygon.geometry.coordinates[0];
-
-            const payload: Polygon = {
-                id,
-                name: "Nom modifié",
-                color: "#FF5733",
-                coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
-                technician: null,
-            };
-
-            updatePolygon(payload);
-        });
-    };
-
-    const _onDeleted = (e: any) => {
-        const layers = e.layers;
-        const idsToDelete: number[] = [];
-
-        layers.eachLayer((layer: any) => {
-            if (layer.options.id) {
-                idsToDelete.push(layer.options.id);
-            }
-        });
-
-        idsToDelete.forEach((id) => deletePolygon(id));
     };
 
     const addPolygonsToFeatureGroup = () => {
@@ -193,7 +154,7 @@ export default function Map() {
                                 id="zoneName"
                                 value={zoneSelected.name}
                                 onChange={(e) =>
-                                    setZoneSelected((prev) => ({ ...prev, name: e.target.value }))
+                                    setZoneSelected((prev) => ({ ...prev!, name: e.target.value }))
                                 }
                             />
                             <Label htmlFor="zoneColor">Couleur de la zone</Label>
@@ -202,54 +163,23 @@ export default function Map() {
                                 id="zoneColor"
                                 value={zoneSelected.color}
                                 onChange={(e) =>
-                                    setZoneSelected((prev) => ({ ...prev, color: e.target.value }))
+                                    setZoneSelected((prev) => ({ ...prev!, color: e.target.value }))
                                 }
                             />
-                            <Label htmlFor="technicianSelect">Technicien</Label>
+                            <Label htmlFor="technicienSelect">Technicien</Label>
                             <TechnicienSelector
-                                defaultTechnicien={zoneSelected?.technician || null}
-                                onTechnicienChange={(selectedTechnician) =>
+                                techniciens={techniciens}
+                                defaultTechnicien={
+                                    techniciens.find((t) => t.id === zoneSelected?.technicien?.id) || null
+                                }
+                                onTechnicienChange={(selectedTechnicien) =>
                                     setZoneSelected((prev) => ({
                                         ...prev!,
-                                        technician: selectedTechnician,
+                                        technicien: selectedTechnicien,
                                     }))
                                 }
                             />
-                            {/* <Select
-                                onValueChange={(value) =>
-                                    setZoneSelected((prev) => ({
-                                        ...prev,
-                                        technician: value === "none" ? null : Number(value),
-                                    }))
-                                }
-                                defaultValue={String(zoneSelected?.technician || "none")}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Choisir un technicien">
-                                        {technicians.find((tech) => tech.id === zoneSelected.technician)?.email || "Aucun"}
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">Aucun technicien</SelectItem>
-                                    {technicians.map((tech) => {
-                                        const isAssigned = polygons.some(
-                                            (polygon) =>
-                                                polygon.technician === tech.id &&
-                                                polygon.id !== zoneSelected?.id
-                                        );
 
-                                        return (
-                                            <SelectItem
-                                                key={tech.id}
-                                                value={String(tech.id)}
-                                                disabled={isAssigned}
-                                            >
-                                                {tech.email} {isAssigned ? "(Assigné)" : ""}
-                                            </SelectItem>
-                                        );
-                                    })}
-                                </SelectContent>
-                            </Select> */}
                             <Button
                                 onClick={() => updatePolygon(zoneSelected)}
                                 className="btn btn-primary mt-2"
@@ -275,8 +205,6 @@ export default function Map() {
                     <EditControl
                         position="topright"
                         onCreated={_onCreate}
-                        onEdited={_onEdited}
-                        onDeleted={_onDeleted}
                         draw={{
                             rectangle: false,
                             polyline: false,

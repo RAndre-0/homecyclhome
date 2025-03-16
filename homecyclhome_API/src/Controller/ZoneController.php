@@ -67,7 +67,7 @@ final class ZoneController extends AbstractController
             }
 
             // Vérification si une zone du même nom existe déjà
-            if ($zoneRepository->findOneBy(['nom' => $zone->getName()])) {
+            if ($zoneRepository->findOneBy(['name' => $zone->getName()])) {
                 return new JsonResponse(["error" => "Une zone avec ce nom existe déjà"], JsonResponse::HTTP_CONFLICT);
             }
 
@@ -125,12 +125,12 @@ final class ZoneController extends AbstractController
 
         // Gérer la relation avec le technicien
         $decodedData = json_decode($data, true);
-        if (isset($decodedData['technician'])) {
-            $technician = $userRepository->find(intval($decodedData['technician']));
-            if (!$technician) {
+        if (isset($decodedData['technicien'])) {
+            $technicien = $userRepository->find(intval($decodedData['technicien']));
+            if (!$technicien) {
                 return new JsonResponse(["error" => "Technicien non trouvé"], Response::HTTP_BAD_REQUEST);
             }
-            $zoneModifiee->setTechnicien($technician);
+            $zoneModifiee->setTechnicien($technicien);
         }
 
         // Validation des données
@@ -144,8 +144,9 @@ final class ZoneController extends AbstractController
             $em->flush();
             $cache->invalidateTags(["zones_cache"]);
         } catch (\Exception $e) {
-            return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données", "details" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        
 
         return new JsonResponse($serializer->serialize($zoneModifiee, "json", ["groups" => ["get_zones"]]), Response::HTTP_OK, [], true);
     }
