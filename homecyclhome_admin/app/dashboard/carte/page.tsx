@@ -62,15 +62,33 @@ export default function Map() {
         fetchTechniciens();
     }, []);
 
+    // Gestion de la création d'une zone
     const savePolygon = async (polygon: Polygon) => {
         try {
             const response = await apiService("zones", "POST", polygon);
             setPolygons((prevPolygons) => [...prevPolygons, { ...polygon, id: response.id }]);
+            toast({ title: "Succès", description: "Zone créée avec succès." });
         } catch (error) {
             console.error("Erreur lors de la sauvegarde de la zone :", error);
+            toast({ title: "Erreur", description: "Échec de la création de la zone." });
         }
     };
+    const _onCreate = (e: any) => {
+        const newPolygon = e.layer.toGeoJSON();
+        const coordinates = newPolygon.geometry.coordinates[0];
 
+        const payload: Polygon = {
+            id: 0,
+            name: `Zone${Math.floor(Math.random() * 1000000000)}`,
+            color: "#FF5733",
+            coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
+            technicien: null,
+        };
+
+        savePolygon(payload);
+    };
+
+    // Gestion de la modification des zones
     const updatePolygon = async (polygon: Polygon) => {
         try {
             console.log("Updating polygon:", polygon);
@@ -87,29 +105,46 @@ export default function Map() {
             toast({ title: "Erreur", description: "Échec de la modification de la zone." });
         }
     };
-
+    const _onEditPath = (e: any) => {
+        console.log("L'événement _onEditPath a été déclenché", e);
+        e.layers.eachLayer((layer: any) => {
+            const layerId = layer.options.id;
+            if (!layerId) return;
+    
+            const updatedCoordinates = layer.toGeoJSON().geometry.coordinates[0].map(
+                (coord: [number, number]) => ({
+                    longitude: coord[0],
+                    latitude: coord[1],
+                })
+            );
+    
+            const updatedPolygon = polygons.find((p) => p.id === layerId);
+            if (!updatedPolygon) return;
+    
+            const newPolygonData = { ...updatedPolygon, coordinates: updatedCoordinates };
+    
+            updatePolygon(newPolygonData);
+        });
+    };
+    
+    // Gestion de la suppression des zones
     const deletePolygon = async (id: number) => {
         try {
             await apiService(`zones/${id}`, "DELETE");
             setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));
+            toast({ title: "Succès", description: "Suppression réussie." });
         } catch (error) {
             console.error(`Erreur lors de la suppression de la zone ${id} :`, error);
+            toast({ title: "Erreur", description: "Échec de la suppression." });
         }
     };
-
-    const _onCreate = (e: any) => {
-        const newPolygon = e.layer.toGeoJSON();
-        const coordinates = newPolygon.geometry.coordinates[0];
-
-        const payload: Polygon = {
-            id: 0,
-            name: "Nom par défaut",
-            color: "#FF5733",
-            coordinates: coordinates.map((coord: [number, number]) => ({ longitude: coord[0], latitude: coord[1] })),
-            technicien: null,
-        };
-
-        savePolygon(payload);
+    const _onDeleted = (e: any) => {
+        e.layers.eachLayer((layer: any) => {
+            const layerId = layer.options.id;
+            if (layerId) {
+                deletePolygon(layerId);
+            }
+        });
     };
 
     const addPolygonsToFeatureGroup = () => {
@@ -205,6 +240,8 @@ export default function Map() {
                     <EditControl
                         position="topright"
                         onCreated={_onCreate}
+                        onDeleted={_onDeleted}
+                        onEdited={_onEditPath}
                         draw={{
                             rectangle: false,
                             polyline: false,

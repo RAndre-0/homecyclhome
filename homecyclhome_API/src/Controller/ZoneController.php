@@ -144,9 +144,8 @@ final class ZoneController extends AbstractController
             $em->flush();
             $cache->invalidateTags(["zones_cache"]);
         } catch (\Exception $e) {
-            return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données", "details" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(["error" => "Erreur lors de la mise à jour en base de données"], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
 
         return new JsonResponse($serializer->serialize($zoneModifiee, "json", ["groups" => ["get_zones"]]), Response::HTTP_OK, [], true);
     }
