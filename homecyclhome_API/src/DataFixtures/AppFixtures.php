@@ -182,25 +182,27 @@ class AppFixtures extends Fixture
         }
 
         /* Génération des produits */
+        // Charger le fichier JSON
+        $articlesFilePath = __DIR__ . '/articles.json';
+
+        if (!file_exists($articlesFilePath)) {
+            throw new \Exception("Le fichier articles.json est introuvable !");
+        }
+
+        $articlesData = json_decode(file_get_contents($articlesFilePath), true);
+
         $produits = [];
-        for ($i = 0 ; $i < 30 ; $i++) {
-            // Generate produits
+
+        foreach ($articlesData as $article) {
             $produit = new Produit();
-            $designation = "Designation " . $i;
-            $produit->setDesignation($designation);
-            $prixProduit = random_int(1, 100) - 0.01;
-            $produit->setPrix($prixProduit);
-            $description = $this->client->request(
-                'GET',
-                'https://loripsum.net/api/2/plaintext',
-                [
-                    "verify_peer" => false,
-                ]
-            );
-            $produit->setDescription($description->getContent());
+            $produit->setDesignation($article['titre']);
+            $produit->setPrix($article['prix']);
+            $produit->setDescription($article['description']);
+            
             $produits[] = $produit;
             $manager->persist($produit);
         }
+
 
 
             // Génération des interventions
@@ -237,16 +239,17 @@ class AppFixtures extends Fixture
             if ($pile_face == 1) {
                 $intervention->setClient($users[array_rand($users)]);
 
-                // Génération InterventionProduit
                 $pile_face = random_int(0, 1);
                 if ($pile_face == 1) {
                     $interventionProduit = new InterventionProduit();
                     $interventionProduit->setIntervention($intervention);
-                    $interventionProduit->setProduit($produits[array_rand($produits)]);
+                    // Sélectionne un produit aléatoire
+                    $produit = $produits[array_rand($produits)];
+                    $interventionProduit->setProduit($produit);
                     $quantite = random_int(1, 3);
                     $interventionProduit->setQuantite($quantite);
-                    $interventionProduit->setPrix($prixProduit*$quantite);
-                    $interventionProduit->setDesignation($designation);
+                    $interventionProduit->setPrix($produit->getPrix() * $quantite);
+                    $interventionProduit->setDesignation($produit->getDesignation());
                     $manager->persist($interventionProduit);
                 }
             }

@@ -129,6 +129,7 @@ export default function Map() {
     
     // Gestion de la suppression des zones
     const deletePolygon = async (id: number) => {
+        console.log(`Tentative de suppression de la zone avec l'ID : ${id}`);
         try {
             await apiService(`zones/${id}`, "DELETE");
             setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));

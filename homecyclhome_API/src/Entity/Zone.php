@@ -34,9 +34,9 @@ class Zone
     #[AcmeAssert\ValidCoordinates()]
     private ?array $coordinates = null;
 
-    #[ORM\OneToOne(inversedBy: 'zone', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'zone', cascade: ['persist'])]
     #[Groups(["get_zones"])]
-    private ?User $technicien = null;
+    private ?User $technicien = null;    
 
     public function getId(): ?int
     {

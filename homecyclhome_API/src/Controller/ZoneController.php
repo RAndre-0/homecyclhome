@@ -125,13 +125,19 @@ final class ZoneController extends AbstractController
 
         // Gérer la relation avec le technicien
         $decodedData = json_decode($data, true);
-        if (isset($decodedData['technicien'])) {
-            $technicien = $userRepository->find(intval($decodedData['technicien']));
-            if (!$technicien) {
-                return new JsonResponse(["error" => "Technicien non trouvé"], Response::HTTP_BAD_REQUEST);
+        if (array_key_exists('technicien', $decodedData) && is_array($decodedData['technicien'])) {
+            $technicienId = $decodedData['technicien']['id'] ?? null;
+            if ($technicienId !== null) {
+                $technicien = $userRepository->find(intval($technicienId));
+                if (!$technicien) {
+                    return new JsonResponse(["error" => "Technicien non trouvé"], Response::HTTP_BAD_REQUEST);
+                }
+                $zoneModifiee->setTechnicien($technicien);
+            } else {
+                $zoneModifiee->setTechnicien(null);
             }
-            $zoneModifiee->setTechnicien($technicien);
         }
+        
 
         // Validation des données
         $errors = $validator->validate($zoneModifiee);
