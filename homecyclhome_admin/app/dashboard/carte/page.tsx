@@ -36,6 +36,7 @@ export default function Map() {
     const [polygons, setPolygons] = useState<Polygon[]>([]);
     const [zoneSelected, setZoneSelected] = useState<Polygon | null>(null);
     const [techniciens, setTechniciens] = useState<Technicien[]>([]);
+    const deletingIds = useRef(new Set<number>());
     const { toast } = useToast();
 
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
@@ -129,7 +130,14 @@ export default function Map() {
     
     // Gestion de la suppression des zones
     const deletePolygon = async (id: number) => {
+        if (deletingIds.current.has(id)) {
+            console.warn(`Suppression déjà en cours pour la zone ${id}`);
+            return;
+        }
+    
+        deletingIds.current.add(id);
         console.log(`Tentative de suppression de la zone avec l'ID : ${id}`);
+        
         try {
             await apiService(`zones/${id}`, "DELETE");
             setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));
@@ -137,9 +145,13 @@ export default function Map() {
         } catch (error) {
             console.error(`Erreur lors de la suppression de la zone ${id} :`, error);
             toast({ title: "Erreur", description: "Échec de la suppression." });
+        } finally {
+            deletingIds.current.delete(id);
         }
     };
     const _onDeleted = (e: any) => {
+        console.log(`Suppression détectée pour ${e.layers.getLayers().length} éléments`);
+    
         e.layers.eachLayer((layer: any) => {
             const layerId = layer.options.id;
             if (layerId) {
