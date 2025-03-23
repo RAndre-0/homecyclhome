@@ -125,7 +125,7 @@ final class ZoneController extends AbstractController
 
         // Gérer la relation avec le technicien
         $decodedData = json_decode($data, true);
-        if (array_key_exists('technicien', $decodedData) && is_array($decodedData['technicien'])) {
+        if (array_key_exists('technicien', $decodedData)) {
             $technicienId = $decodedData['technicien']['id'] ?? null;
             if ($technicienId !== null) {
                 $technicien = $userRepository->find(intval($technicienId));

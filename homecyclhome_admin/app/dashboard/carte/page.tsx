@@ -95,7 +95,7 @@ export default function Map() {
             console.log("Updating polygon:", polygon);
             await apiService(`zones/${polygon.id}/edit`, "PUT", {
                 ...polygon,
-                technicien: polygon.technicien ? polygon.technicien.id : null,
+                technicien: polygon.technicien || null,
             });
             setPolygons((prevPolygons) =>
                 prevPolygons.map((p) => (p.id === polygon.id ? polygon : p))
