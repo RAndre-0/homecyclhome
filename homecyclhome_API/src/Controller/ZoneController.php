@@ -25,6 +25,7 @@ final class ZoneController extends AbstractController
     #[Route("/api/zones", name: "get_zones", methods: ["GET"])]
     public function get_zones(ZoneRepository $zoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
+        $cache->invalidateTags(["zones_cache"]);
         $id_cache = "get_zones";
 
         $listeZones = $cache->get($id_cache, function ($item) use ($zoneRepository, $serializer) {

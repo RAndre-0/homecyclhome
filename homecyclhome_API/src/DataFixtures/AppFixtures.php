@@ -139,7 +139,7 @@ class AppFixtures extends Fixture
 
         $technicians = [];
         // Création des techniciens
-        for ($i = 0 ; $i < 5 ; $i++) {
+        for ($i = 0 ; $i < 8 ; $i++) {
             $userTech = new User();
             $userTech->setEmail("tech" . $i . "@gmail.com");
             $firstName = $firstNames[array_rand($firstNames)];

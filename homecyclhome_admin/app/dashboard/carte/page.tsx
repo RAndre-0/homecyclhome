@@ -37,9 +37,10 @@ export default function Map() {
     const [zoneSelected, setZoneSelected] = useState<Polygon | null>(null);
     const [techniciens, setTechniciens] = useState<Technicien[]>([]);
     const deletingIds = useRef(new Set<number>());
-    const { toast } = useToast();
-
     const featureGroupRef = useRef<L.FeatureGroup | null>(null);
+    const polygonsRef = useRef<Polygon[]>([]);
+    const editingIds = useRef(new Set<number>());
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchZones = async () => {
@@ -62,6 +63,9 @@ export default function Map() {
         };
         fetchTechniciens();
     }, []);
+    useEffect(() => {
+        polygonsRef.current = polygons;
+    }, [polygons]);
 
     // Gestion de la création d'une zone
     const savePolygon = async (polygon: Polygon) => {
@@ -92,7 +96,6 @@ export default function Map() {
     // Gestion de la modification des zones
     const updatePolygon = async (polygon: Polygon) => {
         try {
-            console.log("Updating polygon:", polygon);
             await apiService(`zones/${polygon.id}/edit`, "PUT", {
                 ...polygon,
                 technicien: polygon.technicien || null,
@@ -107,10 +110,16 @@ export default function Map() {
         }
     };
     const _onEditPath = (e: any) => {
-        console.log("L'événement _onEditPath a été déclenché", e);
         e.layers.eachLayer((layer: any) => {
             const layerId = layer.options.id;
             if (!layerId) return;
+    
+            // Empêche la mise à jour multiple
+            if (editingIds.current.has(layerId)) {
+                console.warn(`Modification déjà en cours pour la zone ${layerId}`);
+                return;
+            }
+            editingIds.current.add(layerId);
     
             const updatedCoordinates = layer.toGeoJSON().geometry.coordinates[0].map(
                 (coord: [number, number]) => ({
@@ -119,14 +128,17 @@ export default function Map() {
                 })
             );
     
-            const updatedPolygon = polygons.find((p) => p.id === layerId);
+            const updatedPolygon = polygonsRef.current.find((p) => p.id === layerId);
             if (!updatedPolygon) return;
     
             const newPolygonData = { ...updatedPolygon, coordinates: updatedCoordinates };
     
-            updatePolygon(newPolygonData);
+            updatePolygon(newPolygonData).finally(() => {
+                editingIds.current.delete(layerId);
+            });
         });
     };
+    
     
     // Gestion de la suppression des zones
     const deletePolygon = async (id: number) => {
@@ -134,10 +146,7 @@ export default function Map() {
             console.warn(`Suppression déjà en cours pour la zone ${id}`);
             return;
         }
-    
         deletingIds.current.add(id);
-        console.log(`Tentative de suppression de la zone avec l'ID : ${id}`);
-        
         try {
             await apiService(`zones/${id}`, "DELETE");
             setPolygons((prevPolygons) => prevPolygons.filter((polygon) => polygon.id !== id));
@@ -150,8 +159,6 @@ export default function Map() {
         }
     };
     const _onDeleted = (e: any) => {
-        console.log(`Suppression détectée pour ${e.layers.getLayers().length} éléments`);
-    
         e.layers.eachLayer((layer: any) => {
             const layerId = layer.options.id;
             if (layerId) {
