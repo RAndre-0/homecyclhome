@@ -17,8 +17,8 @@ import {
 
 export function DatePickerWithRange({
     className,
-    onChange, // Ajout de la prop onChange
-}: React.HTMLAttributes<HTMLDivElement> & { onChange: (range: { startDate: Date | null; endDate: Date | null }) => void }) {
+    onChange,
+}: { className?: string; onChange: (range: { startDate: Date | null; endDate: Date | null }) => void }) {
     const [date, setDate] = React.useState<DateRange | undefined>({
         from: addMonths(new Date(), -1),
         to: addYears(new Date(), 1),
