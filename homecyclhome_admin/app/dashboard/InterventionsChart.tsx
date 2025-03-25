@@ -25,11 +25,9 @@ const monthTranslation: { [key: string]: string } = {
 
 // Ordre des mois pour le tri
 const orderedMonths = [
-  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
 ]
 
-// Configuration des couleurs pour le graphique
 const chartConfig: ChartConfig = {
   maintenance: {
     label: "Maintenance",
@@ -65,10 +63,10 @@ export function InterventionsChart() {
         // Récupération du mois actuel pour trier correctement
         const currentMonth = new Date().toLocaleString("fr-FR", { month: "long" }); // Ex: "février"
   
-        // Trouver l'index du mois actuel
+        // Trouve l'index du mois actuel
         const currentMonthIndex = transformedData.findIndex((item: { month: string }) => item.month === currentMonth);
   
-        // Faire pivoter le tableau pour que le mois actuel soit le dernier
+        // Fait pivoter le tableau pour que le mois actuel soit le dernier
         const rotatedData = [
           ...transformedData.slice(currentMonthIndex + 1),
           ...transformedData.slice(0, currentMonthIndex + 1)
@@ -76,7 +74,6 @@ export function InterventionsChart() {
   
         setChartData(rotatedData);
 
-        // Calculer la tendance
         if (rotatedData.length > 1) {
           const lastMonthData = rotatedData[rotatedData.length - 2];
           const currentMonthData = rotatedData[rotatedData.length - 1];
@@ -144,7 +141,7 @@ export function InterventionsChart() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)} // "Jan", "Fév", "Mar"...
+              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
