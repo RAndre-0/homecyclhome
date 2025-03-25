@@ -56,7 +56,6 @@ class InterventionRepository extends ServiceEntityRepository
     public function interventionsByTypeLastTwelveMonths(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-
         $sql = "
             SELECT 
                 TO_CHAR(debut, 'FMMonth') AS month,
@@ -74,7 +73,34 @@ class InterventionRepository extends ServiceEntityRepository
             ";
 
         $resultSet = $conn->executeQuery($sql);
-
         return $resultSet->fetchAllAssociative();
     }
+
+    public function getNextInterventions(int $limit = 10): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+                i.id AS intervention_id,
+                t.nom AS type_intervention,
+                u.first_name AS technicien_prenom,
+                u.last_name AS technicien_nom,
+                i.debut,
+                i.fin,
+                i.adresse
+            FROM intervention i
+            JOIN \"user\" u ON i.technicien_id = u.id
+            JOIN type_intervention t ON i.type_intervention_id = t.id
+            WHERE i.client_id IS NOT NULL
+            ORDER BY i.debut ASC
+            LIMIT $limit;
+        ";
+    
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
+    }
+    
+    
+    
 }

@@ -85,10 +85,8 @@ class InterventionController extends AbstractController
     public function interventionsStats(InterventionRepository $interventionRepository): JsonResponse
     {
         try {
-            // Récupérer les statistiques des interventions
+            // Récupére les statistiques des interventions
             $data = $interventionRepository->interventionsByTypeLastTwelveMonths();
-
-            // Si aucune donnée n'est retournée, on renvoie un HTTP_NO_CONTENT
             if (empty($data)) {
                 return new JsonResponse(["message" => "Aucune donnée trouvée"], JsonResponse::HTTP_NO_CONTENT);
             }
@@ -96,8 +94,24 @@ class InterventionController extends AbstractController
             // Retourner les données sous forme de JSON
             return $this->json($data);
         } catch (\Exception $e) {
-            // Gestion d'erreur : envoi d'une réponse JSON avec erreur
+            // Envoi d'une réponse JSON avec erreur
             return new JsonResponse(["error" => "Une erreur s'est produite lors de la récupération des statistiques."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /* Renvoie les prochaines interventions */
+    #[Route('/api/interventions/next-interventions', name: 'get_next_interventions', methods: ["GET"])]
+    public function get_next_interventions(InterventionRepository $interventionRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    {
+        try {
+            // Récupére les prochaines interventions
+            $data = $interventionRepository->getNextInterventions(10);
+            if (empty($data)) {
+                return new JsonResponse(["message" => "Aucune donnée trouvée"], JsonResponse::HTTP_NO_CONTENT);
+            }
+            return $this->json($data);
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => "Une erreur s'est produite lors de la récupération des prochaines interventions."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
