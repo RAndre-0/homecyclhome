@@ -138,16 +138,16 @@ export default function CreateUser() {
                                 <FormItem>
                                     <FormLabel>Rôle</FormLabel>
                                     <Select
-                                        onValueChange={(value) => field.onChange(value ? [value] : [])}
-                                        defaultValue={field.value[0] || null}
-                                    >
+  onValueChange={(value) => field.onChange(value === "none" ? [] : [value])}
+  defaultValue={field.value[0] || ""}
+>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Choisissez un rôle" />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value={null}>Choisissez un rôle</SelectItem>
+                                        <SelectItem value="none">Choisissez un rôle</SelectItem>
                                             <SelectItem value="ROLE_TECHNICIEN">Technicien</SelectItem>
                                             <SelectItem value="ROLE_ADMIN">Administrateur</SelectItem>
                                         </SelectContent>

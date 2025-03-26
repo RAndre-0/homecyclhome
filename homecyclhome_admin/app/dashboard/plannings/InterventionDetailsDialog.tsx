@@ -129,13 +129,27 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
 }
 
 // Fonction de formatage de la durée
-function formatDuration(duration: string | undefined): string {
+function formatDuration(duration: string | number | Date | null | undefined): string {
     if (!duration) return "Non définie";
-    const match = duration.match(/T(\d{2}):(\d{2}):\d{2}/); // Extraction des heures et minutes
-    if (match) {
-        const hours = parseInt(match[1], 10);
-        const minutes = parseInt(match[2], 10);
-        return `${hours}h ${minutes}m`;
+    if (typeof duration === "string") {
+        // Extraction des heures et minutes
+        const match = duration.match(/T(\d{2}):(\d{2}):\d{2}/);
+        if (match) {
+            const hours = parseInt(match[1], 10);
+            const minutes = parseInt(match[2], 10);
+            return `${hours}h ${minutes}m`;
+        }
+         // Retourne la durée si c'est déjà une string valide
+        return duration;
+    }
+    if (typeof duration === "number") {
+        // Suppose que c'est une durée en minutes
+        return `${duration} min`;
+    }
+    if (duration instanceof Date) {
+        // Affiche l'heure locale
+        return duration.toLocaleTimeString();
     }
     return "Non définie";
 }
+

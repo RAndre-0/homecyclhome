@@ -36,7 +36,7 @@ export interface Client {
 export interface TypeIntervention {
   nom: string;
   duree: string | number | Date | null | undefined;
-  prix_depart: string | null;
+  prixDepart: string | null;
 }
 
 export interface Intervention {
@@ -45,12 +45,12 @@ export interface Intervention {
   fin: string | null;
   commentaire_client: string | null;
   photo: string | null;
-  velo_categorie: string | null;
+  veloCategorie: string | null;
   velo_electrique: boolean | null;
-  velo_modele: string | null;
-  velo_marque: string | null;
+  veloModele: string | null;
+  veloMarque: string | null;
   adresse: string | null;
-  type_intervention: TypeIntervention | null;
+  typeIntervention: TypeIntervention | null;
   client: Client | null;
   technicien: Technicien | null;
 }

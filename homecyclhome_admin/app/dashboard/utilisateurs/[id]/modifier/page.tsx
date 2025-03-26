@@ -8,7 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
-export default function EditUser({ params }) {
+interface EditUserProps {
+  params: { id: string };
+}
+
+export default function EditUser({ params }: EditUserProps) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [user, setUser] = useState(null);
@@ -16,7 +20,7 @@ export default function EditUser({ params }) {
     email: "",
     first_name: "",
     last_name: "",
-    roles: [],
+    roles: [] as string[],
   });
   const router = useRouter();
   const id = params.id;
@@ -43,16 +47,16 @@ export default function EditUser({ params }) {
     fetchUser();
   }, [id]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleRolesChange = (value) => {
-    setFormData({ ...formData, roles: [value] }); // Assume a single role selection for now
+  const handleRolesChange = (value: string) => {
+    setFormData({ ...formData, roles: [value] });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {

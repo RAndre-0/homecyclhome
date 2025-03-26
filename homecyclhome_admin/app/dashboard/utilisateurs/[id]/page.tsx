@@ -1,6 +1,5 @@
-export default function User({ params }) {
-    const id = params.id;
+export default function User({}) {
     return (
-        <div>User to display : { id }</div>
+        <div>Afficher l'utilisateur ici</div>
     )
 }
