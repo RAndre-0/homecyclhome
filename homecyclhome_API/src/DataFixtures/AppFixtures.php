@@ -48,11 +48,11 @@ class AppFixtures extends Fixture
             'Olivier', 'Pauline', 'Quentin', 'René', 'Séverine', 'Thomas', 'Ulysse', 'Valérie', 'William', 'Xénia'
         ];
         $lastNames = [
-            'Dubois', 'Morel', 'Garnier', 'Faure', 'Blanc', 'Dupont', 'Bertrand', 'Lemoine', 'Rousseau', 'Morin',
-            'Noël', 'Simon', 'Lemoine', 'Girard', 'Perrin', 'Bonnet', 'Dupuis', 'Benoit', 'Martel', 'Moulin',
-            'Lefevre', 'Chevalier', 'Bouvier', 'Roy', 'Vidal', 'Gauthier', 'Barbier', 'Denis', 'Marchand', 'Colin',
-            'Perrot', 'Dumas', 'Fontaine', 'Mallet', 'Renard', 'Guérin', 'Lemoine', 'Meunier', 'Clément', 'Dubois',
-            'Lambert', 'Hervé', 'Picard', 'Carpentier', 'Petit', 'Tissier', 'Durand', 'Masson', 'Leclerc', 'Renaud'
+            'DUBOIS', 'MOREL', 'GARNIER', 'FAURE', 'BLANC', 'DUPONT', 'BERTRAND', 'LEMOINE', 'ROUSSEAU', 'MORIN',
+            'NOËL', 'SIMON', 'LEMOINE', 'GIRARD', 'PERRIN', 'BONNET', 'DUPUIS', 'BENOIT', 'MARTEL', 'MOULIN',
+            'LEFEVRE', 'CHEVALIER', 'BOUVIER', 'ROY', 'VIDAL', 'GAUTHIER', 'BARBIER', 'DENIS', 'MARCHAND', 'COLIN',
+            'PERROT', 'DUMAS', 'FONTAINE', 'MALLET', 'RENARD', 'GUÉRIN', 'LEMOINE', 'MEUNIER', 'CLÉMENT', 'DUBOIS',
+            'LAMBERT', 'HERVÉ', 'PICARD', 'CARPENTIER', 'PETIT', 'TISSIER', 'DURAND', 'MASSON', 'LECLERC', 'RENAUD'
         ];
         
         // Création des types d'intervention
