@@ -22,7 +22,7 @@ export default function HeaderNav() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
-            <Link href="/#how-it-works">Fonctionnement</Link>
+            <Link href="/#book">Réserver</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>

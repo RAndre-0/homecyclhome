@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PedalPro | Mobile Bike Repair Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#22c55e',
+                        secondary: '#0ea5e9',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .booking-step {
+            display: none;
+        }
+        .booking-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .nav-link:hover::after {
+            content: '';
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: #22c55e;
+            margin: 4px auto 0;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-slate-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <i class="fas fa-bicycle text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-dark">PedalPro</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="nav-link text-dark font-medium">Home</a>
+                    <a href="#services" class="nav-link text-dark font-medium">Services</a>
+                    <a href="#how-it-works" class="nav-link text-dark font-medium">How It Works</a>
+                    <a href="#pricing" class="nav-link text-dark font-medium">Pricing</a>
+                    <a href="#contact" class="nav-link text-dark font-medium">Contact</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="menu-btn" class="text-dark focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white pb-4 px-4 shadow-lg">
+            <a href="#" class="block py-2 font-medium">Home</a>
+            <a href="#services" class="block py-2 font-medium">Services</a>
+            <a href="#how-it-works" class="block py-2 font-medium">How It Works</a>
+            <a href="#pricing" class="block py-2 font-medium">Pricing</a>
+            <a href="#contact" class="block py-2 font-medium">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary to-secondary text-white py-16 md:py-24">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Expert Bicycle Repair & Maintenance at Your Doorstep</h1>
+                    <p class="text-lg mb-8">Our certified mechanics come to you with all the tools needed to get your bike running smoothly again. No need to haul your bike to a shop!</p>
+                    <button id="book-now-btn" class="bg-white text-primary font-bold px-8 py-3 rounded-full hover:bg-gray-100 transition duration-300">
+                        Book Now <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                         alt="Bike mechanic working" 
+                         class="rounded-lg shadow-xl w-full max-w-md">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Check Availability -->
+    <section class="py-12 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-50 rounded-xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 text-center">Check Our Service Availability</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" 
+                           placeholder="Enter your address" 
+                           class="flex-grow px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <button class="bg-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-green-600 transition duration-300 whitespace-nowrap">
+                        Check Availability
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500 mt-3 text-center">We currently serve most urban and suburban areas within a 25-mile radius.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Flow (Hidden by default) -->
+    <section id="booking-section" class="hidden py-12 bg-gray-50">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl shadow-sm p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold">Book Your Appointment</h2>
+                    <button id="close-booking" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Progress Steps -->
+                <div class="flex justify-between mb-8 relative">
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold mb-2">1</div>
+                        <span class="text-sm font-medium">Service Type</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2">2</div>
+                        <span class="text-sm font-medium text-gray-500">Bike Details</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2">3</div>
+                        <span class="text-sm font-medium text-gray-500">Schedule</span>
+                    </div>
+                    <div class="absolute top-5 w-full h-1 bg-gray-200 -z-10"></div>
+                </div>
+                
+                <!-- Step 1: Service Type -->
+                <div id="step-1" class="booking-step active">
+                    <h3 class="text-lg font-semibold mb-4">What type of service do you need?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="service-card p-6 border border-gray-200 rounded-lg cursor-pointer hover:border-primary transition duration-300">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-tools text-secondary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Repair Service</h4>
+                                    <p class="text-sm text-gray-600">Fix specific issues like flat tires, brake problems, gear shifting, etc.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-card p-6 border border-gray-200 rounded-lg cursor-pointer hover:border-primary transition duration-300">
+                            <div class="flex items-start">
+                                <div class="bg-green-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-broom text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Maintenance</h4>
+                                    <p class="text-sm text-gray-600">Tune-up, cleaning, lubrication and overall bike health check.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="nextStep(1, 2)" class="bg-primary text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Bike Details -->
+                <div id="step-2" class="booking-step">
+                    <h3 class="text-lg font-semibold mb-4">Tell us about your bike</h3>
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Bike Brand</label>
+                            <input type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Bike Model</label>
+                            <input type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Bike Type</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option>Road Bike</option>
+                                <option>Mountain Bike</option>
+                                <option>Hybrid Bike</option>
+                                <option>Electric Bike</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Describe the issue (if repair)</label>
+                            <textarea rows="3" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button onclick="prevStep(2, 1)" class="text-gray-600 font-medium px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button onclick="nextStep(2, 3)" class="bg-primary text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Schedule -->
+                <div id="step-3" class="booking-step">
+                    <h3 class="text-lg font-semibold mb-4">When would you like us to come?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Date</label>
+                            <input type="date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Time</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option>9:00 AM - 11:00 AM</option>
+                                <option>11:00 AM - 1:00 PM</option>
+                                <option>1:00 PM - 3:00 PM</option>
+                                <option>3:00 PM - 5:00 PM</option>
+                                <option>5:00 PM - 7:00 PM</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">Special Instructions</label>
+                            <textarea rows="2" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Gate code, parking instructions, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button onclick="prevStep(3, 2)" class="text-gray-600 font-medium px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button class="bg-primary text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                            Confirm Booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Why Choose PedalPro</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-home text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Convenience</h3>
+                    <p class="text-gray-600">We come to you at your home or office, saving you time and hassle of transporting your bike.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-certificate text-secondary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Expertise</h3>
+                    <p class="text-gray-600">Our mechanics are certified professionals with years of experience working on all bike types.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clock text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Reliability</h3>
+                    <p class="text-gray-600">We show up on time and stand behind our work with a 30-day satisfaction guarantee.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="py-12 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-tools text-secondary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Basic Tune-Up</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Includes brake adjustment, gear tuning, tire pressure check, and lubrication of moving parts.</p>
+                    <p class="font-bold text-primary">From $59</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-broom text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Full Service</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Complete overhaul including deep cleaning, wheel truing, bearing adjustment, and full safety check.</p>
+                    <p class="font-bold text-primary">From $129</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-bolt text-secondary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">E-Bike Service</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Specialized service for electric bikes including motor check, battery diagnostics, and system updates.</p>
+                    <p class="font-bold text-primary">From $99</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-tire text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Tire Service</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Flat tire repair or replacement, tubeless setup, and wheel truing.</p>
+                    <p class="font-bold text-primary">From $29</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-cogs text-secondary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Brake Service</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Brake adjustment, pad replacement (materials extra), and hydraulic brake bleeding.</p>
+                    <p class="font-bold text-primary">From $49</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-wrench text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Custom Repairs</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Diagnosis and repair of specific issues. Price varies based on problem.</p>
+                    <p class="font-bold text-primary">From $39</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+                    <h3 class="text-xl font-bold mb-2">Book Online</h3>
+                    <p class="text-gray-600">Select your service and schedule an appointment at your convenience.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+                    <h3 class="text-xl font-bold mb-2">We Come to You</h3>
+                    <p class="text-gray-600">Our mechanic arrives at your chosen location with all necessary tools and parts.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+                    <h3 class="text-xl font-bold mb-2">Ride Away Happy</h3>
+                    <p class="text-gray-600">Your bike is serviced on the spot. Pay securely when the work is completed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 mr-4 overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Customer" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Sarah J.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"I was amazed at how convenient this service was! The mechanic arrived right on time, fixed my gear shifting issue in under 30 minutes, and even gave me some maintenance tips. Will definitely use again!"</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 mr-4 overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Michael T.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"As an e-bike owner, it's hard to find qualified technicians. PedalPro's specialist knew exactly what to do to optimize my bike's performance. The convenience of at-home service is unbeatable."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-primary to-secondary text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Get Your Bike Serviced?</h2>
+            <p class="text-lg mb-8">Book your appointment today and experience the convenience of professional bike repair at your doorstep.</p>
+            <button id="cta-book-btn" class="bg-white text-primary font-bold px-8 py-3 rounded-full hover:bg-gray-100 transition duration-300">
+                Book Now <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-dark text-white py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-bicycle text-primary mr-2"></i> PedalPro
+                    </h3>
+                    <p class="text-gray-400">Bringing professional bike repair and maintenance services directly to your home or office.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white transition duration-300">Services</a></li>
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white transition duration-300">How It Works</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition duration-300">Pricing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-2 text-primary"></i> (555) 123-4567
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-primary"></i> hello@pedalpro.com
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-primary"></i> Serving Your Area
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-primary transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-primary transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-primary transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-2">Newsletter</h4>
+                        <div class="flex">
+                            <input type="email" placeholder="Your email" class="px-3 py-2 bg-slate-700 text-white rounded-l focus:outline-none">
+                            <button class="bg-primary px-3 py-2 rounded-r">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2023 PedalPro. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition duration-300">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition duration-300">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Booking flow
+        const bookNowBtn = document.getElementById('book-now-btn');
+        const ctaBookBtn = document.getElementById('cta-book-btn');
+        const bookingSection = document.getElementById('booking-section');
+        const closeBooking = document.getElementById('close-booking');
+        
+        function showBooking() {
+            bookingSection.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideBooking() {
+            bookingSection.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        bookNowBtn.addEventListener('click', showBooking);
+        ctaBookBtn.addEventListener('click', showBooking);
+        closeBooking.addEventListener('click', hideBooking);
+
+        // Booking steps navigation
+        function nextStep(current, next) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${next}`).classList.add('active');
+            
+            // Update progress steps
+            const steps = document.querySelectorAll('.flex-1 div');
+            steps[current-1].classList.remove('bg-primary', 'text-white');
+            steps[current-1].classList.add('bg-gray-200', 'text-gray-600');
+            steps[next-1].classList.remove('bg-gray-200', 'text-gray-600');
+            steps[next-1].classList.add('bg-primary', 'text-white');
+        }
+        
+        function prevStep(current, prev) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${prev}`).classList.add('active');
+            
+            // Update progress steps
+            const steps = document.querySelectorAll('.flex-1 div');
+            steps[current-1].classList.remove('bg-primary', 'text-white');
+            steps[current-1].classList.add('bg-gray-200', 'text-gray-600');
+            steps[prev-1].classList.remove('bg-gray-200', 'text-gray-600');
+            steps[prev-1].classList.add('bg-primary', 'text-white');
+        }
+
+        // Service card selection
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            card.addEventListener('click', function() {
+                serviceCards.forEach(c => c.classList.remove('border-primary', 'bg-gray-50'));
+                this.classList.add('border-primary', 'bg-gray-50');
+            });
+        });
+    </script>
+</body>
+</html>
