@@ -178,4 +178,34 @@ final class ZoneController extends AbstractController
         }
     }
 
+    /* Vérifie si une coordonnée est couverte */
+    #[Route("/api/zones/check", name: "check_zone_coverage", methods: ["POST"])]
+    public function checkZoneCoverage(Request $request, ZoneRepository $zoneRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['latitude']) || !isset($data['longitude'])) {
+            return new JsonResponse(["error" => "Latitude et longitude requises"], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $lat = $data['latitude'];
+        $lon = $data['longitude'];
+
+        // Recherche de toutes les zones
+        $zones = $zoneRepository->findAll();
+
+        foreach ($zones as $zone) {
+            if ($zone->containsPoint($lat, $lon)) {
+                return new JsonResponse([
+                    "covered" => true,
+                    "zone_id" => $zone->getId(),
+                    "zone_name" => $zone->getName(),
+                    "technicien_id" => $zone->getTechnicien()?->getId(),
+                ], JsonResponse::HTTP_OK);
+            }
+        }
+
+        return new JsonResponse(["covered" => false], JsonResponse::HTTP_OK);
+    }
+
 }

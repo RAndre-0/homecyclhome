@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { fetchAddressCoordinates } from '@/services/banService';
+import { apiService } from '@/services/api-service';
 
 export default function AvailabilityCheck() {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchSuggestions = async (text: string) => {
     if (text.length < 3) return;
@@ -18,22 +20,35 @@ export default function AvailabilityCheck() {
   };
 
   const handleSelect = (label: string) => {
-    setSelectedAddress(label);
     setQuery(label);
     setSuggestions([]);
     setMessage('');
   };
 
   const handleVerify = async () => {
-    const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=1`);
-    const data = await res.json();
+    setIsLoading(true);
+    setMessage('');
 
-    if (data.features && data.features.length > 0) {
-      setSelectedAddress(data.features[0].properties.label);
-      setMessage('✅ Adresse valide et reconnue.');
-    } else {
-      setSelectedAddress(null);
-      setMessage("❌ Adresse introuvable.");
+    try {
+      // Vérification de la validité de l'adresse auprès de l'API BAN
+      const { lat, lon, label } = await fetchAddressCoordinates(query);
+
+      // Appel vers l'API pour vérifier si la coordonnée est bien couverte
+      const result = await apiService('zones/check', 'POST', {
+        latitude: lat,
+        longitude: lon
+      }, false);
+
+      if (result.covered) {
+        setMessage(`✅ Nous desservons votre adresse (${label}).`);
+      } else {
+        setMessage(`❌ Désolé, cette adresse n'est pas encore desservie.`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setMessage("❌ Adresse invalide ou erreur lors de la vérification.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,7 +73,7 @@ export default function AvailabilityCheck() {
             />
 
             {Array.isArray(suggestions) && suggestions.length > 0 && (
-              <ul className="absolute z-10 w-full bg-white border rounded shadow">
+              <ul className="absolute z-10 w-full bg-white border rounded shadow max-h-48 overflow-auto">
                 {suggestions.map((s) => (
                   <li
                     key={s.properties.id}
@@ -70,11 +85,14 @@ export default function AvailabilityCheck() {
                 ))}
               </ul>
             )}
-
           </div>
 
-          <Button className="w-full mt-4 bg-green-500 hover:bg-green-600" onClick={handleVerify}>
-            Vérifier
+          <Button
+            className="w-full mt-4 bg-green-500 hover:bg-green-600"
+            onClick={handleVerify}
+            disabled={isLoading}
+          >
+            {isLoading ? "Vérification..." : "Vérifier"}
           </Button>
 
           {message && (
@@ -82,7 +100,7 @@ export default function AvailabilityCheck() {
           )}
 
           <p className="text-center text-sm text-gray-500 mt-3">
-            Nous intervenons actuellement dans la majorité des zones urbaines et périurbaines.
+            Nous intervenons actuellement dans la majeur partie de la zone urbaine lyonnaise.
           </p>
         </div>
       </div>
