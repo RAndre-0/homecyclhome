@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+
 
 class UserController extends AbstractController
 {
@@ -114,4 +116,54 @@ class UserController extends AbstractController
 
         return new JsonResponse($serializer->serialize($userModifie, 'json'), Response::HTTP_OK, [], true);
     }
+
+    #[Route('/api/register', name: 'register_user', methods: ['POST'])]
+    public function register(
+        Request $request,
+        EntityManagerInterface $em,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        UserPasswordHasherInterface $passwordHasher,
+        UrlGeneratorInterface $urlGenerator,
+        UserRepository $userRepository,
+        TagAwareCacheInterface $cache,
+        JWTTokenManagerInterface $jwtManager
+    ): JsonResponse {
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+
+        $errors = $validator->validate($user);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        if ($userRepository->findOneBy(['email' => $user->getEmail()])) {
+            return new JsonResponse(['error' => 'Un utilisateur avec cette adresse email existe déjà.'], Response::HTTP_CONFLICT);
+        }
+
+        $plainPassword = $user->getPassword();
+        $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+        $user->setPassword($hashedPassword);
+
+        try {
+            $em->persist($user);
+            $em->flush();
+            $cache->invalidateTags(["users_cache", "users_cache_ROLE_TECHNICIEN", "users_cache_ROLE_ADMIN"]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur lors de l’enregistrement.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // Renvoi d'un token JWT pour authentifier l'utilisateur
+        $token = $jwtManager->create($user);
+
+        return new JsonResponse([
+            'token' => $token,
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+            ]
+        ], JsonResponse::HTTP_CREATED);
+    }
+
+
 }

@@ -35,3 +35,18 @@ const schemas = {
 // Export des schémas individuellement et regroupés sous un objet
 export { loginSchema, registerSchema };
 export default schemas;
+
+export const userRegisterSchema = z.object({
+  firstname: z.string().min(1, "Le prénom est requis"),
+  lastname: z.string().min(1, "Le nom est requis"),
+  email: z
+    .string()
+    .email({ message: "L'adresse email est invalide" }),
+  password: z
+    .string()
+    .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères" })
+    .max(32, { message: "Le mot de passe ne peut contenir plus de 32 caractères" })
+    .regex(/[a-z]/, { message: "Le mot de passe doit contenir au moins une lettre minuscule" })
+    .regex(/[A-Z]/, { message: "Le mot de passe doit contenir au moins une lettre majuscule" })
+    .regex(/[@$!%*?&-_]/, { message: "Le mot de passe doit contenir au moins un caractère spécial" }),
+})
