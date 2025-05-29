@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Intervention;
 use App\Entity\TypeIntervention;
+use App\Repository\TypeInterventionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\InterventionRepository;
@@ -340,19 +341,35 @@ class InterventionController extends AbstractController
     }
 
     #[Route('/api/interventions/available/{technicienId}', name: 'get_available_slots', methods: ['GET'])]
-    public function getAvailableSlots(int $technicienId, InterventionRepository $repo, SerializerInterface $serializer): JsonResponse
-    {
+    public function getAvailableSlots(
+        int $technicienId,
+        Request $request,
+        InterventionRepository $repo,
+        TypeInterventionRepository $typeRepo,
+        SerializerInterface $serializer
+    ): JsonResponse {
         $tomorrow = (new \DateTimeImmutable())->modify('+1 day')->setTime(0, 0);
+        $typeId = $request->query->get('typeId');
 
-        $slots = $repo->createQueryBuilder('i')
+        $qb = $repo->createQueryBuilder('i')
             ->where('i.technicien = :techId')
             ->andWhere('i.client IS NULL')
             ->andWhere('i.debut >= :tomorrow')
             ->setParameter('techId', $technicienId)
             ->setParameter('tomorrow', $tomorrow)
-            ->orderBy('i.debut', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('i.debut', 'ASC');
+
+        if ($typeId) {
+            $type = $typeRepo->find($typeId);
+            if (!$type) {
+                return new JsonResponse(['error' => 'Type d\'intervention introuvable.'], JsonResponse::HTTP_BAD_REQUEST);
+            }
+
+            $qb->andWhere('i.typeIntervention = :type')
+            ->setParameter('type', $type);
+        }
+
+        $slots = $qb->getQuery()->getResult();
 
         return new JsonResponse(
             $serializer->serialize($slots, 'json', ['groups' => 'get_intervention']),
@@ -361,6 +378,8 @@ class InterventionController extends AbstractController
             true
         );
     }
+
+
 
 
 
