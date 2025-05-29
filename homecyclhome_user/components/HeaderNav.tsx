@@ -44,7 +44,7 @@ export default function HeaderNav() {
               <NavigationMenuLink asChild><Link href="/#services">Services</Link></NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/#book">Réserver</Link></NavigationMenuLink>
+              <NavigationMenuLink asChild><Link href="/book">Réserver</Link></NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild><Link href="/#pricing">Tarifs</Link></NavigationMenuLink>
@@ -88,7 +88,7 @@ export default function HeaderNav() {
           <ul className="flex flex-col gap-3 text-sm">
             <li><Link href="/" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
             <li><Link href="/#services" onClick={() => setMenuOpen(false)}>Services</Link></li>
-            <li><Link href="/#book" onClick={() => setMenuOpen(false)}>Réserver</Link></li>
+            <li><Link href="/book" onClick={() => setMenuOpen(false)}>Réserver</Link></li>
             <li><Link href="/#pricing" onClick={() => setMenuOpen(false)}>Tarifs</Link></li>
             <li><Link href="/#contact" onClick={() => setMenuOpen(false)}>Contact</Link></li>
             <li className="pt-2 border-t text-gray-600 text-xs">Mon compte</li>

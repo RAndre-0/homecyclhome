@@ -338,4 +338,30 @@ class InterventionController extends AbstractController
 
         return new JsonResponse(['success' => 'Interventions créées avec succès.'], 201);
     }
+
+    #[Route('/api/interventions/available/{technicienId}', name: 'get_available_slots', methods: ['GET'])]
+    public function getAvailableSlots(int $technicienId, InterventionRepository $repo, SerializerInterface $serializer): JsonResponse
+    {
+        $tomorrow = (new \DateTimeImmutable())->modify('+1 day')->setTime(0, 0);
+
+        $slots = $repo->createQueryBuilder('i')
+            ->where('i.technicien = :techId')
+            ->andWhere('i.client IS NULL')
+            ->andWhere('i.debut >= :tomorrow')
+            ->setParameter('techId', $technicienId)
+            ->setParameter('tomorrow', $tomorrow)
+            ->orderBy('i.debut', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return new JsonResponse(
+            $serializer->serialize($slots, 'json', ['groups' => 'get_intervention']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+
+
 }
