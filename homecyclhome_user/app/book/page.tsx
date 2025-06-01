@@ -156,7 +156,7 @@ export default function BookPage() {
       }
 
       alert('✅ Demande envoyée avec succès.');
-      //router.push('/mes-interventions');
+      router.push('/');
     } catch (err: any) {
       console.error(err);
       alert(`❌ Erreur : ${err.message}`);
