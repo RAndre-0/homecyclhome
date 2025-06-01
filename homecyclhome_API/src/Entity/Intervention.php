@@ -101,7 +101,6 @@ class Intervention
     public function setVeloCategorie(?string $veloCategorie): static
     {
         $this->veloCategorie = $veloCategorie;
-
         return $this;
     }
 
@@ -113,7 +112,6 @@ class Intervention
     public function setVeloElectrique(?bool $veloElectrique): static
     {
         $this->veloElectrique = $veloElectrique;
-
         return $this;
     }
 
@@ -125,7 +123,6 @@ class Intervention
     public function setVeloMarque(?string $veloMarque): static
     {
         $this->veloMarque = $veloMarque;
-
         return $this;
     }
 
@@ -137,7 +134,6 @@ class Intervention
     public function setVeloModele(string $veloModele): static
     {
         $this->veloModele = $veloModele;
-
         return $this;
     }
 
@@ -149,7 +145,6 @@ class Intervention
     public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
-
         return $this;
     }
 
@@ -161,7 +156,6 @@ class Intervention
     public function setCommentaireClient(?string $commentaireClient): static
     {
         $this->commentaireClient = $commentaireClient;
-
         return $this;
     }
 
@@ -173,7 +167,6 @@ class Intervention
     public function setPhoto(?string $photo): static
     {
         $this->photo = $photo;
-
         return $this;
     }
 

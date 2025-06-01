@@ -23,6 +23,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 
 class InterventionController extends AbstractController
@@ -379,8 +383,76 @@ class InterventionController extends AbstractController
         );
     }
 
+#[Route('/api/interventions/{id}/book', name: 'book_intervention', methods: ['POST'])]
+public function bookIntervention(
+    int $id,
+    Request $request,
+    EntityManagerInterface $em,
+    UserRepository $userRepo
+): JsonResponse {
+    $intervention = $em->getRepository(Intervention::class)->find($id);
+    if (!$intervention) {
+        return new JsonResponse(['error' => 'Intervention introuvable'], 404);
+    }
 
+    $clientId = $request->request->get('clientId');
+    $client = $userRepo->find($clientId);
+    if (!$client) {
+        return new JsonResponse(['error' => 'Client introuvable'], 404);
+    }
 
+    $adresse = $request->request->get('adresse');
+    $marque = $request->request->get('marqueVelo');
+    $modele = $request->request->get('modeleVelo');
 
+    if (!$marque || !$modele || !$adresse) {
+        return new JsonResponse(['error' => 'Données incomplètes.'], 400);
+    }
+
+    $electrique = filter_var($request->request->get('electrique'), FILTER_VALIDATE_BOOLEAN);
+    $commentaire = $request->request->get('commentaire');
+
+    // Gestion de la photo
+    $photo = $request->files->get('photo');
+    if ($photo instanceof UploadedFile) {
+        $uploadDir = $this->getParameter('upload_directory');
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!in_array($photo->getMimeType(), $allowedMimeTypes)) {
+            return new JsonResponse(['error' => 'Format de fichier non autorisé'], 400);
+        }
+
+        if ($photo->getSize() > 5 * 1024 * 1024) {
+            return new JsonResponse(['error' => 'Fichier trop volumineux (max 5 Mo)'], 400);
+        }
+
+        // Récupération l'ancien nom de fichier si il existe
+        $anciennePhoto = $intervention->getPhoto();
+
+        $filename = uniqid('velo_') . '.' . $photo->guessExtension();
+        $photo->move($uploadDir, $filename);
+
+        $intervention->setPhoto($filename);
+
+        // Suppression de l’ancienne photo si elle existe
+        if ($anciennePhoto) {
+            $ancienChemin = $uploadDir . '/' . $anciennePhoto;
+            if (file_exists($ancienChemin)) {
+                @unlink($ancienChemin);
+            }
+        }
+    }
+
+    $intervention
+        ->setClient($client)
+        ->setVeloMarque($marque)
+        ->setVeloModele($modele)
+        ->setVeloElectrique($electrique)
+        ->setCommentaireClient($commentaire)
+        ->setAdresse($adresse);
+
+    $em->flush();
+
+    return new JsonResponse(['message' => 'Intervention réservée'], 200);
+}
 
 }
