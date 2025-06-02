@@ -13,8 +13,6 @@ vendor
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-.env
-.env.*
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
 /phpunit.xml
@@ -24,3 +22,7 @@ vendor
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+.env
+.env.*
+public/uploads
