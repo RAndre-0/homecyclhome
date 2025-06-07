@@ -20,6 +20,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Menu, CircleUser, X } from 'lucide-react'
 
+const navLinks = [
+  { title: 'Accueil', href: '/' },
+  { title: 'Services', href: '/#services' },
+  { title: 'Réserver', href: '/book' },
+  { title: 'Tarifs', href: '/#pricing' },
+  { title: 'Contact', href: '/#contact' },
+]
+
 export default function HeaderNav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -37,25 +45,17 @@ export default function HeaderNav() {
       <div className="hidden md:flex items-center gap-6">
         <NavigationMenu>
           <NavigationMenuList className="gap-x-4">
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/">Accueil</Link></NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/#services">Services</Link></NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/book">Réserver</Link></NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/#pricing">Tarifs</Link></NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild><Link href="/#contact">Contact</Link></NavigationMenuLink>
-            </NavigationMenuItem>
+            {navLinks.map(link => (
+              <NavigationMenuItem key={link.href}>
+                <NavigationMenuLink asChild>
+                  <Link href={link.href}>{link.title}</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Menu utilisateur sur desktop */}
+        {/* Compte utilisateur desktop */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -77,7 +77,7 @@ export default function HeaderNav() {
         </DropdownMenu>
       </div>
 
-      {/* Mobile toggle */}
+      {/* Bouton toggle mobile */}
       <Button variant="ghost" className="md:hidden" onClick={toggleMenu}>
         {menuOpen ? <X className="h-6 w-6 text-gray-700" /> : <Menu className="h-6 w-6 text-gray-700" />}
       </Button>
@@ -86,11 +86,11 @@ export default function HeaderNav() {
       {menuOpen && (
         <div className="absolute top-14 right-2 left-2 max-w-[95vw] bg-white shadow-lg border rounded-md p-4 z-50 md:hidden text-right">
           <ul className="flex flex-col gap-3 text-sm">
-            <li><Link href="/" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
-            <li><Link href="/#services" onClick={() => setMenuOpen(false)}>Services</Link></li>
-            <li><Link href="/book" onClick={() => setMenuOpen(false)}>Réserver</Link></li>
-            <li><Link href="/#pricing" onClick={() => setMenuOpen(false)}>Tarifs</Link></li>
-            <li><Link href="/#contact" onClick={() => setMenuOpen(false)}>Contact</Link></li>
+            {navLinks.map(link => (
+              <li key={link.href}>
+                <Link href={link.href} onClick={() => setMenuOpen(false)}>{link.title}</Link>
+              </li>
+            ))}
             <li className="pt-2 border-t text-gray-600 text-xs">Mon compte</li>
             {isAuthenticated ? (
               <>

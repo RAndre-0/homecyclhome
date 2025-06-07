@@ -8,14 +8,10 @@ import HowItWorks from '@/components/HowItWorks';
 export default function Home() {
   return (
     <>
-      <Header />
-      <main>
         <HeroSection />
         <AvailabilityCheck />
         <HowItWorks />
         <WhyChooseUs />
-      </main>
-      <Footer />
     </>
   );
 }

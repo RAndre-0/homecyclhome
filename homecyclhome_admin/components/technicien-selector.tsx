@@ -25,7 +25,7 @@ export default function TechnicienSelector({ onTechnicienChange, defaultTechnici
   useEffect(() => {
     const fetchTechniciens = async () => {
       try {
-        const data = await apiService("users/ROLE_TECHNICIEN", "GET");
+        const data = await apiService("users/role-ROLE_TECHNICIEN", "GET");
         setTechniciens(data);
         if (data.length > 0 && !defaultTechnicien) {
           setSelectedTechnicienId(data[0].id.toString());

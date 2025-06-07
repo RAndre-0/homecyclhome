@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import peugeotBike from '@/public/media/image/peugeot_bike.jpeg';
+import Link from 'next/link';
 
 export default function HeroSection() {
   return (
@@ -11,7 +12,11 @@ export default function HeroSection() {
           <p className="mb-6">
             Nos mécaniciens certifiés se déplacent chez vous avec tout l’équipement nécessaire pour remettre votre vélo en état.
           </p>
-          <Button className="bg-white text-green-600 hover:bg-gray-100">Prendre rendez-vous</Button>
+          <Link href="/book" passHref>
+            <Button className="bg-white text-green-600 hover:bg-gray-100">
+              Prendre rendez-vous
+            </Button>
+          </Link>
         </div>
         <div className="md:w-1/2">
           <Image

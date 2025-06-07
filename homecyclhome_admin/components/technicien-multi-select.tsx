@@ -21,7 +21,7 @@ export default function TechnicienMultiSelect({
   useEffect(() => {
     const fetchTechniciens = async () => {
       try {
-        const data = await apiService("users/ROLE_TECHNICIEN", "GET");
+        const data = await apiService("users/role-ROLE_TECHNICIEN", "GET");
         const options = data.map((technicien: Technicien) => ({
           value: technicien.id.toString(),
           label: `${technicien.first_name} ${technicien.last_name}`,

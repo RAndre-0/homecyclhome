@@ -55,7 +55,7 @@ export default function Map() {
 
         const fetchTechniciens = async () => {
             try {
-                const fetchedTechniciens = await apiService("users/ROLE_TECHNICIEN", "GET");
+                const fetchedTechniciens = await apiService("users/role-ROLE_TECHNICIEN", "GET");
                 setTechniciens(fetchedTechniciens);
             } catch (error) {
                 console.error("Error fetching techniciens", error);

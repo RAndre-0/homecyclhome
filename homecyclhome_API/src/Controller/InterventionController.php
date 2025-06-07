@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Bundle\SecurityBundle\Security;
 
 
 class InterventionController extends AbstractController
@@ -84,6 +85,25 @@ class InterventionController extends AbstractController
         $interventionsJson = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
         return new JsonResponse($interventionsJson, Response::HTTP_OK, [], true);
     }
+
+    /* Renvoie les interventions d'un client authentifié */
+    #[Route('/api/interventions/client', name: 'get_interventions_authenticated_client', methods: ["GET"])]
+    public function get_interventions_authenticated_client(
+        Security $security,
+        InterventionRepository $interventionRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $interventions = $interventionRepository->findBy(['client' => $user->getId()]);
+        $interventionsJson = $serializer->serialize($interventions, 'json', ['groups' => 'get_interventions']);
+
+        return new JsonResponse($interventionsJson, Response::HTTP_OK, [], true);
+    }
+
 
     /* Renvoie le nombre d'interventions par type et par mois pour les 12 derniers mois */
     #[Route('/api/interventions/stats', name: 'get_interventions_stats', methods: ['GET'])]
