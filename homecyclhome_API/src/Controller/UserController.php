@@ -62,10 +62,22 @@ class UserController extends AbstractController
     }
 
     /* Retourne un utilisateur */
-    #[Route('/api/users/{id}', name: 'user', methods: ["GET"])]
+    #[Route('/api/users/{id<\d+>}', name: 'user', methods: ["GET"])]
     public function get_user(User $user, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
     {
         $userJson = $serializer->serialize($user, 'json', ["groups" => "get_user"]);
+        return new JsonResponse($userJson, Response::HTTP_OK, [], true);
+    }
+
+    /* Retourne l'utilisateur connecté */
+    #[Route('/api/users/me', name: 'user_me', methods: ['GET'])]
+    public function getCurrentUser(SerializerInterface $serializer): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $userJson = $serializer->serialize($user, 'json', ['groups' => 'get_user']);
+
         return new JsonResponse($userJson, Response::HTTP_OK, [], true);
     }
 

@@ -65,11 +65,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
-    private ?string $first_name = null;
+    private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["get_users", "get_user", "get_zones", "get_intervention", "get_interventions"])]
-    private ?string $last_name = null;
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(["get_users", "get_user"])]
+    #[Assert\Regex(
+        pattern: "/^\+?[0-9\s\-()]{7,20}$/",
+        message: "Le numéro de téléphone n'est pas valide."
+    )]
+    private ?string $phoneNumber = null;
+
 
     public function __construct()
     {
@@ -153,6 +162,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(?string $phoneNumber): static
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
 
     /**
      * @see UserInterface
@@ -277,24 +299,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFirstName(): ?string
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
-    public function setFirstName(?string $first_name): static
+    public function setFirstName(?string $firstName): static
     {
-        $this->first_name = $first_name;
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        return $this->last_name;
+        return $this->lastName;
     }
 
-    public function setLastName(string $last_name): static
+    public function setLastName(string $lastName): static
     {
-        $this->last_name = $last_name;
+        $this->lastName = $lastName;
 
         return $this;
     }

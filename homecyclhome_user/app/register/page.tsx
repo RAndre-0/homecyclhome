@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCookies } from 'react-cookie'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -19,6 +20,7 @@ import { Label } from '@/components/ui/label'
 import { userRegisterSchema } from '@/schemas/schemas'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { apiService } from '@/services/api-service'
+import { PhoneInput } from '@/components/PhoneInput'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -33,6 +35,7 @@ export default function RegisterPage() {
       password: '',
       firstname: '',
       lastname: '',
+      phoneNumber: '',
     },
   })
 
@@ -46,12 +49,11 @@ export default function RegisterPage() {
       if (!token) throw new Error("Le token n'a pas été renvoyé par l'API.")
       setCookie('token', token, {
         path: '/',
-        maxAge: 60 * 60, // 1h
+        maxAge: 60 * 60,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       })
 
-      // Redirection après l'inscription réussie
       router.push('/')
     } catch (error) {
       console.error(error)
@@ -89,6 +91,26 @@ export default function RegisterPage() {
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input type="email" id="email" {...form.register('email')} required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phoneNumber">Numéro de téléphone</Label>
+                <Controller
+                  name="phoneNumber"
+                  control={form.control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      id="phoneNumber"
+                      placeholder="+33 6 12 34 56 78"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {form.formState.errors.phoneNumber && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.phoneNumber.message}
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Mot de passe</Label>

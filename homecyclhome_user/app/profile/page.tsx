@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { apiService } from '@/services/api-service'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Card, CardContent } from '@/components/ui/card'
+import { useEffect, useState } from 'react';
+import { apiService } from '@/services/api-service';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface User {
   id: number
-  first_name: string
-  last_name: string
+  firstName: string
+  lastName: string
   email: string
+  phoneNumber?: string
 }
 
 interface Intervention {
@@ -41,32 +42,25 @@ export default function MonProfilPage() {
   const [interventions, setInterventions] = useState<Intervention[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // 1. Récupération des interventions
-        const inters = await apiService('interventions/client', 'GET', undefined, true)
-        setInterventions(inters)
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // 1. Récupération des interventions
+      const inters = await apiService('interventions/client', 'GET', undefined, true)
+      setInterventions(inters)
 
-        // 2. Récupération des infos utilisateur, avec l'ID depuis une intervention ou depuis le token
-        const userId = inters.length > 0 ? inters[0].client.id : await fetchUserIdFromToken()
-        const userInfo = await apiService(`users/${userId}`, 'GET', undefined, true)
-        setUser(userInfo)
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
+      // 2. Récupération des infos utilisateur via la nouvelle route sécurisée
+      const userInfo = await apiService('users/me', 'GET', undefined, true)
+      setUser(userInfo)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
     }
-
-    fetchData()
-  }, [])
-
-  // Exemple très simplifié pour obtenir l'ID du token (remplace-le selon ton système réel)
-  const fetchUserIdFromToken = async (): Promise<number> => {
-    const userData = await apiService('me', 'GET', undefined, true)
-    return userData.id
   }
+
+  fetchData()
+}, [])
 
   const now = new Date()
   const futures = interventions.filter(i => new Date(i.debut) > now)
@@ -110,14 +104,18 @@ export default function MonProfilPage() {
           <CardContent className="p-6 space-y-2">
             {user ? (
               <>
-                <p><strong>Nom :</strong> {user.last_name}</p>
-                <p><strong>Prénom :</strong> {user.first_name}</p>
+                <p><strong>Nom :</strong> {user.lastName}</p>
+                <p><strong>Prénom :</strong> {user.firstName}</p>
                 <p><strong>Email :</strong> {user.email}</p>
+                {user.phoneNumber && (
+                  <p><strong>Téléphone :</strong> {user.phoneNumber}</p>
+                )}
               </>
             ) : (
               <p>Chargement des informations utilisateur…</p>
             )}
           </CardContent>
+
         </Card>
       </section>
 

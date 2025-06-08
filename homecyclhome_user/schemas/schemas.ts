@@ -42,6 +42,13 @@ export const userRegisterSchema = z.object({
   email: z
     .string()
     .email({ message: "L'adresse email est invalide" }),
+  phoneNumber: z
+    .string()
+    .min(10, { message: 'Le numéro est trop court' })
+    .max(17, { message: 'Le numéro est trop long' })
+    .regex(/^(\+33\s?|0)[67](?:[\s.-]?\d{2}){4}$/, {
+      message: 'Format attendu : 06XXXXXXXX ou +33 6 XX XX XX XX',
+    }),
   password: z
     .string()
     .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères" })

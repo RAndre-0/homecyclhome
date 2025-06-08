@@ -156,7 +156,7 @@ export default function BookPage() {
       }
 
       alert('✅ Demande envoyée avec succès.');
-      router.push('/');
+      router.push('/profile');
     } catch (err: any) {
       console.error(err);
       alert(`❌ Erreur : ${err.message}`);
