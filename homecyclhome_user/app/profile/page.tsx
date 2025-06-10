@@ -5,6 +5,7 @@ import { apiService } from '@/services/api-service';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
+import ZoomableImage from '@/components/ZoomableImage';
 
 interface User {
   id: number
@@ -42,25 +43,25 @@ export default function MonProfilPage() {
   const [interventions, setInterventions] = useState<Intervention[]>([])
   const [loading, setLoading] = useState(true)
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      // 1. Récupération des interventions
-      const inters = await apiService('interventions/client', 'GET', undefined, true)
-      setInterventions(inters)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 1. Récupération des interventions
+        const inters = await apiService('interventions/client', 'GET', undefined, true)
+        setInterventions(inters)
 
-      // 2. Récupération des infos utilisateur via la nouvelle route sécurisée
-      const userInfo = await apiService('users/me', 'GET', undefined, true)
-      setUser(userInfo)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
+        // 2. Récupération des infos utilisateur via la nouvelle route sécurisée
+        const userInfo = await apiService('users/me', 'GET', undefined, true)
+        setUser(userInfo)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  fetchData()
-}, [])
+    fetchData()
+  }, [])
 
   const now = new Date()
   const futures = interventions.filter(i => new Date(i.debut) > now)
@@ -78,17 +79,17 @@ useEffect(() => {
         <Card>
           <CardContent className="p-4 space-y-2">
             <p><strong>Vélo :</strong> {intervention.veloMarque} {intervention.veloModele} ({intervention.veloCategorie}) {intervention.veloElectrique ? '⚡' : ''}</p>
-            <p><strong>Technicien :</strong> {intervention.technicien.first_name} {intervention.technicien.last_name}</p>
             <p><strong>Prix :</strong> {intervention.typeIntervention.prixDepart} €</p>
             <p><strong>Durée :</strong> {new Date(intervention.typeIntervention.duree).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
             <p><strong>Commentaire :</strong> {intervention.commentaireClient}</p>
             {intervention.photo && (
-              <img
-                src={`${process.env.NEXT_PUBLIC_API_ROUTE}/uploads/photos/${intervention.photo}`}
+              <ZoomableImage
+                src={`${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${intervention.photo}`}
                 alt="Photo du vélo"
-                className="max-w-xs rounded-md"
+                className="max-w-xs rounded-md cursor-zoom-in"
               />
             )}
+
           </CardContent>
         </Card>
       </AccordionContent>

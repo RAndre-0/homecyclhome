@@ -18,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "HomecyclHome",
-  description: "Maintenance et réparation de vélos.",
+  description: "Homecyclhome propose de faire la réparation ou la maintenance de votre vélo à domicile."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
