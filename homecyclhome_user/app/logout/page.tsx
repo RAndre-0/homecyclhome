@@ -10,8 +10,8 @@ export default function Logout() {
   useEffect(() => {
     // Suppression du cookie contenant le token
     removeCookie('token', { path: '/' });
-    // Redirection vers la page de login
-    router.push('/login');
+    // Redirection vers la page de login, pas de router.push pour recharger la navbar
+    window.location.href = "/login";
   }, [removeCookie, router]);
 
   return (

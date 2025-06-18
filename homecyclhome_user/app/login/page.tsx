@@ -67,7 +67,8 @@ export default function LoginPage() {
         sameSite: "strict",
       })
 
-      router.push("/")
+    // Pas de router.push pour recharger la navbar
+    window.location.href = "/";
     } catch (error) {
       console.error("Login error:", error)
       setErrorMessage(

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { apiService } from '@/services/api-service';
+import { apiService, convertKeysToCamel } from '@/services/api-service';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -47,8 +47,8 @@ export default function MonProfilPage() {
     const fetchData = async () => {
       try {
         // 1. Récupération des interventions
-        const inters = await apiService('interventions/client', 'GET', undefined, true)
-        setInterventions(inters)
+        const response = await apiService('interventions/client', 'GET', undefined, true)
+        setInterventions(convertKeysToCamel(response))
 
         // 2. Récupération des infos utilisateur via la nouvelle route sécurisée
         const userInfo = await apiService('users/me', 'GET', undefined, true)

@@ -48,3 +48,17 @@ export const apiService = async (
     throw error;
   }
 };
+
+export const convertKeysToCamel = (input: any): any => {
+  if (Array.isArray(input)) {
+    return input.map(convertKeysToCamel)
+  } else if (input && typeof input === 'object') {
+    return Object.entries(input).reduce((acc, [key, value]) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
+      acc[camelKey] = convertKeysToCamel(value)
+      return acc
+    }, {} as Record<string, any>)
+  }
+  return input
+};
+

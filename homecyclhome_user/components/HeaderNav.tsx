@@ -1,15 +1,15 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { getCookie } from 'cookies-next'
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { getCookie } from 'cookies-next';
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-} from '@/components/ui/navigation-menu'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,8 +17,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import { Menu, CircleUser, X } from 'lucide-react'
+} from '@/components/ui/dropdown-menu';
+import { Menu, CircleUser, X } from 'lucide-react';
 
 const navLinks = [
   { title: 'Accueil', href: '/' },
