@@ -22,15 +22,15 @@ export interface Polygon {
 export interface Technicien {
   id: number;
   email: string;
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
 export interface Client {
   id: number;
   email: string | null;
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
 export interface TypeIntervention {
@@ -43,10 +43,10 @@ export interface Intervention {
   id: number;
   debut: string;
   fin: string | null;
-  commentaire_client: string | null;
+  commentaireClient: string | null;
   photo: string | null;
   veloCategorie: string | null;
-  velo_electrique: boolean | null;
+  veloElectrique: boolean | null;
   veloModele: string | null;
   veloMarque: string | null;
   adresse: string | null;

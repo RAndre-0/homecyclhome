@@ -4,7 +4,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { apiService } from "@/services/api-service";
+import { apiService, convertKeysToSnake } from "@/services/api-service";
 import TypeInterventionSelector from "@/components/types-intervention-selector";
 import { Plus } from "lucide-react";
 
@@ -26,13 +26,13 @@ export default function CreateModelInterventionDialog({ selectedModelId, onInter
         }
 
         const payload = {
-            type_intervention: selectedTypeIntervention,
-            modele_planning: selectedModelId,
-            intervention_time: interventionTime
+            typeIntervention: selectedTypeIntervention,
+            modelePlanning: selectedModelId,
+            interventionTime: interventionTime
         };
 
         try {
-            const newIntervention = await apiService("modele-interventions", "POST", payload);
+            const newIntervention = await apiService("modele-interventions", "POST", convertKeysToSnake(payload));
             onInterventionCreated(newIntervention);
 
             toast({ title: "Succès", description: "Intervention ajoutée avec succès." });

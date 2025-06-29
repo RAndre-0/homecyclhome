@@ -24,7 +24,7 @@ export default function TechnicienMultiSelect({
         const data = await apiService("users/role-ROLE_TECHNICIEN", "GET");
         const options = data.map((technicien: Technicien) => ({
           value: technicien.id.toString(),
-          label: `${technicien.first_name} ${technicien.last_name}`,
+          label: `${technicien.firstName} ${technicien.lastName}`,
         }));
         setTechniciensList(options);
       } catch (error) {

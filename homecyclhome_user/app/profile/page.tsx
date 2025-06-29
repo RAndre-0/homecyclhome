@@ -46,13 +46,13 @@ export default function MonProfilPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Récupération des interventions
+        // Récupération des interventions
         const response = await apiService('interventions/client', 'GET', undefined, true)
         setInterventions(convertKeysToCamel(response))
 
-        // 2. Récupération des infos utilisateur via la nouvelle route sécurisée
+        // Récupération des infos de l'utilisateur connecté
         const userInfo = await apiService('users/me', 'GET', undefined, true)
-        setUser(userInfo)
+        setUser(convertKeysToCamel(userInfo))
       } catch (e) {
         console.error(e)
       } finally {

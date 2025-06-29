@@ -1,5 +1,5 @@
 "use client";
-import { apiService } from "@/services/api-service";
+import { apiService, convertKeysToSnake } from "@/services/api-service";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,8 @@ export default function EditUser({ params }: EditUserProps) {
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     roles: [] as string[],
   });
   const router = useRouter();
@@ -33,8 +33,8 @@ export default function EditUser({ params }: EditUserProps) {
         setUser(fetchedUser);
         setFormData({
           email: fetchedUser.email || "",
-          first_name: fetchedUser.first_name || "",
-          last_name: fetchedUser.last_name || "",
+          firstName: fetchedUser.firstName || "",
+          lastName: fetchedUser.lastName || "",
           roles: fetchedUser.roles || [],
         });
       } catch (error) {
@@ -60,7 +60,7 @@ export default function EditUser({ params }: EditUserProps) {
     e.preventDefault();
     setLoading(true);
     try {
-      await apiService(`users/${id}`, "PUT", formData);
+      await apiService(`users/${id}`, "PUT", convertKeysToSnake(formData));
       toast({
         title: "Utilisateur modifié avec succès",
         description: "Les informations de l'utilisateur ont été mises à jour.",
@@ -101,23 +101,23 @@ export default function EditUser({ params }: EditUserProps) {
         <h2 className="text-2xl font-bold mb-4">Modifier l'utilisateur</h2>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="first_name">Prénom</Label>
+            <Label htmlFor="firstName">Prénom</Label>
             <Input
-              id="first_name"
-              name="first_name"
+              id="firstName"
+              name="firstName"
               placeholder="Prénom"
-              value={formData.first_name}
+              value={formData.firstName}
               onChange={handleInputChange}
               disabled={loading}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="last_name">Nom</Label>
+            <Label htmlFor="lastName">Nom</Label>
             <Input
-              id="last_name"
-              name="last_name"
+              id="lastName"
+              name="lastName"
               placeholder="Nom"
-              value={formData.last_name}
+              value={formData.lastName}
               onChange={handleInputChange}
               disabled={loading}
             />

@@ -69,7 +69,7 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
                     {isReserved && (
                         <>
                             <p>
-                                <strong>Client :</strong> {`${intervention.client?.first_name ?? "Non défini"} ${intervention.client?.last_name ?? "Non défini"}`}
+                                <strong>Client :</strong> {`${intervention.client?.firstName ?? "Non défini"} ${intervention.client?.lastName ?? "Non défini"}`}
                             </p>
                             <p>
                                 <strong>Email :</strong> {intervention.client?.email ?? "Non défini"}
@@ -81,11 +81,11 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
                                 <strong>Vélo :</strong> {`${intervention.veloCategorie ?? "Non défini"} - ${intervention.veloMarque ?? "Non définie"} ${intervention.veloModele ?? ""}`}
                             </p>
                             <p>
-                                <strong>Électrique :</strong> {intervention.velo_electrique ? "Oui" : "Non"}
+                                <strong>Électrique :</strong> {intervention.veloElectrique ? "Oui" : "Non"}
                             </p>
-                            {intervention.commentaire_client && (
+                            {intervention.commentaireClient && (
                                 <p>
-                                    <strong>Commentaire :</strong> {intervention.commentaire_client}
+                                    <strong>Commentaire :</strong> {intervention.commentaireClient}
                                 </p>
                             )}
                             {intervention.photo && (
@@ -94,7 +94,7 @@ export default function InterventionDetailsDialog({ intervention, isOpen, onClos
                         </>
                     )}
                     <p>
-                        <strong>Technicien :</strong> {`${intervention.technicien?.first_name ?? "Non défini"} ${intervention.technicien?.last_name ?? "Non défini"}`}
+                        <strong>Technicien :</strong> {`${intervention.technicien?.firstName ?? "Non défini"} ${intervention.technicien?.lastName ?? "Non défini"}`}
                     </p>
                     <p>
                         <strong>Type d’intervention :</strong> {intervention.typeIntervention?.nom ?? "Non défini"}

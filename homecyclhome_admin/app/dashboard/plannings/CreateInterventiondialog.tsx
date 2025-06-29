@@ -37,7 +37,7 @@ export default function CreateInterventionDialog({ isOpen, onClose, selectedDate
 
         try {
             await apiService("interventions", "POST", {
-                type_intervention: selectedTypeIntervention,
+                typeIntervention: selectedTypeIntervention,
                 debut: selectedDate, 
                 technicien: selectedTechnicien.id, 
             });

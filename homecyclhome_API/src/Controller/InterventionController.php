@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Service\InterventionBookingService;
+use App\Service\InterventionBatchGenerator;
 
 
 class InterventionController extends AbstractController
@@ -297,21 +299,20 @@ class InterventionController extends AbstractController
         Request $request,
         ModelePlanningRepository $modelePlanningRepository,
         UserRepository $userRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        InterventionBatchGenerator $generator
     ): JsonResponse 
     {
-
-        // Récupérer les données de la requête
         $data = json_decode($request->getContent(), true);
 
-        // Récupérer le modèle de planning
-        $idModele = $data["model"] ? intval($data["model"]) : NULL;
-        $modelePlanning = $modelePlanningRepository->find($idModele);
+        // Récupération du modèle de planning à partir de son identifiant
+        $idModele = $data["model"] ?? null;
+        $modelePlanning = $modelePlanningRepository->find((int)$idModele);
         if (!$modelePlanning) {
             return new JsonResponse(['error' => 'Modèle de planning introuvable.'], 404);
         }
 
-        // Valider les techniciens
+        // Validation et récupération des techniciens à partir de leurs identifiants
         if (!isset($data['technicians']) || !is_array($data['technicians'])) {
             return new JsonResponse(['error' => 'Les techniciens doivent être spécifiés sous forme de tableau d\'identifiants.'], 400);
         }
@@ -325,7 +326,7 @@ class InterventionController extends AbstractController
             $technicians[] = $technician;
         }
 
-        // Valider les dates "from" et "to"
+        // Validation et parsing des dates de début et de fin de la période à générer
         if (!isset($data['from'], $data['to'])) {
             return new JsonResponse(['error' => 'Les paramètres "from" et "to" doivent être spécifiés.'], 400);
         }
@@ -337,32 +338,24 @@ class InterventionController extends AbstractController
             return new JsonResponse(['error' => 'Les dates "from" et "to" doivent être valides et "from" ne peut pas être après "to".'], 400);
         }
 
-        // Générer les dates entre "from" et "to"
-        $interval = new \DateInterval('P1D'); // Intervalle d'un jour
+        // Génération d’un intervalle de dates (quotidien) sur la période donnée
+        $interval = new \DateInterval('P1D');
         $dateRange = new \DatePeriod($from, $interval, (clone $to)->modify('+1 day'));
 
-        // Créer les interventions
-        foreach ($dateRange as $date) {
-            foreach ($technicians as $technician) {
-                foreach ($modelePlanning->getModeleInterventions() as $modeleIntervention) {
-                    $intervention = new Intervention();
-                    $intervention->setDebut((clone $date)->setTime(
-                        (int)$modeleIntervention->getInterventionTime()->format('H'),
-                        (int)$modeleIntervention->getInterventionTime()->format('i'),
-                        0
-                    ));
-                    $intervention->setTypeIntervention($modeleIntervention->getTypeIntervention());
-                    $intervention->setTechnicien($technician);
-                    $entityManager->persist($intervention);
-                }
-            }
+        // Appel au service pour générer la liste des interventions selon le modèle, les techniciens et les dates
+        $interventions = $generator->generateInterventions($modelePlanning, $technicians, $dateRange);
+
+        // Persistance en base des interventions générées
+        foreach ($interventions as $intervention) {
+            $entityManager->persist($intervention);
         }
 
-        // Sauvegarde en base de données
         $entityManager->flush();
 
+        // Retour d’une réponse JSON indiquant le succès de l’opération
         return new JsonResponse(['success' => 'Interventions créées avec succès.'], 201);
     }
+
 
     #[Route('/api/interventions/available/{technicienId}', name: 'get_available_slots', methods: ['GET'])]
     public function getAvailableSlots(
@@ -403,76 +396,40 @@ class InterventionController extends AbstractController
         );
     }
 
-#[Route('/api/interventions/{id}/book', name: 'book_intervention', methods: ['POST'])]
-public function bookIntervention(
-    int $id,
-    Request $request,
-    EntityManagerInterface $em,
-    UserRepository $userRepo
-): JsonResponse {
-    $intervention = $em->getRepository(Intervention::class)->find($id);
-    if (!$intervention) {
-        return new JsonResponse(['error' => 'Intervention introuvable'], 404);
-    }
+    #[Route('/api/interventions/{id}/book', name: 'book_intervention', methods: ['POST'])]
+    public function bookIntervention(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        UserRepository $userRepo,
+        InterventionBookingService $bookingService
+    ): JsonResponse {
+        $intervention = $em->getRepository(Intervention::class)->find($id);
+        if (!$intervention) {
+            return new JsonResponse(['error' => 'Intervention introuvable'], 404);
+        }
 
-    $clientId = $request->request->get('clientId');
-    $client = $userRepo->find($clientId);
-    if (!$client) {
-        return new JsonResponse(['error' => 'Client introuvable'], 404);
-    }
+        $clientId = $request->request->get('clientId');
+        $client = $userRepo->find($clientId);
+        if (!$client) {
+            return new JsonResponse(['error' => 'Client introuvable'], 404);
+        }
 
-    $adresse = $request->request->get('adresse');
-    $marque = $request->request->get('marqueVelo');
-    $modele = $request->request->get('modeleVelo');
-
-    if (!$marque || !$modele || !$adresse) {
-        return new JsonResponse(['error' => 'Données incomplètes.'], 400);
-    }
-
-    $electrique = filter_var($request->request->get('electrique'), FILTER_VALIDATE_BOOLEAN);
-    $commentaire = $request->request->get('commentaire');
-
-    // Gestion de la photo
-    $photo = $request->files->get('photo');
-    if ($photo instanceof UploadedFile) {
         $uploadDir = $this->getParameter('upload_directory');
-        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!in_array($photo->getMimeType(), $allowedMimeTypes)) {
-            return new JsonResponse(['error' => 'Format de fichier non autorisé'], 400);
+        $data = $request->request->all();
+        $photo = $request->files->get('photo');
+
+        try {
+            $bookingService->bookIntervention($intervention, $client, $data, $photo, $uploadDir);
+        } catch (\DomainException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        } catch (\Throwable $e) {
+            // Erreur non gérée par le service (erreur système, etc.)
+            return new JsonResponse(['error' => "Une erreur s'est produite."], 500);
         }
 
-        if ($photo->getSize() > 5 * 1024 * 1024) {
-            return new JsonResponse(['error' => 'Fichier trop volumineux (max 5 Mo)'], 400);
-        }
+        $em->flush();
 
-        // Récupération l'ancien nom de fichier si il existe
-        $anciennePhoto = $intervention->getPhoto();
-
-        $filename = uniqid('velo_') . '.' . $photo->guessExtension();
-        $photo->move($uploadDir, $filename);
-
-        $intervention->setPhoto($filename);
-
-        // Suppression de l’ancienne photo si elle existe
-        if ($anciennePhoto) {
-            $ancienChemin = $uploadDir . '/' . $anciennePhoto;
-            if (file_exists($ancienChemin)) {
-                @unlink($ancienChemin);
-            }
-        }
+        return new JsonResponse(['message' => 'Intervention réservée'], 200);
     }
-
-    $intervention
-        ->setClient($client)
-        ->setVeloMarque($marque)
-        ->setVeloModele($modele)
-        ->setVeloElectrique($electrique)
-        ->setCommentaireClient($commentaire)
-        ->setAdresse($adresse);
-
-    $em->flush();
-
-    return new JsonResponse(['message' => 'Intervention réservée'], 200);
-}
-
 }

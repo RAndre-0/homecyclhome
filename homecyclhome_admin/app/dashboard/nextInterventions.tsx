@@ -5,13 +5,13 @@ import { apiService } from "@/services/api-service"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface NextIntervention {
-    intervention_id: number;
+    interventionId: number;
     adresse: string;
     debut: string;
     fin: string;
-    technicien_prenom: string;
-    technicien_nom: string;
-    type_intervention: string;
+    technicienPrenom: string;
+    technicienNom: string;
+    typeIntervention: string;
 }
 
 export function NextInterventions() {
@@ -69,10 +69,10 @@ export function NextInterventions() {
             <CardContent>
                 <ul>
                     {interventions.map((intervention) => (
-                        <div key={intervention.intervention_id} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.type_intervention === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
+                        <div key={intervention.interventionId} className={`mb-4 rounded-lg p-3 border-x-4 flex flex-row justify-between ${intervention.typeIntervention === "Maintenance" ? "border-emerald-400" : "border-cyan-200"}`}>
                             <div>
-                                <p><strong>{intervention.type_intervention}</strong></p>
-                                <p>{intervention.technicien_prenom} {intervention.technicien_nom}</p>
+                                <p><strong>{intervention.typeIntervention}</strong></p>
+                                <p>{intervention.technicienPrenom} {intervention.technicienNom}</p>
                                 <p>{intervention.adresse}</p>
                                 <p>{new Date(intervention.debut).toLocaleString()}</p>
                             </div>

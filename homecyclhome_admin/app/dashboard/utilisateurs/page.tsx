@@ -43,8 +43,8 @@ export type User = {
   id: number;
   email: string;
   roles: string[];
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -75,7 +75,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Nom complet",
     cell: ({ row }) => {
       const user = row.original;
-      return `${user.first_name} ${user.last_name}`;
+      return `${user.firstName} ${user.lastName}`;
     },
   },
   {

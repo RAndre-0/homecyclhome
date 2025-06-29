@@ -57,7 +57,7 @@ export default function TechnicienSelector({ onTechnicienChange, defaultTechnici
         </SelectItem>
         {techniciens.map((technicien) => (
           <SelectItem key={technicien.id} value={technicien.id.toString()}>
-            {technicien.first_name} {technicien.last_name}
+            {technicien.firstName} {technicien.lastName}
           </SelectItem>
         ))}
       </SelectContent>

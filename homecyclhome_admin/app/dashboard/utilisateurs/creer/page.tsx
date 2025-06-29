@@ -1,6 +1,6 @@
 "use client";
 
-import { apiService } from "@/services/api-service";
+import { apiService, convertKeysToSnake } from "@/services/api-service";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -37,8 +37,8 @@ export default function CreateUser() {
             email: "",
             password: "",
             roles: [],
-            first_name: "",
-            last_name: "",
+            firstName: "",
+            lastName: "",
         },
     });
 
@@ -47,7 +47,7 @@ export default function CreateUser() {
         console.log("Payload envoyé :", values);
         setLoading(true);
         try {
-            await apiService(`users`, "POST", values);
+            await apiService(`users`, "POST", convertKeysToSnake(values));
             toast({
                 title: "Utilisateur créé avec succès",
                 description: "Un utilisateur a bien été ajouté à l'application.",
@@ -81,7 +81,7 @@ export default function CreateUser() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField
                             control={form.control}
-                            name="first_name"
+                            name="firstName"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Prénom</FormLabel>
@@ -94,7 +94,7 @@ export default function CreateUser() {
                         />
                         <FormField
                             control={form.control}
-                            name="last_name"
+                            name="lastName"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Nom</FormLabel>

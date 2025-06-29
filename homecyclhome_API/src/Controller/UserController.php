@@ -37,6 +37,7 @@ class UserController extends AbstractController
 
     //     return new JsonResponse($liste_users, Response::HTTP_OK, [], true);
     // }
+    #[Route('/api/users', name: 'users_all', methods: ["GET"])]
     #[Route('/api/users/role-{role?}', name: 'users', methods: ["GET"])]
     public function getUsers(
         UserRepository $userRepository,

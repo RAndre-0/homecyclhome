@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { apiService } from "@/services/api-service";
+import { apiService, convertKeysToCamel } from "@/services/api-service";
 import { TypeIntervention } from "@/types/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -25,12 +25,14 @@ export default function ModelesDePlanning() {
         const fetchModels = async () => {
             try {
                 const data = await apiService("modeles-planning", "GET");
+
                 const detailedModels = await Promise.all(
                     data.map(async (model: { id: number; name: string }) => {
                         const detailedModel = await apiService(`modeles-planning/${model.id}`, "GET");
-                        return detailedModel;
+                        return convertKeysToCamel(detailedModel);
                     })
                 );
+
                 setModels(detailedModels);
                 setLoading(false);
             } catch (error) {
@@ -73,7 +75,7 @@ export default function ModelesDePlanning() {
     if (error) {
         return <div>{error}</div>;
     }
-
+    
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-row gap-5">

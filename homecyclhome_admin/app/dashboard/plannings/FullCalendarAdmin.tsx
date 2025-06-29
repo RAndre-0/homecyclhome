@@ -6,7 +6,7 @@ import frLocale from "@fullcalendar/core/locales/fr";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useEffect, useState } from "react";
-import { apiService } from "@/services/api-service";
+import { apiService, convertKeysToCamel } from "@/services/api-service";
 import { Intervention, Technicien } from "@/types/types";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -51,7 +51,7 @@ export default function FullCalendarAdmin({ selectedTechnicien, onRefresh }: Cal
     info.jsEvent.preventDefault(); // Empêche la navigation par défaut
     const clickedIntervention = interventions.find(intervention => intervention.id === parseInt(info.event.id));
     if (clickedIntervention) {
-        setSelectedIntervention(clickedIntervention);
+        setSelectedIntervention(convertKeysToCamel(clickedIntervention)); // Convertit les clés en camelCase
         setDialogOpen(true);
     }
 };
@@ -70,7 +70,7 @@ export default function FullCalendarAdmin({ selectedTechnicien, onRefresh }: Cal
         weekends={false}
         events={interventions.map((intervention) => ({
           id: intervention.id.toString(),
-          title: intervention.type_intervention?.nom ?? 'Intervention',
+          title: intervention.typeIntervention?.nom ?? 'Intervention',
           start: intervention.debut,
           end: intervention.fin || undefined,
           color: intervention.client ? "#3e69a0" : "#757575",

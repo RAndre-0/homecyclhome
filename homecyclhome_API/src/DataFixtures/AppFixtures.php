@@ -19,6 +19,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $userPasswordHasher;
     public function __construct(private HttpClientInterface $client, UserPasswordHasherInterface $userPasswordHasher) {
             $this->userPasswordHasher = $userPasswordHasher;
     }

@@ -7,6 +7,19 @@ interface RequestOptions {
   body?: any;
 }
 
+export const convertKeysToCamel = (input: any): any => {
+  if (Array.isArray(input)) {
+    return input.map(convertKeysToCamel);
+  } else if (input && typeof input === 'object') {
+    return Object.entries(input).reduce((acc, [key, value]) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+      acc[camelKey] = convertKeysToCamel(value);
+      return acc;
+    }, {} as Record<string, any>);
+  }
+  return input;
+};
+
 export const apiService = async (endpoint: string, method: HttpMethod, body?: any) => {
   try {
     const token = getCookie('token') as string | undefined;
@@ -16,7 +29,7 @@ export const apiService = async (endpoint: string, method: HttpMethod, body?: an
     }
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_ROUTE}${endpoint}`, {
-      method: method,
+      method,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -25,22 +38,35 @@ export const apiService = async (endpoint: string, method: HttpMethod, body?: an
     });
 
     if (!response.ok) {
-      // Récupère le message d'erreur pour faciliter le débogage
       const errorText = await response.text();
       throw new Error(`Request failed: ${response.status} - ${errorText}`);
     }
 
-    // Vérifier si la réponse contient du JSON
     const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      return await response.json();
+
+    if (contentType?.includes("application/json")) {
+      const rawData = await response.json();
+      return convertKeysToCamel(rawData); // Conversion en camel case
     }
 
-    // Retourne null si aucune donnée JSON n'est présente
+    // Pour les cas comme des blobs ou du texte
     return null;
 
   } catch (error) {
     console.error("API Service Error:", error);
     throw error;
   }
+};
+
+export const convertKeysToSnake = (input: any): any => {
+  if (Array.isArray(input)) {
+    return input.map(convertKeysToSnake);
+  } else if (input && typeof input === 'object') {
+    return Object.entries(input).reduce((acc, [key, value]) => {
+      const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+      acc[snakeKey] = convertKeysToSnake(value);
+      return acc;
+    }, {} as Record<string, any>);
+  }
+  return input;
 };
